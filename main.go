@@ -95,11 +95,8 @@ func run() error {
 		CloseToTray: st.CloseToTray && giode.TraySupported(),
 		// Started at login (Settings → Start in the tray), the window
 		// stays hidden and only the tray icon shows.
-		StartInTray: giode.StartInTrayAtLogin,
-		SingleInstanceLock: &giode.SingleInstanceLock{
-			UniqueID:               "com.middlelan.app",
-			OnSecondInstanceLaunch: func() { app.ShowWindow() },
-		},
+		StartInTray:        giode.StartInTrayAtLogin,
+		SingleInstanceLock: singleInstance(func() { app.ShowWindow() }),
 		OnReady: func() {
 			if giode.LaunchedAtLogin() && giode.TraySupported() {
 				collector.SetVisible(false)
@@ -174,6 +171,18 @@ func dataDir() (string, error) {
 		return "", fmt.Errorf("data folder: %w", err)
 	}
 	return dir, nil
+}
+
+// singleInstance keeps a second launch on desktops from starting another
+// monitor; it brings the running window forward instead. Android already
+// runs one instance per app, and giode's lock file lives in the temp
+// folder, which Android apps can't write: there the lock would report
+// "already running" and the app would exit before opening.
+func singleInstance(show func()) *giode.SingleInstanceLock {
+	if isAndroid {
+		return nil
+	}
+	return &giode.SingleInstanceLock{UniqueID: "com.middlelan.app", OnSecondInstanceLaunch: show}
 }
 
 func notify(app *giode.App, title, body string) {
