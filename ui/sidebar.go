@@ -2,6 +2,7 @@ package ui
 
 import (
 	"github.com/mehran9675/giode"
+	props "github.com/mehran9675/giode/styles/properties"
 )
 
 // sidebar is the desktop navigation: the brand, the pages and the
@@ -14,10 +15,13 @@ type sidebar struct {
 
 func newSidebar(sh *Shell) *sidebar {
 	sb := &sidebar{shell: sh}
-	for _, n := range navItems {
-		n := n
+	for i, n := range navItems {
+		hint := giode.FormatShortcut(navShortcut(i))
+		if n.screen == screenSettings {
+			hint = giode.FormatShortcut("Mod+,")
+		}
 		sb.items = append(sb.items, giode.Pressable(func(s giode.PressState) giode.Element {
-			return sb.itemView(n, s)
+			return sb.itemView(n, hint, s)
 		}).Label(n.label).OnClick(func(giode.ClickEvent) { sh.navigate(n.screen) }))
 	}
 	sb.pause = giode.Pressable(func(s giode.PressState) giode.Element {
@@ -26,7 +30,8 @@ func newSidebar(sh *Shell) *sidebar {
 	return sb
 }
 
-func (sb *sidebar) itemView(n navItem, s giode.PressState) giode.Element {
+// itemView draws a page link; hovering shows its keyboard shortcut.
+func (sb *sidebar) itemView(n navItem, hint string, s giode.PressState) giode.Element {
 	active := sb.shell.current == n.screen || (n.screen == screenApps && sb.shell.current == screenAppDetail)
 	bg, fg, ic := giode.Color("transparent"), giode.Color("theme.muted"), giode.Color("theme.muted")
 	switch {
@@ -36,11 +41,12 @@ func (sb *sidebar) itemView(n navItem, s giode.PressState) giode.Element {
 		bg, fg = colHover, "theme.text"
 	}
 	return giode.Row(giode.Styles{
-		Align: giode.AlignCenter, Gap: 12, Padding: giode.SymmetricInset(12, 10), Background: bg, BorderRadius: 10, Width: -1,
+		Align: giode.AlignCenter, Gap: 12, Padding: giode.SymmetricInset(12, 10), Background: bg, BorderRadius: 10, Width: -1, Wrap: giode.WrapNoWrap,
 	},
 		giode.Box(giode.Styles{Width: 3, Height: 18, BorderRadius: 2, Background: map[bool]giode.Color{true: "theme.primary", false: "transparent"}[active]}),
 		giode.Icon(n.icon, giode.Styles{Width: 18, Color: ic}),
-		giode.Text(n.label, giode.Styles{Color: fg, FontSize: sizeBody, FontWeight: giode.FontWeightMedium}),
+		giode.Text(n.label, giode.Styles{Color: fg, FontSize: sizeBody, FontWeight: giode.FontWeightMedium, FlexGrow: 1}),
+		giode.Text(hint, giode.Styles{Color: "theme.muted", FontSize: sizeTiny, Visibility: map[bool]props.Visibility{true: "", false: giode.VisibilityHidden}[s.Hovered]}),
 	)
 }
 

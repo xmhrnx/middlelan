@@ -3,10 +3,9 @@ package ui
 import (
 	"gioui.org/layout"
 	"github.com/mehran9675/giode"
-	props "github.com/mehran9675/giode/styles/properties"
 )
 
-// cardElement is a card that a grid can stretch to the height of the
+// cardElement is a card; a grid stretches it to the height of the
 // tallest card in its row.
 type cardElement struct {
 	st   giode.Styles
@@ -15,12 +14,6 @@ type cardElement struct {
 
 func (c cardElement) Layout(gtx layout.Context) layout.Dimensions {
 	return giode.Box(c.st, c.kids...).Layout(gtx)
-}
-
-// withHeight is the card at a fixed height in dp; its content keeps its
-// place at the top.
-func (c cardElement) withHeight(h int) giode.Element {
-	return giode.Box(c.st.With(giode.Styles{Height: props.Height(h)}), c.kids...)
 }
 
 // card is a rounded surface with an optional title row.

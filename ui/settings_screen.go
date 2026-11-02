@@ -8,7 +8,6 @@ import (
 	"github.com/mehran9675/giode/components/scroll"
 	"github.com/mehran9675/giode/components/segmented"
 	"github.com/mehran9675/giode/components/toggle"
-	"github.com/xmhrnx/middlelan/internal/autostart"
 	"github.com/xmhrnx/middlelan/internal/settings"
 )
 
@@ -58,7 +57,16 @@ func newSettingsScreen(sh *Shell) *settingsScreen {
 	s.newDevs = sw("Notify when a new device joins the network", cur.NotifyNewDevices, func(st *settings.Settings, v bool) { st.NotifyNewDevices = v })
 	s.bgScan = sw("Scan the network in the background", cur.BackgroundScan, func(st *settings.Settings, v bool) { st.BackgroundScan = v })
 	s.fast = sw("Faster live updates (every second)", cur.FastSampling, func(st *settings.Settings, v bool) { st.FastSampling = v })
-	s.login = sw("Start hidden when I log in", cur.StartAtLogin, func(st *settings.Settings, v bool) { st.StartAtLogin = v })
+	// The system holds the login registration (the user can change it
+	// there too), so the switch reads it rather than a saved setting.
+	s.login = giode.Input.Switch("Start in the tray when I log in", giode.Styles{Color: "theme.text", FontSize: sizeBody, Width: -1})
+	s.login.SetChecked(!isMobile && sh.svc.App.LaunchAtLogin())
+	s.login.OnChange(func(on bool) {
+		if err := sh.svc.App.SetLaunchAtLogin(on); err != nil {
+			sh.Toast(giode.ToastWarning, "Couldn't change the login item: "+err.Error())
+			s.login.SetChecked(sh.svc.App.LaunchAtLogin())
+		}
+	})
 	s.tray = sw("Keep monitoring when the window is closed", cur.CloseToTray, func(st *settings.Settings, v bool) { st.CloseToTray = v })
 	s.keepAlive = sw("Keep monitoring in the background", cur.KeepAliveAndroid, func(st *settings.Settings, v bool) { st.KeepAliveAndroid = v })
 	s.scanEvery = giode.Input.Select(styleField.With(giode.Styles{Width: 160}), "Every 5 minutes", "Every 15 minutes", "Every 30 minutes", "Every hour").OnChange(func(i int) {
@@ -95,10 +103,7 @@ func (s *settingsScreen) content() giode.Element {
 	if isMobile {
 		monitoring = append(monitoring, s.keepAlive, note("Shows an ongoing notification while monitoring in the background."))
 	} else {
-		monitoring = append(monitoring, s.tray)
-		if autostart.Supported() {
-			monitoring = append(monitoring, s.login)
-		}
+		monitoring = append(monitoring, s.tray, s.login)
 	}
 	return pageBody(
 		pageHeader("Settings", "Make MiddleLAN yours"),
@@ -141,16 +146,8 @@ func (sh *Shell) ApplySettings() {
 	} else {
 		sh.svc.Collector.SetInterval(0)
 	}
-	if autostart.Supported() {
-		var err error
-		if st.StartAtLogin {
-			err = autostart.Enable()
-		} else {
-			err = autostart.Disable()
-		}
-		if err != nil {
-			sh.Toast(giode.ToastWarning, "Couldn't change the login item: "+err.Error())
-		}
+	if !isMobile {
+		sh.svc.App.SetCloseToTray(st.CloseToTray && giode.TraySupported())
 	}
 	if sh.OnSettingsChanged != nil {
 		sh.OnSettingsChanged(st)

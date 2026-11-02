@@ -27,7 +27,7 @@ func newWindowBar(sh *Shell) *titlebar.TitleBar {
 				ratePair(formatRate(snap.RateRx), formatRate(snap.RateTx), 11)).Layout(gtx)
 		})).
 		OnClose(func() bool {
-			if sh.svc.Settings.Get().CloseToTray && giode.TraySupported() {
+			if sh.svc.App.CloseToTray() {
 				sh.svc.App.HideWindow()
 				sh.svc.Collector.SetVisible(false)
 				return false

@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"context"
 	"time"
 
 	"github.com/mehran9675/giode"
@@ -26,7 +25,7 @@ func newDevicesScreen(sh *Shell) *devicesScreen {
 			sh.svc.Scanner.Stop()
 			return
 		}
-		sh.svc.Scanner.Start(context.Background())
+		sh.svc.Scanner.Start(sh.ctx)
 	})
 	d.filter = giode.Input.Segmented("Online", "All")
 	d.scroll = giode.Scroll(d.content, giode.Styles{Width: -1, Height: -1, ScrollBar: giode.ScrollBar{AutoHide: true, Width: 6}})

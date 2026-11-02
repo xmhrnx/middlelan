@@ -26,8 +26,6 @@ type Settings struct {
 	ScanEveryMinutes int `json:"scanEveryMinutes"`
 	// FastSampling samples every second instead of every two.
 	FastSampling bool `json:"fastSampling"`
-	// StartAtLogin starts MiddleLAN hidden when the user logs in.
-	StartAtLogin bool `json:"startAtLogin"`
 	// CloseToTray keeps monitoring when the window is closed.
 	CloseToTray bool `json:"closeToTray"`
 	// KeepAliveAndroid keeps monitoring in the background on Android.
