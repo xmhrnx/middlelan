@@ -33,6 +33,11 @@ func (c Conn) Listening() bool {
 	return c.State == "LISTEN" || c.RemoteIP == "" || c.RemoteIP == "0.0.0.0" || c.RemoteIP == "::" || c.RemotePort == 0
 }
 
+// Closed reports whether the connection has ended; it's still reported
+// for one sample (by sources that see closes, like the Android VPN) so
+// its last bytes are counted.
+func (c Conn) Closed() bool { return c.State == "CLOSED" }
+
 // ByteCount is a pair of cumulative byte counters.
 type ByteCount struct{ Rx, Tx uint64 }
 

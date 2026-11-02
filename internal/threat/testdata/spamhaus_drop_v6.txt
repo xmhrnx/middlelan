@@ -1,0 +1,8 @@
+; Spamhaus IPv6 DROP List 2026/11/02 - (c) 2026 The Spamhaus Project SLU
+; https://www.spamhaus.org/drop/drop_v6.txt
+
+2a06:5280::/29 ; SBL474196
+2a07:9944::/30 ; SBL593430
+2001:db8::/32 ; SBL000001
+fc00::/7 ; SBL000002
+2a0d:a3c0::/29 ; SBL610000

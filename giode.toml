@@ -29,7 +29,10 @@ permissions = [
   "android.permission.PACKAGE_USAGE_STATS",           # per-app traffic (granted in Settings → Usage access)
 ]
 keep_alive = true            # foreground service for background monitoring
-java = ["android/java"]      # NetStats.java: per-app usage through NetworkStatsManager
+java = ["android/java"]      # NetStats, Wi-Fi, widget, permission and VPN helpers
+# Manifest entries and resources giode doesn't generate (home screen widget,
+# location permission prompt). Rebuild with android/aar/build-aar.sh.
+libraries = ["android/libs/middlelan.aar"]
 # keystore = "release.keystore"   # created by giode keystore; signs giode build -release
 
 [macos]

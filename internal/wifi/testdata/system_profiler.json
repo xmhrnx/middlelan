@@ -1,0 +1,72 @@
+{
+  "SPAirPortDataType" : [
+    {
+      "spairport_airport_interfaces" : [
+        {
+          "_name" : "en0",
+          "spairport_airport_other_local_wireless_networks" : [
+            {
+              "_name" : "Neighbour",
+              "spairport_network_channel" : "6 (2GHz, 20MHz)",
+              "spairport_network_phymode" : "802.11b/g/n",
+              "spairport_network_type" : "spairport_network_type_station",
+              "spairport_security_mode" : "spairport_security_mode_wpa2_personal",
+              "spairport_signal_noise" : "-71 dBm / -95 dBm"
+            },
+            {
+              "_name" : "Office6E",
+              "spairport_network_channel" : "37 (6GHz, 160MHz)",
+              "spairport_network_phymode" : "802.11ax",
+              "spairport_network_type" : "spairport_network_type_station",
+              "spairport_security_mode" : "spairport_security_mode_wpa3_personal",
+              "spairport_signal_noise" : "-80 dBm / -95 dBm"
+            },
+            {
+              "_name" : "FreeWiFi",
+              "spairport_network_channel" : "11 (2GHz, 20MHz)",
+              "spairport_network_phymode" : "802.11g/n",
+              "spairport_network_type" : "spairport_network_type_station",
+              "spairport_security_mode" : "spairport_security_mode_none"
+            }
+          ],
+          "spairport_current_network_information" : {
+            "_name" : "HomeNet",
+            "spairport_network_channel" : "149 (5GHz, 80MHz)",
+            "spairport_network_country_code" : "US",
+            "spairport_network_mcs" : 9,
+            "spairport_network_phymode" : "802.11ac",
+            "spairport_network_rate" : 867,
+            "spairport_network_type" : "spairport_network_type_station",
+            "spairport_security_mode" : "spairport_security_mode_wpa3_transition",
+            "spairport_signal_noise" : "-52 dBm / -93 dBm"
+          },
+          "spairport_status_information" : "spairport_status_connected",
+          "spairport_supported_channels" : [
+            "1 (2GHz)",
+            "36 (5GHz)"
+          ],
+          "spairport_supported_phymodes" : "802.11 a/b/g/n/ac/ax",
+          "spairport_wireless_card_type" : "Wi-Fi (0x14E4, 0x4378)",
+          "spairport_wireless_country_code" : "US",
+          "spairport_wireless_firmware_version" : "wl0: Jan 14 2024 17:49:57 version 18.20.439.0.7.8.170",
+          "spairport_wireless_locale" : "FCC",
+          "spairport_wireless_mac_address" : "f0:2f:4b:12:34:56"
+        },
+        {
+          "_name" : "awdl0",
+          "spairport_supported_phymodes" : "802.11 a/b/g/n/ac/ax",
+          "spairport_wireless_mac_address" : "6e:12:34:56:78:9a"
+        }
+      ],
+      "spairport_software_information" : {
+        "spairport_corewlan_version" : "16.0 (1657)",
+        "spairport_corewlankit_version" : "16.0 (1657)",
+        "spairport_diagnostics_version" : "11.0 (1163)",
+        "spairport_extra_version" : "17.0 (1728)",
+        "spairport_family_version" : "12.0 (1200.13.0)",
+        "spairport_profiler_version" : "15.0 (1502)",
+        "spairport_utility_version" : "6.3 (630.35)"
+      }
+    }
+  ]
+}

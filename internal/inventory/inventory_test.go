@@ -23,3 +23,16 @@ func TestMergeReportsNewDevices(t *testing.T) {
 		t.Fatalf("IP-only device re-keyed by MAC reported as new: %+v", n)
 	}
 }
+
+func TestPresenceEvents(t *testing.T) {
+	inv := Open("")
+	t0 := time.Now()
+	inv.Merge([]Device{{IP: "10.0.0.2", MAC: "aa:00:00:00:00:02"}}, t0)
+	inv.Merge([]Device{{IP: "10.0.0.2", MAC: "aa:00:00:00:00:02"}}, t0.Add(time.Minute))
+	inv.Merge(nil, t0.Add(2*time.Minute))
+	inv.Merge([]Device{{IP: "10.0.0.2", MAC: "aa:00:00:00:00:02"}}, t0.Add(3*time.Minute))
+	ev := inv.Events("aa:00:00:00:00:02")
+	if len(ev) != 3 || !ev[0].Online || ev[1].Online || !ev[2].Online {
+		t.Fatalf("%+v", ev)
+	}
+}

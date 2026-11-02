@@ -41,3 +41,22 @@ func TestCollectorAttributes(t *testing.T) {
 		t.Fatalf("dest: %+v", d)
 	}
 }
+
+func TestStoreHourly(t *testing.T) {
+	s := OpenStore("")
+	now := time.Date(2026, 11, 2, 15, 30, 0, 0, time.Local)
+	s.Add("a", now, 100, 10)
+	s.Add("b", now.Add(-time.Hour), 50, 5)
+	h := s.Hourly("", 3, now)
+	if len(h) != 3 || h[2].Rx != 100 || h[1].Rx != 50 || h[0].Rx != 0 {
+		t.Fatalf("%+v", h)
+	}
+	if a := s.Hourly("a", 2, now); a[1].Tx != 10 || a[0].Tx != 0 {
+		t.Fatalf("%+v", a)
+	}
+	s.SetToday("c", now, ByteCount{Rx: 70})
+	s.SetToday("c", now, ByteCount{Rx: 100})
+	if got := s.HourApps(now)["c"].Rx; got != 100 {
+		t.Fatalf("SetToday hourly share %d", got)
+	}
+}

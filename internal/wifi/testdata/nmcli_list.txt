@@ -1,0 +1,7 @@
+no:Cafe\: Guest:AA\:BB\:CC\:DD\:EE\:01:82:2437 MHz:6::54 Mbit/s:wlp2s0
+yes:HomeNet:AA\:BB\:CC\:DD\:EE\:02:75:5180 MHz:36:WPA2:540 Mbit/s:wlp2s0
+no:Neighbour:AA\:BB\:CC\:DD\:EE\:03:44:2412 MHz:1:WPA1 WPA2:130 Mbit/s:wlp2s0
+no:Office:AA\:BB\:CC\:DD\:EE\:04:30:5955 MHz:1:WPA3:1201 Mbit/s:wlp2s0
+no:Corp:AA\:BB\:CC\:DD\:EE\:05:60:5745 MHz:149:WPA2 802.1X:405 Mbit/s:wlp2s0
+no:Back\\slash:AA\:BB\:CC\:DD\:EE\:06:20:2462 MHz:11:WEP:54 Mbit/s:wlp2s0
+no::AA\:BB\:CC\:DD\:EE\:07:55:2437 MHz:6:WPA2 WPA3:270 Mbit/s:wlp2s0
