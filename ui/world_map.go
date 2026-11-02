@@ -5,8 +5,8 @@ import (
 	"math"
 	"sync"
 
-	"github.com/mehran9675/giode"
-	props "github.com/mehran9675/giode/styles/properties"
+	"github.com/xmhrnx/giode"
+	props "github.com/xmhrnx/giode/styles/properties"
 	"github.com/xmhrnx/middlelan/assets"
 )
 

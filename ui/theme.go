@@ -4,7 +4,7 @@
 package ui
 
 import (
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 )
 
 // Palettes. Download traffic is always cyan and upload violet, so the two

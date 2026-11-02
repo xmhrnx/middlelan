@@ -4,10 +4,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/dialog"
-	"github.com/mehran9675/giode/components/input"
-	"github.com/mehran9675/giode/components/toggle"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/dialog"
+	"github.com/xmhrnx/giode/components/input"
+	"github.com/xmhrnx/giode/components/toggle"
 	"github.com/xmhrnx/middlelan/internal/inventory"
 	"github.com/xmhrnx/middlelan/internal/nettools"
 )

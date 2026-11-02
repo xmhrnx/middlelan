@@ -5,8 +5,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/titlebar"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/titlebar"
 	"github.com/xmhrnx/middlelan/internal/alerts"
 	"github.com/xmhrnx/middlelan/internal/dnslog"
 	"github.com/xmhrnx/middlelan/internal/firewall"

@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/mehran9675/giode"
+import "github.com/xmhrnx/giode"
 
 // bottomNav is the phone navigation bar.
 type bottomNav struct {

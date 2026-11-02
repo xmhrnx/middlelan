@@ -10,7 +10,7 @@ import "C"
 import (
 	"unsafe"
 
-	"github.com/mehran9675/giode/android"
+	"github.com/xmhrnx/giode/android"
 )
 
 // The JNI glue: calls into com.middlelan.app.VpnBridge and its native

@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/mehran9675/giode"
+import "github.com/xmhrnx/giode"
 
 // toolFrame is the common layout of a tool page: the title with a back
 // button, the form, then the results.

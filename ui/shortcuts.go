@@ -3,7 +3,7 @@ package ui
 import (
 	"strconv"
 
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 )
 
 // navShortcut is the key that opens the i-th page of the navigation:

@@ -2,7 +2,7 @@
 
 package ui
 
-import "github.com/mehran9675/giode/android"
+import "github.com/xmhrnx/giode/android"
 
 const widgetClass = "com/middlelan/app/UsageWidget"
 

@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 
 	"github.com/xmhrnx/middlelan/assets"
 	"github.com/xmhrnx/middlelan/internal/monitor"

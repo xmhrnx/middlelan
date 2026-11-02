@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehran9675/giode/update"
+	"github.com/xmhrnx/giode/update"
 )
 
 // releasesAPI is the repository's latest-release endpoint.

@@ -3,8 +3,8 @@ package ui
 import (
 	"gioui.org/layout"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/titlebar"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/titlebar"
 )
 
 // newWindowBar builds the custom title bar of the frameless desktop window:

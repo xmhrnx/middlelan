@@ -4,11 +4,11 @@ import (
 	"io"
 	"time"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/dropdown"
-	"github.com/mehran9675/giode/components/scroll"
-	"github.com/mehran9675/giode/components/segmented"
-	"github.com/mehran9675/giode/components/toggle"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/dropdown"
+	"github.com/xmhrnx/giode/components/scroll"
+	"github.com/xmhrnx/giode/components/segmented"
+	"github.com/xmhrnx/giode/components/toggle"
 	"github.com/xmhrnx/middlelan/internal/export"
 	"github.com/xmhrnx/middlelan/internal/settings"
 )

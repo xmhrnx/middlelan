@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 )
 
 // netInfoTool shows this device's network configuration.

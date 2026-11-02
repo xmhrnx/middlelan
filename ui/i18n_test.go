@@ -3,7 +3,7 @@ package ui
 import (
 	"testing"
 
-	"github.com/mehran9675/giode/i18n"
+	"github.com/xmhrnx/giode/i18n"
 	"github.com/xmhrnx/middlelan/locales"
 )
 

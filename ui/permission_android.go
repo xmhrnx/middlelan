@@ -2,7 +2,7 @@
 
 package ui
 
-import "github.com/mehran9675/giode/android"
+import "github.com/xmhrnx/giode/android"
 
 // requestLocationPermission asks for location access, which Android
 // requires before telling apps Wi-Fi network names.

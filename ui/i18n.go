@@ -3,12 +3,12 @@ package ui
 import (
 	"time"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/dropdown"
-	"github.com/mehran9675/giode/components/input"
-	"github.com/mehran9675/giode/components/segmented"
-	"github.com/mehran9675/giode/components/toggle"
-	"github.com/mehran9675/giode/i18n"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/dropdown"
+	"github.com/xmhrnx/giode/components/input"
+	"github.com/xmhrnx/giode/components/segmented"
+	"github.com/xmhrnx/giode/components/toggle"
+	"github.com/xmhrnx/giode/i18n"
 )
 
 // The interface is translated with giode.Intl, the English text itself

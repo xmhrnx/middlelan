@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/mehran9675/giode"
+import "github.com/xmhrnx/giode"
 
 // topBar is the phone header: the brand, live rates and settings.
 type topBar struct {

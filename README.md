@@ -2,7 +2,7 @@
 
 **See every connection. Know every device.**
 
-MiddleLAN is a cross-platform network monitor built with [Giode](https://github.com/mehran9675/giode)
+MiddleLAN is a cross-platform network monitor built with [Giode](https://github.com/xmhrnx/giode)
 (Go + Gio, GPU-rendered, no webview). It watches every app's network connections, shows where
 each one connects (host, owner, country, map), finds the devices on your local network, and
 includes a full toolbox of network diagnostics.
@@ -97,7 +97,7 @@ update feed (`giode update-key`, then `[update]` in giode.toml) they also instal
 You need Go 1.26+ and the Giode CLI:
 
 ```sh
-go install github.com/mehran9675/giode-cli/cmd/giode@latest
+go install github.com/xmhrnx/giode-cli/cmd/giode@latest
 giode doctor            # what this computer still needs per platform
 giode run               # run on this computer
 giode run android       # build, install and launch on a connected phone

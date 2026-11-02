@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 )
 
 // destinationRow is one owner apps talk to: name, place and apps.

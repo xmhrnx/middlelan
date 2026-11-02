@@ -4,10 +4,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/dropdown"
-	"github.com/mehran9675/giode/components/input"
-	"github.com/mehran9675/giode/components/segmented"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/dropdown"
+	"github.com/xmhrnx/giode/components/input"
+	"github.com/xmhrnx/giode/components/segmented"
 	"github.com/xmhrnx/middlelan/internal/monitor"
 )
 

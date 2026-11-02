@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehran9675/giode/android"
+	"github.com/xmhrnx/giode/android"
 	"github.com/xmhrnx/middlelan/internal/vpn"
 )
 

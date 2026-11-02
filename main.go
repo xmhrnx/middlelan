@@ -18,7 +18,7 @@ import (
 	"gioui.org/font"
 	"gioui.org/font/gofont"
 	"gioui.org/font/opentype"
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 
 	"github.com/xmhrnx/middlelan/assets"
 	"github.com/xmhrnx/middlelan/internal/alerts"

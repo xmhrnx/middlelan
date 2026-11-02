@@ -5,7 +5,7 @@ package wifi
 import (
 	"context"
 
-	"github.com/mehran9675/giode/android"
+	"github.com/xmhrnx/giode/android"
 )
 
 // The Java side is android/java/com/middlelan/app/WifiInfo.java.
