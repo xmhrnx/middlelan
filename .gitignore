@@ -1,0 +1,6 @@
+/dist/
+*.keystore
+*.jks
+*.syso
+/middlelan
+/MiddleLAN.exe

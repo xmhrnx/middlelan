@@ -1,0 +1,54 @@
+# giode.toml configures how the giode CLI builds MiddleLAN.
+# Reference: https://github.com/mehran9675/giode-cli#giodetoml
+
+[app]
+name = "MiddleLAN"
+id = "com.middlelan.app"
+version = "1.0.0"
+build = 1
+icon = "assets/icon.png"
+package = "."
+platforms = ["windows", "macos", "linux", "android"]
+publisher = "MiddleLAN"
+description = "See which apps use your network, where they connect, and every device on your LAN."
+website = "https://github.com/xmhrnx/middlelan"
+
+[android]
+min_sdk = 23                 # NetworkStatsManager (per-app usage) needs Android 6
+target_sdk = 35
+# Adaptive icon: a full-bleed background layer and a foreground kept inside
+# the 66dp safe zone, so launchers never draw a white frame around it.
+icon_foreground = "assets/android-foreground.png"
+icon_background = "assets/android-background.png"
+icon_monochrome = "assets/android-monochrome.png"
+permissions = [
+  "network",
+  "networkstate",
+  "android.permission.ACCESS_WIFI_STATE",
+  "android.permission.CHANGE_WIFI_MULTICAST_STATE",   # mDNS / Bonjour discovery
+  "android.permission.PACKAGE_USAGE_STATS",           # per-app traffic (granted in Settings → Usage access)
+]
+keep_alive = true            # foreground service for background monitoring
+java = ["android/java"]      # NetStats.java: per-app usage through NetworkStatsManager
+# keystore = "release.keystore"   # created by giode keystore; signs giode build -release
+
+[macos]
+min_os = 11
+# identity = "Developer ID Application: Your Name (TEAMID)"
+# notary_id = "you@example.com"
+# notary_team_id = "TEAMID"
+
+[windows]
+arch = "amd64"
+
+[windows.installer]
+desktop_shortcut = true
+# per_machine = true
+
+[windows.signing]
+# certificate = "codesign.pfx"
+# timestamp = "http://timestamp.digicert.com"
+
+[linux]
+categories = ["Network", "Monitor", "Utility"]
+license = "Apache-2.0"
