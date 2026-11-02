@@ -240,10 +240,14 @@ func (c *Collector) attribute(smp Sample, now time.Time, first bool) map[string]
 			} else if !first {
 				d = cur // opened since the last sample
 			}
-			t := deltas[a.name]
-			t.Rx += d.Rx
-			t.Tx += d.Tx
-			deltas[a.name] = t
+			// With platform-reported app totals (Android), those are the
+			// app's traffic; socket bytes only split it by destination.
+			if smp.AppTotals == nil {
+				t := deltas[a.name]
+				t.Rx += d.Rx
+				t.Tx += d.Tx
+				deltas[a.name] = t
+			}
 		}
 		if conn.Listening() {
 			continue
