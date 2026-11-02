@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/input"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/input"
 	"github.com/xmhrnx/middlelan/internal/nettools"
 )
 
@@ -22,7 +22,7 @@ type tlsTool struct {
 
 func newTLSTool(sh *Shell) *tlsTool {
 	t := &tlsTool{shell: sh, runner: toolRunner{shell: sh}}
-	t.host = giode.Input.Text("Host, e.g. example.com or 10.0.0.5:8443", styleField).Keyboard(giode.KeyboardURL)
+	t.host = textInputT("Host, e.g. example.com or 10.0.0.5:8443", styleField).Keyboard(giode.KeyboardURL)
 	t.host.Submit(func(string) { t.start() })
 	t.run = runButton("Inspect", t.start, &t.runner)
 	return t
@@ -58,12 +58,12 @@ func (t *tlsTool) view(ts *toolsScreen, info toolInfo) giode.Element {
 		results = append(results, noticeBanner("shield-alert", t.err, "theme.danger", nil))
 	}
 	if c := t.cert; c != nil {
-		status, tone, icon := "Valid certificate", giode.Color("theme.success"), "shield-check"
+		status, tone, icon := tr("Valid certificate"), giode.Color("theme.success"), "shield-check"
 		switch {
 		case !c.Valid:
-			status, tone, icon = "Not trusted: "+c.VerifyErr, "theme.danger", "shield-alert"
+			status, tone, icon = tr("Not trusted: {error}", "error", c.VerifyErr), "theme.danger", "shield-alert"
 		case c.DaysLeft < 14:
-			status, tone = "Expires soon", "theme.warning"
+			status, tone = tr("Expires soon"), "theme.warning"
 		}
 		fact := func(label, value string) giode.Element {
 			return giode.Row(giode.Styles{Gap: 12, Width: -1, Padding: giode.SymmetricInset(0, 4), Wrap: giode.WrapNoWrap},
@@ -73,14 +73,14 @@ func (t *tlsTool) view(ts *toolsScreen, info toolInfo) giode.Element {
 		results = append(results,
 			noticeBanner(icon, status, tone, nil),
 			responsiveGrid(150, 3, 12,
-				statTile("clock", "Days left", itoa(c.DaysLeft), "Until "+c.NotAfter.Format("Jan 2, 2006"), tone),
-				statTile("lock", "Protocol", c.TLSVersion, c.Cipher, "theme.primary"),
-				statTile("globe", "Names", itoa(len(c.DNSNames)), "Covered host names", "theme.accent"),
+				statTile("clock", tr("Days left"), itoa(c.DaysLeft), tr("Until {date}", "date", c.NotAfter.Format(time.DateOnly)), tone),
+				statTile("lock", tr("Protocol"), c.TLSVersion, c.Cipher, "theme.primary"),
+				statTile("globe", tr("Names"), itoa(len(c.DNSNames)), tr("Covered host names"), "theme.accent"),
 			),
-			card("Certificate", nil,
-				fact("Subject", c.Subject), fact("Issuer", c.Issuer),
-				fact("Valid from", c.NotBefore.Format(time.DateOnly)), fact("Valid until", c.NotAfter.Format(time.DateOnly)),
-				fact("Names", strings.Join(c.DNSNames, ", ")), fact("Chain", strings.Join(c.Chain, "  ›  "))),
+			card(tr("Certificate"), nil,
+				fact(tr("Subject"), c.Subject), fact(tr("Issuer"), c.Issuer),
+				fact(tr("Valid from"), c.NotBefore.Format(time.DateOnly)), fact(tr("Valid until"), c.NotAfter.Format(time.DateOnly)),
+				fact(tr("Names"), strings.Join(c.DNSNames, ", ")), fact(tr("Chain"), strings.Join(c.Chain, "  ›  "))),
 		)
 	}
 	return ts.toolFrame(info, formRow(t.host, syncRunLabel(t.run, "Inspect", &t.runner)), results...)

@@ -2,7 +2,7 @@ package ui
 
 import (
 	"gioui.org/layout"
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 )
 
 // cardElement is a card; a grid stretches it to the height of the

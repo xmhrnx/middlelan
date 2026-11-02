@@ -14,6 +14,9 @@ import (
 type Settings struct {
 	// Theme is "dark", "light" or "system".
 	Theme string `json:"theme"`
+	// Language is the interface language ("es", "fa", ...); empty
+	// follows the system.
+	Language string `json:"language,omitempty"`
 	// OnlineLookups allows locating remote addresses through geojs.io.
 	OnlineLookups bool `json:"onlineLookups"`
 	// NotifyNewApps notifies when a program uses the network for the first time.
@@ -30,6 +33,21 @@ type Settings struct {
 	CloseToTray bool `json:"closeToTray"`
 	// KeepAliveAndroid keeps monitoring in the background on Android.
 	KeepAliveAndroid bool `json:"keepAliveAndroid"`
+	// ScheduledSpeedTests runs a speed test every SpeedEveryHours (off by
+	// default: each test transfers about 100 MB).
+	ScheduledSpeedTests bool `json:"scheduledSpeedTests"`
+	SpeedEveryHours     int  `json:"speedEveryHours"`
+	// PlanDownMbps and PlanUpMbps are what the internet plan promises,
+	// for the ISP report card.
+	PlanDownMbps float64 `json:"planDownMbps"`
+	PlanUpMbps   float64 `json:"planUpMbps"`
+	// ThreatAlerts checks destinations against public blocklists.
+	ThreatAlerts bool `json:"threatAlerts"`
+	// FirewallAsk asks what to do when a program connects for the first
+	// time (only while the firewall is on).
+	FirewallAsk bool `json:"firewallAsk"`
+	// CheckUpdates looks for a newer MiddleLAN once a day.
+	CheckUpdates bool `json:"checkUpdates"`
 	// OnboardingDone hides the welcome card.
 	OnboardingDone bool `json:"onboardingDone"`
 }
@@ -39,6 +57,7 @@ func Defaults() Settings {
 	return Settings{
 		Theme: "dark", OnlineLookups: true, NotifyNewApps: true, NotifyNewDevices: true,
 		BackgroundScan: true, ScanEveryMinutes: 15, CloseToTray: true, KeepAliveAndroid: false,
+		SpeedEveryHours: 6, CheckUpdates: true, ThreatAlerts: true,
 	}
 }
 
@@ -64,6 +83,9 @@ func Open(dir string) (*File, error) {
 	}
 	if f.s.ScanEveryMinutes <= 0 {
 		f.s.ScanEveryMinutes = 15
+	}
+	if f.s.SpeedEveryHours <= 0 {
+		f.s.SpeedEveryHours = 6
 	}
 	return f, nil
 }

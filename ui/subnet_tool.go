@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/input"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/input"
 	"github.com/xmhrnx/middlelan/internal/nettools"
 )
 
@@ -17,7 +17,7 @@ type subnetTool struct {
 
 func newSubnetTool(sh *Shell) *subnetTool {
 	s := &subnetTool{shell: sh}
-	s.cidr = giode.Input.Text("CIDR, e.g. 192.168.1.0/24 or 10.0.0.1 255.255.0.0", styleField)
+	s.cidr = textInputT("CIDR, e.g. 192.168.1.0/24 or 10.0.0.1 255.255.0.0", styleField)
 	s.cidr.SetText("192.168.1.0/24")
 	return s
 }
@@ -37,14 +37,14 @@ func (s *subnetTool) view(t *toolsScreen, info toolInfo) giode.Element {
 					giode.Text(label, styleLabel),
 					giode.Text(nonEmpty(value, "—"), giode.Styles{Color: "theme.text", FontSize: 15, FontWeight: giode.FontWeightMedium, FontFamily: fontMono}).Selectable("subnet-"+label))
 			}
-			scope := "Public"
+			scope := tr("Public")
 			if sn.Private {
-				scope = "Private"
+				scope = tr("Private")
 			}
 			results = append(results, cardStyled(giode.Styles{}, responsiveGrid(180, 3, 18,
-				fact("Network", sn.Network+"/"+strconv.Itoa(sn.Prefix)), fact("Netmask", sn.Netmask), fact("Wildcard", sn.Wildcard),
-				fact("First host", sn.FirstHost), fact("Last host", sn.LastHost), fact("Broadcast", sn.Broadcast),
-				fact("Usable hosts", strconv.FormatUint(sn.Hosts, 10)), fact("Class", sn.Class), fact("Scope", scope),
+				fact(tr("Network"), sn.Network+"/"+strconv.Itoa(sn.Prefix)), fact(tr("Netmask"), sn.Netmask), fact(tr("Wildcard"), sn.Wildcard),
+				fact(tr("First host"), sn.FirstHost), fact(tr("Last host"), sn.LastHost), fact(tr("Broadcast"), sn.Broadcast),
+				fact(tr("Usable hosts"), strconv.FormatUint(sn.Hosts, 10)), fact(tr("Class"), sn.Class), fact(tr("Scope"), scope),
 			)))
 		}
 	}

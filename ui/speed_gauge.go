@@ -3,7 +3,7 @@ package ui
 import (
 	"math"
 
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 )
 
 // speedGauge is a 270° dial for a speed in Mbps, on a log scale up to

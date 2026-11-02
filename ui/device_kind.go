@@ -27,21 +27,21 @@ func deviceIcon(kind string) string {
 func deviceKindLabel(kind string) string {
 	switch kind {
 	case "router":
-		return "Router"
+		return tr("Router")
 	case "phone":
-		return "Phone or tablet"
+		return tr("Phone or tablet")
 	case "computer":
-		return "Computer"
+		return tr("Computer")
 	case "printer":
-		return "Printer"
+		return tr("Printer")
 	case "tv":
-		return "TV or streamer"
+		return tr("TV or streamer")
 	case "camera":
-		return "Camera"
+		return tr("Camera")
 	case "speaker":
-		return "Speaker"
+		return tr("Speaker")
 	case "iot":
-		return "Smart device"
+		return tr("Smart device")
 	}
-	return "Unknown device"
+	return tr("Unknown device")
 }

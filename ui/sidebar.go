@@ -1,8 +1,8 @@
 package ui
 
 import (
-	"github.com/mehran9675/giode"
-	props "github.com/mehran9675/giode/styles/properties"
+	"github.com/xmhrnx/giode"
+	props "github.com/xmhrnx/giode/styles/properties"
 )
 
 // sidebar is the desktop navigation: the brand, the pages and the
@@ -20,13 +20,16 @@ func newSidebar(sh *Shell) *sidebar {
 		if n.screen == screenSettings {
 			hint = giode.FormatShortcut("Mod+,")
 		}
-		sb.items = append(sb.items, giode.Pressable(func(s giode.PressState) giode.Element {
+		item := giode.Pressable(func(s giode.PressState) giode.Element {
 			return sb.itemView(n, hint, s)
-		}).Label(n.label).OnClick(func(giode.ClickEvent) { sh.navigate(n.screen) }))
+		}).OnClick(func(giode.ClickEvent) { sh.navigate(n.screen) })
+		localized(func() { item.Label(tr(n.label)) })
+		sb.items = append(sb.items, item)
 	}
 	sb.pause = giode.Pressable(func(s giode.PressState) giode.Element {
 		return sb.statusView(s)
-	}).Label("Pause or resume monitoring").OnClick(func(giode.ClickEvent) { sh.togglePause() })
+	}).OnClick(func(giode.ClickEvent) { sh.togglePause() })
+	localized(func() { sb.pause.Label(tr("Pause or resume monitoring")) })
 	return sb
 }
 
@@ -45,7 +48,7 @@ func (sb *sidebar) itemView(n navItem, hint string, s giode.PressState) giode.El
 	},
 		giode.Box(giode.Styles{Width: 3, Height: 18, BorderRadius: 2, Background: map[bool]giode.Color{true: "theme.primary", false: "transparent"}[active]}),
 		giode.Icon(n.icon, giode.Styles{Width: 18, Color: ic}),
-		giode.Text(n.label, giode.Styles{Color: fg, FontSize: sizeBody, FontWeight: giode.FontWeightMedium, FlexGrow: 1}),
+		giode.Text(tr(n.label), giode.Styles{Color: fg, FontSize: sizeBody, FontWeight: giode.FontWeightMedium, FlexGrow: 1}),
 		giode.Text(hint, giode.Styles{Color: "theme.muted", FontSize: sizeTiny, Visibility: map[bool]props.Visibility{true: "", false: giode.VisibilityHidden}[s.Hovered]}),
 	)
 }
@@ -53,9 +56,9 @@ func (sb *sidebar) itemView(n navItem, hint string, s giode.PressState) giode.El
 func (sb *sidebar) statusView(s giode.PressState) giode.Element {
 	snap := sb.shell.svc.Collector.Snapshot()
 	paused := sb.shell.svc.Collector.Paused()
-	dot, label, sub := giode.Color("theme.success"), "Monitoring", "Every "+snap.Interval.String()
+	dot, label, sub := giode.Color("theme.success"), tr("Monitoring"), tr("Every {interval}", "interval", snap.Interval.String())
 	if paused {
-		dot, label, sub = "theme.warning", "Paused", "Click to resume"
+		dot, label, sub = "theme.warning", tr("Paused"), tr("Click to resume")
 	}
 	bg := colSurface2
 	if s.Hovered {
@@ -79,11 +82,11 @@ func (sb *sidebar) statusView(s giode.PressState) giode.Element {
 func (sb *sidebar) view() giode.Element {
 	snap := sb.shell.svc.Collector.Snapshot()
 	kids := []giode.Element{
-		giode.Row(giode.Styles{Align: giode.AlignCenter, Gap: 10, Padding: giode.Inset{Left: 8, Bottom: 18, Top: 4}},
+		giode.Row(giode.Styles{Align: giode.AlignCenter, Gap: 10, Padding: giode.Inset{Start: 8, Bottom: 18, Top: 4}},
 			logoMark(34),
 			giode.Stack(giode.Styles{Gap: 1},
 				giode.Text("MiddleLAN", giode.Styles{Color: "theme.text", FontSize: 17, FontWeight: giode.FontWeightBold}),
-				giode.Text("Network monitor", giode.Styles{Color: "theme.muted", FontSize: sizeTiny}),
+				giode.Text(tr("Network monitor"), giode.Styles{Color: "theme.muted", FontSize: sizeTiny}),
 			),
 		),
 	}
@@ -93,8 +96,8 @@ func (sb *sidebar) view() giode.Element {
 	kids = append(kids,
 		giode.Box(giode.Styles{FlexGrow: 1}),
 		giode.Stack(giode.Styles{Gap: 8, Padding: giode.Inset{Bottom: 10}},
-			throughputMini("Download", snap.RateRx, colDown),
-			throughputMini("Upload", snap.RateTx, colUp),
+			throughputMini(tr("Download"), snap.RateRx, colDown),
+			throughputMini(tr("Upload"), snap.RateTx, colUp),
 		),
 		sb.pause,
 	)

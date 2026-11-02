@@ -3,9 +3,9 @@ package ui
 import (
 	"time"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/scroll"
-	"github.com/mehran9675/giode/components/segmented"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/scroll"
+	"github.com/xmhrnx/giode/components/segmented"
 	"github.com/xmhrnx/middlelan/internal/inventory"
 )
 
@@ -20,14 +20,14 @@ type devicesScreen struct {
 
 func newDevicesScreen(sh *Shell) *devicesScreen {
 	d := &devicesScreen{shell: sh, dialog: newDeviceDialog(sh)}
-	d.scan = giode.Button("Scan network", stylePrimary).Icon(giode.Icon("radar", giode.Styles{Width: 16})).OnClick(func() {
+	d.scan = giode.Button(tr("Scan network"), stylePrimary).Icon(giode.Icon("radar", giode.Styles{Width: 16})).OnClick(func() {
 		if running, _, _, _ := sh.svc.Scanner.Status(); running {
 			sh.svc.Scanner.Stop()
 			return
 		}
 		sh.svc.Scanner.Start(sh.ctx)
 	})
-	d.filter = giode.Input.Segmented("Online", "All")
+	d.filter = segmentedT("Online", "All")
 	d.scroll = giode.Scroll(d.content, giode.Styles{Width: -1, Height: -1, ScrollBar: giode.ScrollBar{AutoHide: true, Width: 6}})
 	return d
 }
@@ -49,15 +49,15 @@ func (d *devicesScreen) content() giode.Element {
 		}
 	}
 	if running {
-		d.scan.Label("Stop scan")
+		d.scan.Label(tr("Stop scan"))
 	} else {
-		d.scan.Label("Scan network")
+		d.scan.Label(tr("Scan network"))
 	}
-	sub := "Not scanned yet"
+	sub := tr("Not scanned yet")
 	if t := inv.LastScan(); !t.IsZero() {
-		sub = plural(online, "device", "devices") + " online · scanned " + formatAgo(t, now)
+		sub = trn("{count} devices online · scanned {ago}", online, "ago", formatAgo(t, now))
 	}
-	kids := []giode.Element{pageHeader("Devices", sub, d.scan)}
+	kids := []giode.Element{pageHeader(tr("Devices"), sub, d.scan)}
 	if running {
 		p := float32(0)
 		if total > 0 {
@@ -66,13 +66,13 @@ func (d *devicesScreen) content() giode.Element {
 		kids = append(kids, cardStyled(giode.Styles{Gap: 8},
 			giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter},
 				giode.Spinner(giode.Styles{Width: 18, Color: "theme.primary"}),
-				giode.Text("Scanning your network… "+itoa(done)+" of "+itoa(total)+" addresses", styleBody)),
+				giode.Text(tr("Scanning your network… {done} of {total} addresses", "done", done, "total", total), styleBody)),
 			giode.Progress(p, giode.Styles{Color: "theme.primary", Background: colGrid, Height: 6}),
 		))
 	} else if err != nil {
-		kids = append(kids, noticeBanner("shield-alert", "Scan problem: "+err.Error(), "theme.warning", nil))
+		kids = append(kids, noticeBanner("shield-alert", tr("Scan problem: {error}", "error", err.Error()), "theme.warning", nil))
 	}
-	kids = append(kids, d.networkCard())
+	kids = append(kids, d.networkCard(), d.shell.routerCard())
 	rows := []giode.Element{}
 	for _, dev := range all {
 		if d.filter.Selected() == 0 && !dev.Online {
@@ -82,9 +82,9 @@ func (d *devicesScreen) content() giode.Element {
 	}
 	var list giode.Element = giode.Stack(giode.Styles{Gap: 2, Width: -1}, rows...)
 	if len(rows) == 0 {
-		list = emptyState("radar", "No devices yet", "Scan to find the phones, computers, TVs and gadgets on your network. MiddleLAN remembers them and tells you when a new one joins.", nil)
+		list = emptyState("radar", tr("No devices yet"), tr("Scan to find the phones, computers, TVs and gadgets on your network. MiddleLAN remembers them and tells you when a new one joins."), nil)
 	}
-	kids = append(kids, card("On this network", d.filter, list))
+	kids = append(kids, card(tr("On this network"), d.filter, list))
 	return pageBody(kids...)
 }
 
@@ -112,7 +112,7 @@ func (d *devicesScreen) networkCard() giode.Element {
 		}
 	}
 	return cardStyled(giode.Styles{},
-		responsiveGrid(140, 5, 14, item("This device", local), item("Router", gw), item("Subnet", subnet), item("Public IP", public), item("Provider", isp)))
+		responsiveGrid(140, 5, 14, item(tr("This device"), local), item(tr("Router"), gw), item(tr("Subnet"), subnet), item(tr("Public IP"), public), item(tr("Provider"), isp)))
 }
 
 func (d *devicesScreen) devicePressable(key string) giode.Element {

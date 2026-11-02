@@ -4,8 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehran9675/giode"
-	props "github.com/mehran9675/giode/styles/properties"
+	"github.com/xmhrnx/giode"
+	props "github.com/xmhrnx/giode/styles/properties"
 	"github.com/xmhrnx/middlelan/internal/inventory"
 )
 
@@ -34,15 +34,15 @@ func deviceRow(d inventory.Device, s giode.PressState, now time.Time) giode.Elem
 	tags := []giode.Element{}
 	switch {
 	case d.IsSelf:
-		tags = append(tags, pill("This device", "theme.success"))
+		tags = append(tags, pill(tr("This device"), "theme.success"))
 	case d.IsGateway:
-		tags = append(tags, pill("Router", "theme.warning"))
+		tags = append(tags, pill(tr("Router"), "theme.warning"))
 	}
 	if !d.Trusted && !d.IsSelf && now.Sub(d.FirstSeen) < 24*time.Hour && !d.FirstSeen.IsZero() {
-		tags = append(tags, pill("New", "theme.info"))
+		tags = append(tags, pill(tr("New"), "theme.info"))
 	}
 	if !d.Online {
-		tags = append(tags, giode.Text("Seen "+formatAgo(d.LastSeen, now), styleMuted))
+		tags = append(tags, giode.Text(tr("Seen {ago}", "ago", formatAgo(d.LastSeen, now)), styleMuted))
 	} else if d.LatencyMs > 0 {
 		tags = append(tags, giode.Text(trimRate(d.LatencyMs)+" ms", styleMuted))
 	}
@@ -57,6 +57,6 @@ func deviceRow(d inventory.Device, s giode.PressState, now time.Time) giode.Elem
 			giode.Text(strings.Join(sub, " · "), giode.Styles{Color: "theme.muted", FontSize: sizeTiny, TextOverflow: giode.TextOverflowEllipsis}),
 		),
 		giode.Row(giode.Styles{Gap: 8, Align: giode.AlignCenter, Wrap: giode.WrapNoWrap}, tags...),
-		giode.Icon("chevron-right", giode.Styles{Width: 16, Color: "theme.muted"}),
+		giode.Icon(chevronForward(), giode.Styles{Width: 16, Color: "theme.muted"}),
 	)
 }

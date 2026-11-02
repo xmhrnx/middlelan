@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/mehran9675/giode"
+import "github.com/xmhrnx/giode"
 
 // emptyState fills a space that has nothing to show yet.
 func emptyState(icon, title, body string, action giode.Element) giode.Element {

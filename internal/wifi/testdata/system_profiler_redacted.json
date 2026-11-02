@@ -1,0 +1,27 @@
+{
+  "SPAirPortDataType" : [
+    {
+      "spairport_airport_interfaces" : [
+        {
+          "_name" : "en0",
+          "spairport_airport_other_local_wireless_networks" : [
+            {
+              "_name" : "<redacted>",
+              "spairport_network_channel" : "44 (5GHz, 80MHz)",
+              "spairport_security_mode" : "spairport_security_mode_wpa2_enterprise",
+              "spairport_signal_noise" : "-66 dBm / -92 dBm"
+            }
+          ],
+          "spairport_current_network_information" : {
+            "_name" : "<redacted>",
+            "spairport_network_channel" : "1 (2GHz, 20MHz)",
+            "spairport_network_rate" : 144,
+            "spairport_security_mode" : "spairport_security_mode_wpa2_personal",
+            "spairport_signal_noise" : "-60 dBm / -90 dBm"
+          },
+          "spairport_status_information" : "spairport_status_connected"
+        }
+      ]
+    }
+  ]
+}

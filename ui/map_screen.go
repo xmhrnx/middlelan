@@ -4,9 +4,9 @@ import (
 	"math"
 	"sort"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/scroll"
-	"github.com/mehran9675/giode/components/segmented"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/scroll"
+	"github.com/xmhrnx/giode/components/segmented"
 	"github.com/xmhrnx/middlelan/internal/geo"
 )
 
@@ -19,7 +19,7 @@ type mapScreen struct {
 
 func newMapScreen(sh *Shell) *mapScreen {
 	m := &mapScreen{shell: sh}
-	m.scope = giode.Input.Segmented("Live", "This session")
+	m.scope = segmentedT("Live", "This session")
 	m.scroll = giode.Scroll(m.content, giode.Styles{Width: -1, Height: -1, ScrollBar: giode.ScrollBar{AutoHide: true, Width: 6}})
 	return m
 }
@@ -63,7 +63,7 @@ func (m *mapScreen) content() giode.Element {
 		}
 		key := d.Country
 		if key == "" {
-			key = "Unknown"
+			key = tr("Unknown")
 		}
 		c := countries[key]
 		if c == nil {
@@ -80,15 +80,15 @@ func (m *mapScreen) content() giode.Element {
 	}
 	subtitle := plural(public, "remote network", "remote networks")
 	if !m.shell.svc.Settings.Get().OnlineLookups {
-		subtitle += " · locations are off in Settings"
+		subtitle += " · " + tr("locations are off in Settings")
 	} else if located < public {
-		subtitle += " · locating " + itoa(public-located) + "…"
+		subtitle += " · " + tr("locating {count}…", "count", public-located)
 	}
 	return pageBody(
-		pageHeader("Map", subtitle, m.scope),
+		pageHeader(tr("Map"), subtitle, m.scope),
 		cardStyled(giode.Styles{Padding: giode.UniformInset(14)}, worldMap(markers, home),
 			giode.Row(giode.Styles{Gap: 16, Align: giode.AlignCenter},
-				legendDot("You", "theme.success"), legendDot("Destination", colDown), legendDot("Shared by 3+ apps", colUp))),
+				legendDot(tr("You"), "theme.success"), legendDot(tr("Destination"), colDown), legendDot(tr("Shared by 3+ apps"), colUp))),
 		responsiveGrid(380, 2, 18, m.countryList(countries), m.ownerList(dests)),
 	)
 }
@@ -128,9 +128,9 @@ func (m *mapScreen) countryList(countries map[string]*country) giode.Element {
 		))
 	}
 	if len(rows) == 0 {
-		rows = append(rows, emptyState("globe", "No countries yet", "Countries appear as apps reach the internet.", nil))
+		rows = append(rows, emptyState("globe", tr("No countries yet"), tr("Countries appear as apps reach the internet."), nil))
 	}
-	return card("Countries", nil, giode.Stack(giode.Styles{Gap: 4, Width: -1}, rows...))
+	return card(tr("Countries"), nil, giode.Stack(giode.Styles{Gap: 4, Width: -1}, rows...))
 }
 
 func (m *mapScreen) ownerList(dests []*destination) giode.Element {
@@ -142,7 +142,7 @@ func (m *mapScreen) ownerList(dests []*destination) giode.Element {
 		rows = append(rows, destinationRow(d))
 	}
 	if len(rows) == 0 {
-		rows = append(rows, emptyState("server", "No networks yet", "Companies and networks your apps reach appear here.", nil))
+		rows = append(rows, emptyState("server", tr("No networks yet"), tr("Companies and networks your apps reach appear here."), nil))
 	}
-	return card("Networks", nil, giode.Stack(giode.Styles{Gap: 2, Width: -1}, rows...))
+	return card(tr("Networks"), nil, giode.Stack(giode.Styles{Gap: 2, Width: -1}, rows...))
 }

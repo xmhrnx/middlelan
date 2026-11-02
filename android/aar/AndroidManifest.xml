@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Manifest entries and resources MiddleLAN needs beyond what giode
+     generates: the home screen widget (code: com.middlelan.app.UsageWidget),
+     the permission prompt (com.middlelan.app.PermissionActivity) and the
+     on-device VPN (com.middlelan.app.MiddleVpnService). Packed
+     into android/libs/middlelan.aar by build-aar.sh. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.middlelan.widget">
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <!-- The VPN runs as a foreground service of type specialUse (Android 14+). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <application>
+        <!-- BIND_VPN_SERVICE guards the service so only the system binds it. -->
+        <service
+            android:name="com.middlelan.app.MiddleVpnService"
+            android:permission="android.permission.BIND_VPN_SERVICE"
+            android:foregroundServiceType="specialUse"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="On-device VPN that shows and filters which apps connect where; no traffic leaves the device through a remote server." />
+        </service>
+        <activity android:name="com.middlelan.app.PermissionActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <receiver android:name="com.middlelan.app.UsageWidget" android:exported="false" android:label="MiddleLAN">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/middlelan_widget_info" />
+        </receiver>
+    </application>
+</manifest>

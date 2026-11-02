@@ -5,13 +5,20 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/titlebar"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/titlebar"
+	"github.com/xmhrnx/middlelan/internal/alerts"
+	"github.com/xmhrnx/middlelan/internal/dnslog"
+	"github.com/xmhrnx/middlelan/internal/firewall"
 	"github.com/xmhrnx/middlelan/internal/geo"
 	"github.com/xmhrnx/middlelan/internal/inventory"
 	"github.com/xmhrnx/middlelan/internal/monitor"
 	"github.com/xmhrnx/middlelan/internal/nettools"
+	"github.com/xmhrnx/middlelan/internal/router"
 	"github.com/xmhrnx/middlelan/internal/settings"
+	"github.com/xmhrnx/middlelan/internal/speedlog"
+	"github.com/xmhrnx/middlelan/internal/threat"
+	"github.com/xmhrnx/middlelan/internal/updates"
 )
 
 // Services are the app's long-lived parts the UI reads and drives.
@@ -22,6 +29,13 @@ type Services struct {
 	Settings  *settings.File
 	Inventory *inventory.Inventory
 	Scanner   *inventory.Scanner
+	Router    *router.Watcher
+	Speed     *speedlog.Log
+	Updates   *updates.Checker
+	Firewall  *firewall.Firewall
+	Alerts    *alerts.Watcher
+	Threats   *threat.DB
+	Names     *dnslog.Log
 }
 
 // Shell is the root of the UI: navigation around the current page.
@@ -43,12 +57,17 @@ type Shell struct {
 	devices     *devicesScreen
 	tools       *toolsScreen
 	settings    *settingsScreen
+	history     *historyScreen
+	security    *securityScreen
+	prompt      *firewallPrompt
 
 	// OnSettingsChanged lets main apply settings it owns (tray, keep-alive).
 	OnSettingsChanged func(settings.Settings)
 
-	shortcuts []giode.KeyShortcut
-	ctx       context.Context
+	shortcuts  []giode.KeyShortcut
+	update     updateState
+	installBtn *giode.ButtonElement
+	ctx        context.Context
 
 	redrawPending atomic.Bool
 	public        atomic.Pointer[nettools.PublicInfo]
@@ -71,7 +90,11 @@ func NewShell(ctx context.Context, svc Services) *Shell {
 	sh.devices = newDevicesScreen(sh)
 	sh.tools = newToolsScreen(sh)
 	sh.settings = newSettingsScreen(sh)
+	sh.history = newHistoryScreen(sh)
+	sh.security = newSecurityScreen(sh)
+	sh.prompt = newFirewallPrompt(sh)
 	sh.shortcuts = newShortcuts(sh)
+	sh.installBtn = buttonT("Install", stylePrimary.With(giode.Styles{Padding: giode.SymmetricInset(12, 7), FontSize: sizeSmall})).OnClick(sh.installUpdate)
 	return sh
 }
 
@@ -151,12 +174,17 @@ func (sh *Shell) page() giode.Element {
 		return sh.tools.view()
 	case screenSettings:
 		return sh.settings.view()
+	case screenHistory:
+		return sh.history.view()
+	case screenSecurity:
+		return sh.security.view()
 	}
 	return sh.dashboard.view()
 }
 
 // View is the whole window, every frame.
 func (sh *Shell) View() giode.Element {
+	syncLocale()
 	giode.Shortcuts(sh.shortcuts...)
 	body := giode.Responsive(
 		giode.Breakpoint{MaxWidth: 760, Name: "compact", View: sh.compactView},
@@ -165,7 +193,7 @@ func (sh *Shell) View() giode.Element {
 	if sh.windowBar != nil {
 		body = giode.Stack(giode.Styles{Width: -1, Height: -1}, sh.windowBar, giode.Stack(giode.Styles{FlexGrow: 1, Width: -1}, body))
 	}
-	return giode.Box(giode.Styles{Width: -1, Height: -1, Background: "theme.background"}, body, sh.toasts)
+	return giode.Box(giode.Styles{Width: -1, Height: -1, Background: "theme.background"}, body, sh.prompt.dialog, sh.toasts)
 }
 
 func (sh *Shell) wideView() giode.Element {
@@ -206,3 +234,6 @@ func compactKids(kids []giode.Element) []giode.Element {
 
 // FormatRate formats bytes per second as a bit rate, for the tray.
 func FormatRate(bytesPerSec float64) string { return formatRate(bytesPerSec) }
+
+// FormatBytes formats a byte count, for the tray.
+func FormatBytes(b uint64) string { return formatBytes(b) }

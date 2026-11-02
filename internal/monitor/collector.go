@@ -240,10 +240,14 @@ func (c *Collector) attribute(smp Sample, now time.Time, first bool) map[string]
 			} else if !first {
 				d = cur // opened since the last sample
 			}
-			t := deltas[a.name]
-			t.Rx += d.Rx
-			t.Tx += d.Tx
-			deltas[a.name] = t
+			// With platform-reported app totals (Android), those are the
+			// app's traffic; socket bytes only split it by destination.
+			if smp.AppTotals == nil {
+				t := deltas[a.name]
+				t.Rx += d.Rx
+				t.Tx += d.Tx
+				deltas[a.name] = t
+			}
 		}
 		if conn.Listening() {
 			continue
@@ -255,7 +259,7 @@ func (c *Collector) attribute(smp Sample, now time.Time, first bool) map[string]
 			a.endpoints[key] = e
 			trimEndpoints(a.endpoints)
 		}
-		e.Active, e.LastSeen = true, now
+		e.Active, e.LastSeen = !conn.Closed(), now
 		e.Rx += d.Rx
 		e.Tx += d.Tx
 		_, known := c.prevSock[conn.Key]
@@ -385,9 +389,10 @@ func (c *Collector) publish(smp Sample, now time.Time, rateRx, rateTx float64) {
 				pids[conn.PID] = true
 				app.PIDs = append(app.PIDs, conn.PID)
 			}
-			if conn.Listening() {
+			switch {
+			case conn.Listening():
 				app.Listening++
-			} else {
+			case !conn.Closed():
 				app.Active++
 			}
 		}

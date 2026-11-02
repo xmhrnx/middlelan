@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/mehran9675/giode"
+import "github.com/xmhrnx/giode"
 
 // toolbar puts a search field first and controls after it, wrapping on
 // narrow screens.

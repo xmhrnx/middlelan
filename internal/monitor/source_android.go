@@ -8,7 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehran9675/giode/android"
+	"github.com/xmhrnx/giode/android"
+	"github.com/xmhrnx/middlelan/internal/vpn"
 )
 
 const netStatsClass = "com/middlelan/app/NetStats"
@@ -45,10 +46,15 @@ func (s *androidSource) Limits() string { return s.limits }
 func (s *androidSource) Sample() (Sample, error) {
 	var smp Sample
 	var limits []string
-	if socks, _, err := s.linux.sockets(); err == nil && len(socks) > 0 {
-		smp.Conns = s.linux.owners.resolve(socks)
-	} else {
-		limits = append(limits, "Android hides other apps' connections; destinations are shown for this device's own traffic only.")
+	switch {
+	case vpn.Default.Running():
+		smp.Conns = vpnConns(vpn.Default.Flows())
+	default:
+		if socks, _, err := s.linux.sockets(); err == nil && len(socks) > 0 {
+			smp.Conns = s.linux.owners.resolve(socks)
+		} else {
+			limits = append(limits, "Android hides other apps' connections. Turn on MiddleLAN's VPN in Security to see where each app connects.")
+		}
 	}
 	if t, err := android.CallString(netStatsClass, "totals", "()Ljava/lang/String;"); err == nil {
 		rx, tx, _ := strings.Cut(t, ",")
@@ -72,6 +78,35 @@ func (s *androidSource) Sample() (Sample, error) {
 }
 
 var errUsageAccess = errors.New("usage access not granted")
+
+// vpnConns turns the VPN's flows into connections. Flows closed since the
+// last sample are kept (as CLOSED) so their final bytes are counted.
+func vpnConns(flows []vpn.Flow) []Conn {
+	conns := make([]Conn, 0, len(flows))
+	cutoff := time.Now().Add(-15 * time.Second)
+	for _, f := range flows {
+		if f.Closed && f.LastActive.Before(cutoff) {
+			continue
+		}
+		state := "ESTABLISHED"
+		if f.Closed {
+			state = "CLOSED"
+		}
+		name := f.App
+		if name == "" {
+			name = f.Package
+		}
+		if f.Blocked {
+			state = "CLOSED"
+		}
+		conns = append(conns, Conn{
+			Key: "vpn:" + f.Key, Proto: f.Proto, LocalIP: f.LocalIP, LocalPort: f.LocalPort,
+			RemoteIP: f.RemoteIP, RemotePort: f.RemotePort, State: state, UID: f.UID, Process: name,
+			Sent: f.Sent, Recv: f.Recv, HasBytes: true,
+		})
+	}
+	return conns
+}
 
 func (s *androidSource) appUsage() (map[string]ByteCount, error) {
 	now := time.Now()

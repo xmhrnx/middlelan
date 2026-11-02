@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/input"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/input"
 	"github.com/xmhrnx/middlelan/internal/nettools"
 )
 
@@ -42,7 +42,7 @@ const (
 
 func newUptimeTool(sh *Shell) *uptimeTool {
 	u := &uptimeTool{shell: sh, runner: toolRunner{shell: sh}}
-	u.host = giode.Input.Text("Host to watch", styleField)
+	u.host = textInputT("Host to watch", styleField)
 	u.host.SetText("1.1.1.1")
 	u.run = runButton("Start monitoring", u.start, &u.runner)
 	return u
@@ -72,8 +72,8 @@ func (u *uptimeTool) add(r nettools.PingReply) {
 	if r.OK {
 		if u.misses >= outageAfter && len(u.outages) > 0 {
 			u.outages[len(u.outages)-1].to = now
-			if err := u.shell.svc.App.Notify("Internet is back", "The connection was down for "+now.Sub(u.outages[len(u.outages)-1].from).Round(time.Second).String()+"."); err != nil {
-				u.shell.Toast(giode.ToastSuccess, "Internet is back")
+			if err := u.shell.svc.App.Notify(tr("Internet is back"), tr("The connection was down for {duration}.", "duration", now.Sub(u.outages[len(u.outages)-1].from).Round(time.Second).String())); err != nil {
+				u.shell.Toast(giode.ToastSuccess, tr("Internet is back"))
 			}
 		}
 		u.misses = 0
@@ -82,8 +82,8 @@ func (u *uptimeTool) add(r nettools.PingReply) {
 	u.misses++
 	if u.misses == outageAfter {
 		u.outages = append(u.outages, outage{from: now.Add(-time.Duration(outageAfter-1) * uptimeInterval)})
-		if err := u.shell.svc.App.Notify("Internet connection lost", "MiddleLAN can't reach "+u.host.Text()+"."); err != nil {
-			u.shell.Toast(giode.ToastError, "Internet connection lost")
+		if err := u.shell.svc.App.Notify(tr("Internet connection lost"), tr("MiddleLAN can't reach {host}.", "host", u.host.Text())); err != nil {
+			u.shell.Toast(giode.ToastError, tr("Internet connection lost"))
 		}
 	}
 }
@@ -105,24 +105,24 @@ func (u *uptimeTool) view(t *toolsScreen, info toolInfo) giode.Element {
 			avg = sum / time.Duration(ok)
 		}
 		upPct := float64(ok) / float64(len(u.samples)) * 100
-		state, tone := "Online", giode.Color("theme.success")
+		state, tone := tr("Online"), giode.Color("theme.success")
 		if u.misses >= outageAfter {
-			state, tone = "Offline", "theme.danger"
+			state, tone = tr("Offline"), "theme.danger"
 		}
 		results = append(results,
 			responsiveGrid(150, 4, 12,
-				statTile("signal", "Status", state, "Watching for "+time.Since(u.started).Round(time.Second).String(), tone),
-				statTile("activity", "Average latency", formatMs(avg), "", "theme.primary"),
-				statTile("shield-check", "Uptime", fmt.Sprintf("%.2f%%", upPct), plural(len(u.samples), "check", "checks"), "theme.success"),
-				statTile("zap", "Outages", itoa(len(u.outages)), "3 missed replies in a row", "theme.warning"),
+				statTile("signal", tr("Status"), state, tr("Watching for {duration}", "duration", time.Since(u.started).Round(time.Second).String()), tone),
+				statTile("activity", tr("Average latency"), formatMs(avg), "", "theme.primary"),
+				statTile("shield-check", tr("Uptime"), fmt.Sprintf("%.2f%%", upPct), plural(len(u.samples), "check", "checks"), "theme.success"),
+				statTile("zap", tr("Outages"), itoa(len(u.outages)), tr("3 missed replies in a row"), "theme.warning"),
 			),
-			card("Latency", giode.Text("Every "+uptimeInterval.String(), styleMuted), sparkline(vals, -1, 130, "theme.primary"), u.lossStrip()),
+			card(tr("Latency"), giode.Text(tr("Every {interval}", "interval", uptimeInterval.String()), styleMuted), sparkline(vals, -1, 130, "theme.primary"), u.lossStrip()),
 		)
 		if len(u.outages) > 0 {
 			rows := []giode.Element{}
 			for i := len(u.outages) - 1; i >= 0; i-- {
 				o := u.outages[i]
-				dur := "ongoing"
+				dur := tr("ongoing")
 				if !o.to.IsZero() {
 					dur = o.to.Sub(o.from).Round(time.Second).String()
 				}
@@ -131,12 +131,12 @@ func (u *uptimeTool) view(t *toolsScreen, info toolInfo) giode.Element {
 					giode.Text(o.from.Format("Jan 2 15:04:05"), giode.Styles{Color: "theme.text", FontSize: sizeSmall, FlexGrow: 1}),
 					giode.Text(dur, styleMuted)))
 			}
-			results = append(results, card("Outage log", nil, giode.Stack(giode.Styles{Width: -1}, rows...)))
+			results = append(results, card(tr("Outage log"), nil, giode.Stack(giode.Styles{Width: -1}, rows...)))
 		}
 	}
 	form := giode.Stack(giode.Styles{Gap: 10, Width: -1},
 		formRow(u.host, syncRunLabel(u.run, "Start monitoring", &u.runner)),
-		giode.Text("Keeps running in the background while MiddleLAN is open, and notifies you of outages.", styleMuted))
+		giode.Text(tr("Keeps running in the background while MiddleLAN is open, and notifies you of outages."), styleMuted))
 	return t.toolFrame(info, form, results...)
 }
 

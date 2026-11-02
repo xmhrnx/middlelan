@@ -33,9 +33,10 @@ type DayUsage struct {
 }
 
 type storeData struct {
-	Usage        map[string]map[string]ByteCount   `json:"usage"` // day -> app -> bytes
-	Destinations map[string]map[string]Destination `json:"dest"`  // app -> ip:port -> destination
-	FirstSeen    map[string]time.Time              `json:"first"` // app -> when first seen
+	Usage        map[string]map[string]ByteCount   `json:"usage"`  // day -> app -> bytes
+	Destinations map[string]map[string]Destination `json:"dest"`   // app -> ip:port -> destination
+	FirstSeen    map[string]time.Time              `json:"first"`  // app -> when first seen
+	Hourly       map[string]map[string]ByteCount   `json:"hourly"` // "2006-01-02T15" -> app -> bytes
 }
 
 // Store keeps daily usage per app and the destinations apps use in a
@@ -52,6 +53,7 @@ type Store struct {
 func OpenStore(dir string) *Store {
 	s := &Store{data: storeData{
 		Usage: map[string]map[string]ByteCount{}, Destinations: map[string]map[string]Destination{}, FirstSeen: map[string]time.Time{},
+		Hourly: map[string]map[string]ByteCount{},
 	}}
 	if dir == "" {
 		return s
@@ -69,6 +71,9 @@ func OpenStore(dir string) *Store {
 			if d.FirstSeen != nil {
 				s.data.FirstSeen = d.FirstSeen
 			}
+			if d.Hourly != nil {
+				s.data.Hourly = d.Hourly
+			}
 		}
 	}
 	s.saved = time.Now()
@@ -76,6 +81,60 @@ func OpenStore(dir string) *Store {
 }
 
 func dayKey(t time.Time) string { return t.Format("2006-01-02") }
+
+func hourKey(t time.Time) string { return t.Format("2006-01-02T15") }
+
+// keepHours is how long hourly usage is kept.
+const keepHours = 14 * 24
+
+// HourUsage is traffic in one hour.
+type HourUsage struct {
+	Hour time.Time
+	ByteCount
+}
+
+// Hourly returns the traffic of each of the last n hours, oldest first;
+// app "" sums every app.
+func (s *Store) Hourly(app string, n int, now time.Time) []HourUsage {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	out := make([]HourUsage, n)
+	top := now.Truncate(time.Hour)
+	for i := 0; i < n; i++ {
+		h := top.Add(time.Duration(i-n+1) * time.Hour)
+		out[i].Hour = h
+		for a, c := range s.data.Hourly[hourKey(h)] {
+			if app == "" || a == app {
+				out[i].Rx += c.Rx
+				out[i].Tx += c.Tx
+			}
+		}
+	}
+	return out
+}
+
+// HourApps returns every app's traffic in the hour containing t.
+func (s *Store) HourApps(t time.Time) map[string]ByteCount {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	out := map[string]ByteCount{}
+	for k, v := range s.data.Hourly[hourKey(t)] {
+		out[k] = v
+	}
+	return out
+}
+
+// Days returns every stored day, oldest first, with each app's traffic.
+func (s *Store) Days() []string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	out := make([]string, 0, len(s.data.Usage))
+	for d := range s.data.Usage {
+		out = append(out, d)
+	}
+	sort.Strings(out)
+	return out
+}
 
 // Add records traffic for app at time t.
 func (s *Store) Add(app string, t time.Time, rx, tx uint64) {
@@ -94,7 +153,20 @@ func (s *Store) Add(app string, t time.Time, rx, tx uint64) {
 	c.Rx += rx
 	c.Tx += tx
 	m[app] = c
+	addTo(s.data.Hourly, hourKey(t), app, rx, tx)
 	s.dirty = true
+}
+
+func addTo(m map[string]map[string]ByteCount, key, app string, rx, tx uint64) {
+	inner := m[key]
+	if inner == nil {
+		inner = map[string]ByteCount{}
+		m[key] = inner
+	}
+	c := inner[app]
+	c.Rx += rx
+	c.Tx += tx
+	inner[app] = c
 }
 
 // SetToday replaces app's total for today (platforms that report daily
@@ -108,7 +180,12 @@ func (s *Store) SetToday(app string, t time.Time, c ByteCount) {
 		m = map[string]ByteCount{}
 		s.data.Usage[d] = m
 	}
-	if m[app] != c {
+	if old := m[app]; old != c {
+		// The platform reports the day's total; the change since the last
+		// report is this hour's share.
+		if c.Rx >= old.Rx && c.Tx >= old.Tx {
+			addTo(s.data.Hourly, hourKey(t), app, c.Rx-old.Rx, c.Tx-old.Tx)
+		}
 		m[app] = c
 		s.dirty = true
 	}
@@ -230,6 +307,7 @@ func (s *Store) Reset() {
 	s.mu.Lock()
 	s.data.Usage = map[string]map[string]ByteCount{}
 	s.data.Destinations = map[string]map[string]Destination{}
+	s.data.Hourly = map[string]map[string]ByteCount{}
 	s.dirty = true
 	s.mu.Unlock()
 	_ = s.Save()
@@ -258,6 +336,12 @@ func (s *Store) Save() error {
 	for d := range s.data.Usage {
 		if d < cutoff {
 			delete(s.data.Usage, d)
+		}
+	}
+	hourCutoff := hourKey(time.Now().Add(-keepHours * time.Hour))
+	for h := range s.data.Hourly {
+		if h < hourCutoff {
+			delete(s.data.Hourly, h)
 		}
 	}
 	b, err := json.Marshal(s.data)

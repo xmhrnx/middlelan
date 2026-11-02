@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/input"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/input"
 	"github.com/xmhrnx/middlelan/internal/nettools"
 )
 
@@ -23,9 +23,9 @@ type dnsTool struct {
 
 func newDNSTool(sh *Shell) *dnsTool {
 	d := &dnsTool{shell: sh, runner: toolRunner{shell: sh}}
-	d.name = giode.Input.Text("Domain or IP, e.g. example.com", styleField).Keyboard(giode.KeyboardURL)
+	d.name = textInputT("Domain or IP, e.g. example.com", styleField).Keyboard(giode.KeyboardURL)
 	d.name.Submit(func(string) { d.start() })
-	d.server = giode.Input.Text("DNS server (optional), e.g. 1.1.1.1", styleField)
+	d.server = textInputT("DNS server (optional), e.g. 1.1.1.1", styleField)
 	d.run = runButton("Look up", d.start, &d.runner)
 	return d
 }
@@ -68,7 +68,7 @@ func (d *dnsTool) view(t *toolsScreen, info toolInfo) giode.Element {
 				giode.Text(r.Value, giode.Styles{Color: "theme.text", FontSize: sizeSmall, FontFamily: fontMono, FlexGrow: 1}).Selectable("dns-"+r.Type+r.Value),
 			))
 		}
-		results = append(results, card("Records", giode.Text("Answered in "+formatMs(d.took), styleMuted), giode.Stack(giode.Styles{Width: -1}, withDividers(rows)...)))
+		results = append(results, card(tr("Records"), giode.Text("Answered in "+formatMs(d.took), styleMuted), giode.Stack(giode.Styles{Width: -1}, withDividers(rows)...)))
 	}
 	return t.toolFrame(info, form, results...)
 }

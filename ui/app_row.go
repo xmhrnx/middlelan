@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 	"github.com/xmhrnx/middlelan/internal/monitor"
 )
 
@@ -36,7 +36,7 @@ func appRow(a monitor.App, share float64, s giode.PressState, compact bool) giod
 	}
 	kids = append(kids, giode.Stack(giode.Styles{Align: giode.AlignEnd, Gap: 3, MinWidth: 84},
 		giode.Text(rate, giode.Styles{Color: "theme.text", FontSize: sizeSmall, FontWeight: giode.FontWeightSemiBold}),
-		giode.Text(formatBytes(a.TodayRx+a.TodayTx)+" today", giode.Styles{Color: "theme.muted", FontSize: sizeTiny}),
+		giode.Text(tr("{amount} today", "amount", formatBytes(a.TodayRx+a.TodayTx)), giode.Styles{Color: "theme.muted", FontSize: sizeTiny}),
 	))
 	return giode.Row(giode.Styles{Align: giode.AlignCenter, Gap: 12, Padding: giode.SymmetricInset(10, 9), BorderRadius: 12, Background: bg, Width: -1, Wrap: giode.WrapNoWrap}, kids...)
 }

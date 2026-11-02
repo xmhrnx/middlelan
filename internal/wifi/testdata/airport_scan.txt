@@ -1,0 +1,5 @@
+                            SSID BSSID             RSSI CHANNEL HT CC SECURITY (auth/unicast/group)
+                         HomeNet 04:d9:f5:0a:0b:0c -55  149,+1  Y  US WPA2(PSK/AES/AES) 
+                    My Neighbour 10:20:30:40:50:61 -72  6       Y  -- WPA(PSK/TKIP/TKIP) WPA2(PSK/AES,TKIP/TKIP) 
+                        FreeWiFi 10:20:30:40:50:62 -80  11      N  -- NONE
+                                 10:20:30:40:50:63 -85  1       Y  -- WEP

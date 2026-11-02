@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/mehran9675/giode"
+import "github.com/xmhrnx/giode"
 
 // noticeBanner is an inline message with an optional action.
 func noticeBanner(icon, text string, tone giode.Color, action giode.Element) giode.Element {

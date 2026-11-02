@@ -23,7 +23,10 @@ const (
 
 // Info is what is known about an address.
 type Info struct {
-	IP          string  `json:"ip"`
+	IP string `json:"ip"`
+	// Domain is the name an app looked up to reach this address (from
+	// observed DNS answers); more telling than Host, the reverse-DNS name.
+	Domain      string  `json:"-"`
 	Host        string  `json:"host,omitempty"`
 	Country     string  `json:"country,omitempty"`
 	CountryCode string  `json:"cc,omitempty"`
@@ -59,10 +62,25 @@ func (i Info) Place() string {
 
 // Owner is the company or service behind the address, best effort.
 func (i Info) Owner() string {
+	if s := ServiceName(i.Domain, ""); s != "" {
+		return s
+	}
 	if s := ServiceName(i.Host, i.Org); s != "" {
 		return s
 	}
 	return i.Org
+}
+
+// Name is the best name for the address: the looked-up domain, else the
+// reverse-DNS host, else the IP.
+func (i Info) Name() string {
+	switch {
+	case i.Domain != "":
+		return i.Domain
+	case i.Host != "":
+		return i.Host
+	}
+	return i.IP
 }
 
 // Classify returns the scope of an IP address.

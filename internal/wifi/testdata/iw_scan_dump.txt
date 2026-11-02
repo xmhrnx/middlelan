@@ -1,0 +1,60 @@
+BSS aa:bb:cc:dd:ee:02(on wlp2s0) -- associated
+	last seen: 51234.567s [boottime]
+	TSF: 123456789012 usec (1d, 10:17:36)
+	freq: 5180
+	beacon interval: 100 TUs
+	capability: ESS Privacy SpectrumMgmt RadioMeasure (0x1111)
+	signal: -52.00 dBm
+	last seen: 120 ms ago
+	Information elements from Probe Response frame:
+	SSID: HomeNet
+	Supported rates: 6.0* 9.0 12.0* 18.0 24.0* 36.0 48.0 54.0 
+	DS Parameter set: channel 36
+	RSN:	 * Version: 1
+		 * Group cipher: CCMP
+		 * Pairwise ciphers: CCMP
+		 * Authentication suites: PSK SAE
+		 * Capabilities: 16-PTKSA-RC 1-GTKSA-RC MFP-capable (0x008c)
+	HT capabilities:
+		Capabilities: 0x1ef
+			RX LDPC
+BSS aa:bb:cc:dd:ee:03(on wlp2s0)
+	freq: 2412
+	capability: ESS Privacy ShortSlotTime (0x0411)
+	signal: -71.00 dBm
+	SSID: Neighbour
+	DS Parameter set: channel 1
+	WPA:	 * Version: 1
+		 * Group cipher: TKIP
+		 * Pairwise ciphers: TKIP
+		 * Authentication suites: PSK
+BSS aa:bb:cc:dd:ee:05(on wlp2s0)
+	freq: 5745
+	capability: ESS Privacy (0x0011)
+	signal: -64.00 dBm
+	SSID: Corp
+	RSN:	 * Version: 1
+		 * Group cipher: CCMP
+		 * Pairwise ciphers: CCMP
+		 * Authentication suites: IEEE 802.1X FT/IEEE 802.1X
+BSS aa:bb:cc:dd:ee:06(on wlp2s0)
+	freq: 2462
+	capability: ESS Privacy (0x0011)
+	signal: -80.00 dBm
+	SSID: OldRouter
+	DS Parameter set: channel 11
+BSS aa:bb:cc:dd:ee:01(on wlp2s0)
+	freq: 2437
+	capability: ESS ShortSlotTime (0x0401)
+	signal: -60.00 dBm
+	SSID: Cafe Guest
+	DS Parameter set: channel 6
+BSS aa:bb:cc:dd:ee:04(on wlp2s0)
+	freq: 5955
+	capability: ESS Privacy (0x0011)
+	signal: -75.00 dBm
+	SSID: Office
+	RSN:	 * Version: 1
+		 * Group cipher: CCMP
+		 * Pairwise ciphers: CCMP
+		 * Authentication suites: SAE

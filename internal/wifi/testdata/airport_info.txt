@@ -1,0 +1,17 @@
+     agrCtlRSSI: -55
+     agrExtRSSI: 0
+    agrCtlNoise: -91
+    agrExtNoise: 0
+          state: running
+        op mode: station 
+     lastTxRate: 702
+        maxRate: 1300
+lastAssocStatus: 0
+    802.11 auth: open
+      link auth: wpa2-psk
+          BSSID: 4:d9:f5:a:b:c
+           SSID: HomeNet
+            MCS: 8
+  guardInterval: 800
+            NSS: 2
+        channel: 149,80

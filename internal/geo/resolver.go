@@ -27,6 +27,25 @@ type Resolver struct {
 	path     string
 	dirty    bool
 	wake     chan struct{}
+	domains  func(ip string) (string, bool)
+}
+
+// SetDomains sets where domain names for addresses come from (the DNS
+// answers apps received).
+func (r *Resolver) SetDomains(fn func(ip string) (string, bool)) {
+	r.mu.Lock()
+	r.domains = fn
+	r.mu.Unlock()
+}
+
+// withDomain fills in the looked-up domain. Called with r.mu held.
+func (r *Resolver) withDomain(in Info) Info {
+	if r.domains != nil {
+		if d, ok := r.domains(in.IP); ok {
+			in.Domain = d
+		}
+	}
+	return in
 }
 
 type entry struct {
@@ -81,7 +100,7 @@ func (r *Resolver) Get(ip string) Info {
 		r.pendGeo = append(r.pendGeo, ip)
 	}
 	e.used = time.Now()
-	return e.Info
+	return r.withDomain(e.Info)
 }
 
 // Peek returns what is known without queueing anything.
@@ -89,9 +108,9 @@ func (r *Resolver) Peek(ip string) (Info, bool) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	if e, ok := r.cache[ip]; ok {
-		return e.Info, true
+		return r.withDomain(e.Info), true
 	}
-	return Info{IP: ip, Scope: Classify(ip)}, false
+	return r.withDomain(Info{IP: ip, Scope: Classify(ip)}), false
 }
 
 func (r *Resolver) signal() {

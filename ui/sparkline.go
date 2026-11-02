@@ -1,8 +1,8 @@
 package ui
 
 import (
-	"github.com/mehran9675/giode"
-	props "github.com/mehran9675/giode/styles/properties"
+	"github.com/xmhrnx/giode"
+	props "github.com/xmhrnx/giode/styles/properties"
 )
 
 // sparkline is a tiny trend line of recent values.

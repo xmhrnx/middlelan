@@ -1,6 +1,6 @@
 package ui
 
-import "github.com/mehran9675/giode"
+import "github.com/xmhrnx/giode"
 
 // pageHeader is a page's title, subtitle and actions.
 func pageHeader(title, subtitle string, actions ...giode.Element) giode.Element {

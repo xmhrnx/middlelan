@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 )
 
 // destinationRow is one owner apps talk to: name, place and apps.
@@ -17,9 +17,9 @@ func destinationRow(d *destination) giode.Element {
 	if len(apps) > 3 {
 		apps = append(apps[:3], "+"+itoa(len(apps)-3))
 	}
-	place := d.Place
+	place := placeName(d.Place)
 	if place == "" {
-		place = "Locating…"
+		place = tr("Locating…")
 	}
 	right := plural(d.Conns, "connection", "connections")
 	if d.Bytes > 0 {

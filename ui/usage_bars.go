@@ -3,8 +3,8 @@ package ui
 import (
 	"time"
 
-	"github.com/mehran9675/giode"
-	props "github.com/mehran9675/giode/styles/properties"
+	"github.com/xmhrnx/giode"
+	props "github.com/xmhrnx/giode/styles/properties"
 	"github.com/xmhrnx/middlelan/internal/monitor"
 )
 
@@ -19,7 +19,7 @@ func usageBars(days []monitor.DayUsage, height int) giode.Element {
 	for i, d := range days {
 		name := d.Day
 		if t, err := time.Parse("2006-01-02", d.Day); err == nil {
-			name = t.Format("Mon")
+			name = weekdayShort(t)
 		}
 		labels[i] = giode.Text(name, giode.Styles{Color: "theme.muted", FontSize: sizeTiny, TextAlign: giode.TextAlignCenter, FlexGrow: 1, Width: -1})
 	}

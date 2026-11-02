@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mehran9675/giode"
-	"github.com/mehran9675/giode/components/input"
+	"github.com/xmhrnx/giode"
+	"github.com/xmhrnx/giode/components/input"
 	"github.com/xmhrnx/middlelan/internal/nettools"
 )
 
@@ -22,7 +22,7 @@ type traceTool struct {
 
 func newTraceTool(sh *Shell) *traceTool {
 	t := &traceTool{shell: sh, runner: toolRunner{shell: sh}}
-	t.host = giode.Input.Text("Host or IP, e.g. example.com", styleField).Keyboard(giode.KeyboardURL)
+	t.host = textInputT("Host or IP, e.g. example.com", styleField).Keyboard(giode.KeyboardURL)
 	t.host.SetText("1.1.1.1")
 	t.host.Submit(func(string) { t.start() })
 	t.run = runButton("Trace", t.start, &t.runner)
@@ -62,9 +62,9 @@ func (t *traceTool) view(ts *toolsScreen, info toolInfo) giode.Element {
 		}
 		if t.runner.running {
 			rows = append(rows, giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter, Padding: giode.UniformInset(8)},
-				giode.Spinner(giode.Styles{Width: 16, Color: "theme.primary"}), giode.Text("Tracing…", styleMuted)))
+				giode.Spinner(giode.Styles{Width: 16, Color: "theme.primary"}), giode.Text(tr("Tracing…"), styleMuted)))
 		}
-		results = append(results, card("Route", nil, giode.Stack(giode.Styles{Width: -1}, rows...)))
+		results = append(results, card(tr("Route"), nil, giode.Stack(giode.Styles{Width: -1}, rows...)))
 	}
 	return ts.toolFrame(info, formRow(t.host, syncRunLabel(t.run, "Trace", &t.runner)), results...)
 }
@@ -74,7 +74,7 @@ func (t *traceTool) hopRow(h nettools.Hop) giode.Element {
 	name, sub := h.Host, h.Addr
 	switch {
 	case h.Timeout:
-		dot, name, sub = "theme.muted", "No reply", "This router doesn't answer probes"
+		dot, name, sub = "theme.muted", tr("No reply"), tr("This router doesn't answer probes")
 	case h.Reached:
 		dot = "theme.success"
 	}

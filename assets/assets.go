@@ -31,7 +31,8 @@ var World []byte
 //go:embed icons/*.svg
 var Icons embed.FS
 
-// Fonts holds the Inter typeface, under "fonts".
+// Fonts holds the Inter typeface and Vazirmatn (Persian script), under
+// "fonts".
 //
-//go:embed fonts/*.otf
+//go:embed fonts/*.otf fonts/*.ttf
 var Fonts embed.FS

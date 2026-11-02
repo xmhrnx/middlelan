@@ -11,6 +11,8 @@ const (
 	screenDevices
 	screenTools
 	screenSettings
+	screenHistory
+	screenSecurity
 	// screenAppDetail shows one app; it isn't in the navigation.
 	screenAppDetail
 )
@@ -25,19 +27,21 @@ type navItem struct {
 }
 
 var navItems = []navItem{
-	{screenDashboard, "Overview", "layout-dashboard", true},
-	{screenApps, "Apps", "app-window", true},
-	{screenConnections, "Connections", "waypoints", false},
-	{screenMap, "Map", "globe", true},
-	{screenDevices, "Devices", "radar", true},
-	{screenTools, "Tools", "wrench", true},
-	{screenSettings, "Settings", "settings", false},
+	{screenDashboard, msg("Overview"), "layout-dashboard", true},
+	{screenApps, msg("Apps"), "app-window", true},
+	{screenConnections, msg("Connections"), "waypoints", false},
+	{screenMap, msg("Map"), "globe", false},
+	{screenHistory, msg("History"), "clock-arrow-up", false},
+	{screenDevices, msg("Devices"), "radar", true},
+	{screenSecurity, msg("Security"), "shield-check", true},
+	{screenTools, msg("Tools"), "wrench", true},
+	{screenSettings, msg("Settings"), "settings", false},
 }
 
 func (s screen) title() string {
 	for _, n := range navItems {
 		if n.screen == s {
-			return n.label
+			return tr(n.label)
 		}
 	}
 	return ""

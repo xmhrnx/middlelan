@@ -52,12 +52,33 @@ func KeyFor(mac, ip string) string {
 	return ip
 }
 
+// Event is a device joining or leaving the network, as seen by scans.
+type Event struct {
+	Key    string    `json:"key"`
+	Online bool      `json:"on"`
+	At     time.Time `json:"at"`
+}
+
+// keepEvents bounds the presence timeline.
+const (
+	keepEvents    = 5000
+	keepEventDays = 30
+)
+
 // Inventory is the set of known devices. Safe from any goroutine.
 type Inventory struct {
 	mu      sync.Mutex
 	path    string
 	devices map[string]*Device
+	events  []Event
 	scanned time.Time
+}
+
+// saved is the file format.
+type saved struct {
+	Devices []*Device `json:"devices"`
+	Events  []Event   `json:"events"`
+	Scanned time.Time `json:"scanned"`
 }
 
 // Open loads the inventory from dir ("" keeps it in memory).
@@ -68,12 +89,16 @@ func Open(dir string) *Inventory {
 	}
 	inv.path = filepath.Join(dir, "devices.json")
 	if b, err := os.ReadFile(inv.path); err == nil {
-		var list []*Device
-		if json.Unmarshal(b, &list) == nil {
-			for _, d := range list {
-				inv.devices[d.Key] = d
-			}
+		var data saved
+		if json.Unmarshal(b, &data) != nil {
+			// The first version saved a bare list of devices.
+			data = saved{}
+			_ = json.Unmarshal(b, &data.Devices)
 		}
+		for _, d := range data.Devices {
+			inv.devices[d.Key] = d
+		}
+		inv.events, inv.scanned = data.Events, data.Scanned
 	}
 	return inv
 }
@@ -85,7 +110,9 @@ func (inv *Inventory) Merge(found []Device, now time.Time) []Device {
 	inv.mu.Lock()
 	defer inv.mu.Unlock()
 	firstEver := len(inv.devices) == 0
-	for _, d := range inv.devices {
+	wasOnline := map[string]bool{}
+	for k, d := range inv.devices {
+		wasOnline[k] = !inv.scanned.IsZero() && d.LastSeen.Equal(inv.scanned)
 		d.Online = false
 	}
 	var fresh []*Device
@@ -127,10 +154,42 @@ func (inv *Inventory) Merge(found []Device, now time.Time) []Device {
 		}
 		inv.devices[key] = d
 	}
+	for k, d := range inv.devices {
+		if d.Online != wasOnline[k] {
+			inv.events = append(inv.events, Event{Key: k, Online: d.Online, At: now})
+		}
+	}
+	inv.trimEvents(now)
 	inv.scanned = now
 	out := make([]Device, len(fresh))
 	for i, d := range fresh {
 		out[i] = *d
+	}
+	return out
+}
+
+func (inv *Inventory) trimEvents(now time.Time) {
+	cutoff := now.AddDate(0, 0, -keepEventDays)
+	i := 0
+	for i < len(inv.events) && inv.events[i].At.Before(cutoff) {
+		i++
+	}
+	inv.events = inv.events[i:]
+	if len(inv.events) > keepEvents {
+		inv.events = inv.events[len(inv.events)-keepEvents:]
+	}
+}
+
+// Events returns the presence timeline, oldest first; key "" returns
+// every device's.
+func (inv *Inventory) Events(key string) []Event {
+	inv.mu.Lock()
+	defer inv.mu.Unlock()
+	out := make([]Event, 0, len(inv.events))
+	for _, e := range inv.events {
+		if key == "" || e.Key == key {
+			out = append(out, e)
+		}
 	}
 	return out
 }
@@ -180,16 +239,16 @@ func (inv *Inventory) Forget(key string) error {
 // Save writes the inventory.
 func (inv *Inventory) Save() error {
 	inv.mu.Lock()
-	list := make([]*Device, 0, len(inv.devices))
+	data := saved{Devices: make([]*Device, 0, len(inv.devices)), Events: append([]Event(nil), inv.events...), Scanned: inv.scanned}
 	for _, d := range inv.devices {
 		c := *d
-		list = append(list, &c)
+		data.Devices = append(data.Devices, &c)
 	}
 	inv.mu.Unlock()
 	if inv.path == "" {
 		return nil
 	}
-	b, err := json.MarshalIndent(list, "", " ")
+	b, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}

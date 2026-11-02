@@ -5,8 +5,8 @@ import (
 	"math"
 	"sync"
 
-	"github.com/mehran9675/giode"
-	props "github.com/mehran9675/giode/styles/properties"
+	"github.com/xmhrnx/giode"
+	props "github.com/xmhrnx/giode/styles/properties"
 	"github.com/xmhrnx/middlelan/assets"
 )
 
@@ -62,7 +62,7 @@ type mapMarker struct {
 func worldMap(markers []mapMarker, home *mapMarker) giode.Element {
 	m := loadWorld()
 	if m.cols == 0 {
-		return emptyState("map", "Map unavailable", "The map data couldn't be loaded.", nil)
+		return emptyState("map", tr("Map unavailable"), tr("The map data couldn't be loaded."), nil)
 	}
 	aspect := float32(m.cols) / float32(m.rows)
 	land := giode.Memo("world-land", func() giode.Element {

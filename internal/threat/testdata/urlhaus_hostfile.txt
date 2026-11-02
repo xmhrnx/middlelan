@@ -1,0 +1,13 @@
+################################################################
+# abuse.ch URLhaus Host file
+#
+# Last updated: 2026-11-02 12:00:00 (UTC)
+################################################################
+#
+127.0.0.1	localhost
+127.0.0.1	evil-malware.example.com
+127.0.0.1	Bad-Host.Net.
+127.0.0.1	payload.cdn-evil.org # trailing comment
+
+127.0.0.1	45.95.147.10
+127.0.0.1	malware.co.uk

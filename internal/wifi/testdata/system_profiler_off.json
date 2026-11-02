@@ -1,0 +1,13 @@
+{
+  "SPAirPortDataType" : [
+    {
+      "spairport_airport_interfaces" : [
+        {
+          "_name" : "en0",
+          "spairport_status_information" : "spairport_status_off",
+          "spairport_wireless_mac_address" : "f0:2f:4b:12:34:56"
+        }
+      ]
+    }
+  ]
+}

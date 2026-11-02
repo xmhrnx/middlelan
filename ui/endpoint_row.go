@@ -4,26 +4,26 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 	"github.com/xmhrnx/middlelan/internal/geo"
 )
 
 // endpointRow shows one remote address: who it is, where, and how much
 // traffic went there.
 func endpointRow(info geo.Info, port int, proto string, bytes uint64, active bool, lastSeen, now time.Time) giode.Element {
-	title := info.Host
-	if title == "" {
-		title = info.IP
-	}
+	title := info.Name()
 	details := []string{}
+	if info.Domain != "" && info.Host != "" && info.Host != info.Domain {
+		details = append(details, info.Host)
+	}
 	if o := info.Owner(); o != "" {
 		details = append(details, o)
 	}
-	if p := info.Place(); p != "" {
+	if p := placeName(info.Place()); p != "" {
 		details = append(details, p)
 	}
 	details = append(details, strings.ToUpper(strings.TrimSuffix(proto, "6"))+" "+serviceLabel(port))
-	status := pill("Active", "theme.success")
+	status := pill(tr("Active"), "theme.success")
 	if !active {
 		status = giode.Text(formatAgo(lastSeen, now), styleMuted)
 	}

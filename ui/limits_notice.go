@@ -1,7 +1,7 @@
 package ui
 
 import (
-	"github.com/mehran9675/giode"
+	"github.com/xmhrnx/giode"
 	"github.com/xmhrnx/middlelan/internal/monitor"
 )
 
@@ -18,19 +18,19 @@ type limitsNotice struct {
 func newLimitsNotice(sh *Shell) *limitsNotice {
 	n := &limitsNotice{shell: sh}
 	small := giode.Styles{Padding: giode.SymmetricInset(12, 6), BorderRadius: 8, FontSize: sizeSmall}
-	n.elevate = giode.Button("Run as administrator", stylePrimary.With(small)).OnClick(func() {
+	n.elevate = buttonT("Run as administrator", stylePrimary.With(small)).OnClick(func() {
 		go func() {
 			if err := sh.svc.App.RestartElevated(); err != nil {
-				sh.Toast(giode.ToastWarning, "Administrator rights weren't granted: "+err.Error())
+				sh.Toast(giode.ToastWarning, tr("Administrator rights weren't granted: {error}", "error", err.Error()))
 			}
 		}()
 	})
-	n.usage = giode.Button("Grant Usage Access", stylePrimary.With(small)).OnClick(func() {
+	n.usage = buttonT("Grant Usage Access", stylePrimary.With(small)).OnClick(func() {
 		if err := monitor.OpenUsageAccessSettings(); err != nil {
 			sh.Toast(giode.ToastError, err.Error())
 		}
 	})
-	n.dismiss = giode.Button("Hide", styleGhost.With(small)).Variant(giode.VariantGhost).OnClick(func() {
+	n.dismiss = buttonT("Hide", styleGhost.With(small)).Variant(giode.VariantGhost).OnClick(func() {
 		n.dismissed = sh.svc.Collector.Snapshot().Limits
 	})
 	return n
@@ -38,7 +38,7 @@ func newLimitsNotice(sh *Shell) *limitsNotice {
 
 func (n *limitsNotice) view(s *monitor.Snapshot) giode.Element {
 	if s.Err != "" {
-		return noticeBanner("shield-alert", "Monitoring error: "+s.Err, "theme.danger", nil)
+		return noticeBanner("shield-alert", tr("Monitoring error: {error}", "error", s.Err), "theme.danger", nil)
 	}
 	if s.Limits == "" || s.Limits == n.dismissed {
 		return nil
