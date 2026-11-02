@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/mehran9675/giode"
+	"github.com/mehran9675/giode/components/titlebar"
 	"github.com/xmhrnx/middlelan/internal/geo"
 	"github.com/xmhrnx/middlelan/internal/inventory"
 	"github.com/xmhrnx/middlelan/internal/monitor"
@@ -32,6 +33,7 @@ type Shell struct {
 	sidebar   *sidebar
 	bottomNav *bottomNav
 	topBar    *topBar
+	windowBar *titlebar.TitleBar
 
 	dashboard   *dashboardScreen
 	apps        *appsScreen
@@ -57,6 +59,7 @@ func NewShell(svc Services) *Shell {
 	sh.sidebar = newSidebar(sh)
 	sh.bottomNav = newBottomNav(sh)
 	sh.topBar = newTopBar(sh)
+	sh.windowBar = newWindowBar(sh)
 	sh.dashboard = newDashboardScreen(sh)
 	sh.apps = newAppsScreen(sh)
 	sh.detail = newAppDetailScreen(sh)
@@ -150,13 +153,14 @@ func (sh *Shell) page() giode.Element {
 
 // View is the whole window, every frame.
 func (sh *Shell) View() giode.Element {
-	return giode.Box(giode.Styles{Width: -1, Height: -1, Background: "theme.background"},
-		giode.Responsive(
-			giode.Breakpoint{MaxWidth: 760, Name: "compact", View: sh.compactView},
-			giode.Breakpoint{View: sh.wideView},
-		),
-		sh.toasts,
+	body := giode.Responsive(
+		giode.Breakpoint{MaxWidth: 760, Name: "compact", View: sh.compactView},
+		giode.Breakpoint{View: sh.wideView},
 	)
+	if sh.windowBar != nil {
+		body = giode.Stack(giode.Styles{Width: -1, Height: -1}, sh.windowBar, giode.Stack(giode.Styles{FlexGrow: 1, Width: -1}, body))
+	}
+	return giode.Box(giode.Styles{Width: -1, Height: -1, Background: "theme.background"}, body, sh.toasts)
 }
 
 func (sh *Shell) wideView() giode.Element {

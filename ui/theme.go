@@ -82,8 +82,3 @@ func applyTheme(mode string) {
 		giode.SetMode(giode.ModeDark)
 	}
 }
-
-// gradientBrand is the emblem's cyan to violet sweep.
-func gradientBrand() *giode.LinearGradient {
-	return giode.Linear(135, "#22d3ee", "#818cf8", "#c084fc")
-}
