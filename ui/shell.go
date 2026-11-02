@@ -47,14 +47,17 @@ type Shell struct {
 	// OnSettingsChanged lets main apply settings it owns (tray, keep-alive).
 	OnSettingsChanged func(settings.Settings)
 
+	shortcuts []giode.KeyShortcut
+	ctx       context.Context
+
 	redrawPending atomic.Bool
 	public        atomic.Pointer[nettools.PublicInfo]
 	netInfo       atomic.Pointer[nettools.NetInfo]
 }
 
 // NewShell builds the UI. Call it once, before App.Run.
-func NewShell(svc Services) *Shell {
-	sh := &Shell{svc: svc, toasts: giode.Toaster().Duration(5 * time.Second).Max(3)}
+func NewShell(ctx context.Context, svc Services) *Shell {
+	sh := &Shell{ctx: ctx, svc: svc, toasts: giode.Toaster().Duration(5 * time.Second).Max(3)}
 	applyTheme(svc.Settings.Get().Theme)
 	sh.sidebar = newSidebar(sh)
 	sh.bottomNav = newBottomNav(sh)
@@ -68,6 +71,7 @@ func NewShell(svc Services) *Shell {
 	sh.devices = newDevicesScreen(sh)
 	sh.tools = newToolsScreen(sh)
 	sh.settings = newSettingsScreen(sh)
+	sh.shortcuts = newShortcuts(sh)
 	return sh
 }
 
@@ -153,6 +157,7 @@ func (sh *Shell) page() giode.Element {
 
 // View is the whole window, every frame.
 func (sh *Shell) View() giode.Element {
+	giode.Shortcuts(sh.shortcuts...)
 	body := giode.Responsive(
 		giode.Breakpoint{MaxWidth: 760, Name: "compact", View: sh.compactView},
 		giode.Breakpoint{View: sh.wideView},

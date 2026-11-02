@@ -27,7 +27,8 @@ Platforms: **Windows, macOS, Linux, Android** (one codebase).
 ### Runs quietly in the background
 - Closes to the system tray / macOS menu bar and keeps monitoring. The tray menu can pause it
   and shows live rates in the tooltip.
-- Optional **start hidden at login** (Windows Run key, macOS LaunchAgent, Linux autostart).
+- Optional **start in the tray at login** (Windows Run key, macOS LaunchAgent, Linux autostart).
+- Keyboard shortcuts: Ctrl/⌘+1–6 switch pages, Ctrl/⌘+F search, Ctrl/⌘+P pause, Ctrl/⌘+, settings, F5 refresh.
 - Sampling every 2 s while the window is shown and every 6 s while hidden. When idle it draws
   about one frame per sample, and per-socket counters come straight from the kernel, so it
   doesn't poll processes.
@@ -94,7 +95,7 @@ internal/monitor                 connection sources per OS, collector, usage sto
 internal/geo                     reverse DNS, IP geolocation, owner names (cached, batched)
 internal/nettools                ping, traceroute, port scan, DNS, WHOIS, LAN scan, OUI, SSDP, mDNS, speed test…
 internal/inventory               known devices, new-device detection, background scanner
-internal/settings, autostart     preferences, start at login
+internal/settings                preferences
 ui/                              Giode UI: shell, screens, components (one per file)
 ```
 

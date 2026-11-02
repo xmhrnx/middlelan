@@ -11,7 +11,6 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"slices"
 	"strings"
 	"time"
 
@@ -22,7 +21,6 @@ import (
 	"github.com/mehran9675/giode"
 
 	"github.com/xmhrnx/middlelan/assets"
-	"github.com/xmhrnx/middlelan/internal/autostart"
 	"github.com/xmhrnx/middlelan/internal/geo"
 	"github.com/xmhrnx/middlelan/internal/inventory"
 	"github.com/xmhrnx/middlelan/internal/monitor"
@@ -37,6 +35,11 @@ func main() {
 }
 
 func run() error {
+	// Names the login entry and other registrations; the giode CLI sets it
+	// from giode.toml, a plain go build doesn't.
+	if giode.AppID == "" {
+		giode.AppID = "com.middlelan.app"
+	}
 	if err := registerFonts(); err != nil {
 		return err
 	}
@@ -52,7 +55,6 @@ func run() error {
 		log.Printf("settings: %v (using defaults)", err)
 	}
 	st := prefs.Get()
-	startHidden := slices.Contains(os.Args[1:], autostart.HiddenFlag)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -89,17 +91,17 @@ func run() error {
 		Frameless:  !isAndroid,
 		Background: "theme.background",
 		Icon:       assets.Icon,
-		Minimized:  startHidden,
 		// Closing hides to the tray so monitoring continues; Quit ends it.
-		CloseToTray:    st.CloseToTray && giode.TraySupported(),
-		MinimizeToTray: false,
+		CloseToTray: st.CloseToTray && giode.TraySupported(),
+		// Started at login (Settings → Start in the tray), the window
+		// stays hidden and only the tray icon shows.
+		StartInTray: giode.StartInTrayAtLogin,
 		SingleInstanceLock: &giode.SingleInstanceLock{
 			UniqueID:               "com.middlelan.app",
 			OnSecondInstanceLaunch: func() { app.ShowWindow() },
 		},
 		OnReady: func() {
-			if startHidden && giode.TraySupported() {
-				app.HideWindow()
+			if giode.LaunchedAtLogin() && giode.TraySupported() {
 				collector.SetVisible(false)
 			}
 			applyKeepAlive(app, prefs.Get())
@@ -113,7 +115,7 @@ func run() error {
 		OnShutdown: cancel,
 	})
 
-	shell = ui.NewShell(ui.Services{
+	shell = ui.NewShell(ctx, ui.Services{
 		App: app, Collector: collector, Resolver: resolver, Settings: prefs, Inventory: inv, Scanner: scanner,
 	})
 	shell.OnSettingsChanged = func(s settings.Settings) { applyKeepAlive(app, s) }

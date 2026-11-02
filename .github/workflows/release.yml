@@ -12,6 +12,7 @@ permissions:
   contents: write
 
 env:
+  # A four-part tag (v1.4.2.7) also sets the build number.
   GIODE_VERSION: ${{ github.ref_type == 'tag' && github.ref_name || '' }}
   GIODE_BUILD: ${{ github.run_number }}
 
