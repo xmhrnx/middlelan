@@ -8,7 +8,7 @@ func (t *toolsScreen) toolFrame(info toolInfo, form giode.Element, results ...gi
 	head := giode.Row(giode.Styles{Gap: 14, Align: giode.AlignCenter, Width: -1, Wrap: giode.WrapNoWrap},
 		iconBadge(info.icon, info.color, 46),
 		giode.Stack(giode.Styles{Gap: 3, FlexGrow: 1, Width: -1},
-			giode.Row(giode.Styles{Gap: 8, Align: giode.AlignCenter}, giode.Text(info.name, styleTitle), proBadge(info.pro)),
+			giode.Text(info.name, styleTitle),
 			giode.Text(info.desc, giode.Styles{Color: "theme.muted", FontSize: sizeSmall}),
 		),
 	)
@@ -18,16 +18,6 @@ func (t *toolsScreen) toolFrame(info toolInfo, form giode.Element, results ...gi
 	}
 	kids = append(kids, results...)
 	return pageBody(kids...)
-}
-
-// proBadge marks the advanced tools (which other apps sell separately;
-// MiddleLAN includes them).
-func proBadge(on bool) giode.Element {
-	if !on {
-		return giode.Box(giode.Styles{})
-	}
-	return giode.Box(giode.Styles{Padding: giode.SymmetricInset(7, 2), BorderRadius: 6, BackgroundGradient: gradientBrand()},
-		giode.Text("PRO", giode.Styles{Color: "#ffffff", FontSize: 10, FontWeight: giode.FontWeightBold}))
 }
 
 // formRow lays out a field and its button side by side.

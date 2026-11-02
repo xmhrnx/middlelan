@@ -46,11 +46,10 @@ UPnP & Bonjour service discovery · Ping · Traceroute · Port scanner · DNS lo
 TLS certificate inspector · Wake on LAN · Network info (interfaces, gateway, DNS, public IP,
 ISP) · Subnet calculator.
 
-The advanced tools are marked **PRO** in the UI; they're all included.
-
 ### Design
-Dark and light themes, the Inter typeface, and responsive layouts: a sidebar on desktops and
-a bottom navigation bar on phones.
+Dark and light themes, the Inter typeface, and a custom title bar on desktops (traffic lights on
+macOS) instead of the OS frame. Layouts are responsive: a sidebar on desktops and a bottom
+navigation bar on phones.
 
 ## How it sees connections
 

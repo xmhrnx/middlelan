@@ -32,23 +32,22 @@ type toolInfo struct {
 	desc  string
 	icon  string
 	color giode.Color
-	pro   bool
 }
 
 var toolCatalog = []toolInfo{
-	{toolSpeed, "Speed test", "Download, upload, latency and jitter of your internet connection.", "gauge", "theme.primary", false},
-	{toolUptime, "Internet monitor", "Watches latency and packet loss continuously and logs outages.", "signal", "theme.success", true},
-	{toolRouter, "Router check", "Audits your router for risky open services and DNS hijacking.", "shield-check", "theme.warning", true},
-	{toolDiscovery, "Service discovery", "Finds UPnP and Bonjour devices and services on the network.", "cast", "theme.accent", true},
-	{toolPing, "Ping", "Measures round-trip time and packet loss to any host.", "activity", "theme.info", false},
-	{toolTrace, "Traceroute", "Shows each router between you and a host.", "route", "theme.accent", false},
-	{toolPorts, "Port scanner", "Finds open TCP ports and the services behind them.", "scan-search", "theme.danger", false},
-	{toolDNS, "DNS lookup", "Queries A, AAAA, MX, TXT, NS and other records.", "search", "theme.primary", false},
-	{toolWhois, "WHOIS", "Who owns a domain name or IP address.", "book-open", "theme.info", false},
-	{toolTLS, "Certificate inspector", "Checks a site's TLS certificate, chain and expiry.", "lock", "theme.success", true},
-	{toolWake, "Wake on LAN", "Turns on a sleeping computer over the network.", "power", "theme.warning", false},
-	{toolNetInfo, "Network info", "Interfaces, addresses, router, DNS servers and public IP.", "network", "theme.accent", false},
-	{toolSubnet, "Subnet calculator", "Network, broadcast, host range and mask of any CIDR.", "calculator", "theme.info", false},
+	{toolSpeed, "Speed test", "Download, upload, latency and jitter of your internet connection.", "gauge", "theme.primary"},
+	{toolUptime, "Internet monitor", "Watches latency and packet loss continuously and logs outages.", "signal", "theme.success"},
+	{toolRouter, "Router check", "Audits your router for risky open services and DNS hijacking.", "shield-check", "theme.warning"},
+	{toolDiscovery, "Service discovery", "Finds UPnP and Bonjour devices and services on the network.", "cast", "theme.accent"},
+	{toolPing, "Ping", "Measures round-trip time and packet loss to any host.", "activity", "theme.info"},
+	{toolTrace, "Traceroute", "Shows each router between you and a host.", "route", "theme.accent"},
+	{toolPorts, "Port scanner", "Finds open TCP ports and the services behind them.", "scan-search", "theme.danger"},
+	{toolDNS, "DNS lookup", "Queries A, AAAA, MX, TXT, NS and other records.", "search", "theme.primary"},
+	{toolWhois, "WHOIS", "Who owns a domain name or IP address.", "book-open", "theme.info"},
+	{toolTLS, "Certificate inspector", "Checks a site's TLS certificate, chain and expiry.", "lock", "theme.success"},
+	{toolWake, "Wake on LAN", "Turns on a sleeping computer over the network.", "power", "theme.warning"},
+	{toolNetInfo, "Network info", "Interfaces, addresses, router, DNS servers and public IP.", "network", "theme.accent"},
+	{toolSubnet, "Subnet calculator", "Network, broadcast, host range and mask of any CIDR.", "calculator", "theme.info"},
 }
 
 // tool is one tool's page.
@@ -130,11 +129,7 @@ func toolCard(info toolInfo, s giode.PressState) giode.Element {
 		border = giode.Mix(info.color, "theme.surface", 0.5)
 	}
 	return giode.Box(styleCard.With(giode.Styles{BorderColor: border, Gap: 10, Height: 150, Width: -1}),
-		giode.Row(giode.Styles{Align: giode.AlignCenter, Width: -1, Wrap: giode.WrapNoWrap},
-			iconBadge(info.icon, info.color, 40),
-			giode.Box(giode.Styles{FlexGrow: 1}),
-			proBadge(info.pro),
-		),
+		iconBadge(info.icon, info.color, 40),
 		giode.Text(info.name, giode.Styles{Color: "theme.text", FontSize: 15, FontWeight: giode.FontWeightSemiBold}),
 		giode.Text(info.desc, giode.Styles{Color: "theme.muted", FontSize: sizeSmall, MaxLines: 2}),
 	)

@@ -79,11 +79,14 @@ func run() error {
 	scanner := inventory.NewScanner(inv)
 
 	app = giode.New(giode.Config{
-		Title:      "MiddleLAN",
-		Size:       image.Pt(1240, 800),
-		MinSize:    image.Pt(380, 560),
-		Resizable:  true,
-		Center:     true,
+		Title:     "MiddleLAN",
+		Size:      image.Pt(1240, 800),
+		MinSize:   image.Pt(380, 560),
+		Resizable: true,
+		Center:    true,
+		// A custom title bar (ui/window_bar.go) replaces the OS frame on
+		// desktops; phones have none.
+		Frameless:  !isAndroid,
 		Background: "theme.background",
 		Icon:       assets.Icon,
 		Minimized:  startHidden,

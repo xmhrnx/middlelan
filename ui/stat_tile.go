@@ -7,7 +7,7 @@ import (
 
 // statTile is a key figure: an icon, a label, a big value and a note.
 func statTile(icon, label, value, note string, accent giode.Color) giode.Element {
-	return giode.Box(styleCard.With(giode.Styles{Gap: 10, Padding: giode.UniformInset(16)}),
+	return cardStyled(giode.Styles{Gap: 10, Padding: giode.UniformInset(16)},
 		giode.Row(giode.Styles{Align: giode.AlignCenter, Gap: 10, Wrap: giode.WrapNoWrap},
 			iconBadge(icon, accent, 32),
 			giode.Text(label, giode.Styles{Color: "theme.muted", FontSize: sizeSmall, FontWeight: giode.FontWeightMedium, TextOverflow: giode.TextOverflowEllipsis}),
