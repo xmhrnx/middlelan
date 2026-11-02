@@ -21,10 +21,19 @@ import (
 	"github.com/mehran9675/giode"
 
 	"github.com/xmhrnx/middlelan/assets"
+	"github.com/xmhrnx/middlelan/internal/alerts"
+	"github.com/xmhrnx/middlelan/internal/dnslog"
+	"github.com/xmhrnx/middlelan/internal/firewall"
 	"github.com/xmhrnx/middlelan/internal/geo"
 	"github.com/xmhrnx/middlelan/internal/inventory"
 	"github.com/xmhrnx/middlelan/internal/monitor"
+	"github.com/xmhrnx/middlelan/internal/router"
 	"github.com/xmhrnx/middlelan/internal/settings"
+	"github.com/xmhrnx/middlelan/internal/speedlog"
+	"github.com/xmhrnx/middlelan/internal/threat"
+	"github.com/xmhrnx/middlelan/internal/updates"
+	"github.com/xmhrnx/middlelan/internal/vpn"
+	"github.com/xmhrnx/middlelan/locales"
 	"github.com/xmhrnx/middlelan/ui"
 )
 
@@ -62,23 +71,57 @@ func run() error {
 	var app *giode.App
 	var shell *ui.Shell
 	var collector *monitor.Collector
+	var tray *trayPanel
+	var watcher *alerts.Watcher
+	var fw *firewall.Firewall
 	resolver := geo.New(dir, st.OnlineLookups)
+	names := dnslog.New()
+	resolver.SetDomains(names.Lookup)
 	collector = monitor.NewCollector(monitor.NewSource(), monitor.Options{
 		Interval: 2 * time.Second, HiddenInterval: 6 * time.Second, DataDir: dir,
 		OnUpdate: func() {
 			if shell != nil {
+				snap := collector.Snapshot()
 				shell.Redraw()
-				updateTray(app, collector)
+				tray.refresh(false)
+				shell.OnSample(snap)
+				if watcher != nil && prefs.Get().ThreatAlerts {
+					for _, a := range watcher.Check(snap.Conns, snap.Time) {
+						notify(app, giode.Intl("Suspicious connection"), giode.Intl("{app} contacted {ip}, listed for {category} ({list}).",
+							"app", a.App, "ip", a.IP, "category", a.Category, "list", a.List))
+					}
+				}
 			}
 		},
 		OnNewApp: func(name string) {
-			if app != nil && prefs.Get().NotifyNewApps {
-				notify(app, "New app on the network", name+" connected to the internet for the first time.")
+			p := prefs.Get()
+			if shell != nil && fw != nil && fw.Enabled() && p.FirewallAsk {
+				shell.AskAboutApp(name)
+			} else if app != nil && p.NotifyNewApps {
+				notify(app, giode.Intl("New app on the network"), giode.Intl("{app} connected to the internet for the first time.", "app", name))
 			}
 		},
 	})
 	inv := inventory.Open(dir)
 	scanner := inventory.NewScanner(inv)
+	gateway := &router.Watcher{}
+	threats := threat.Open(dir)
+	watcher = alerts.New(threats, names.Lookup, dir)
+	fw, err = firewall.Open(dir, firewall.DefaultBackend())
+	if err != nil {
+		// The firewall is optional: without its saved state it starts
+		// off, which is the default anyway.
+		log.Printf("firewall: %v", err)
+	}
+	if fw != nil {
+		// Re-resolve host rules, or, if the firewall is off but the last
+		// run crashed with rules installed, remove them.
+		go func() {
+			if err := fw.Refresh(); err != nil {
+				log.Printf("firewall: %v", err)
+			}
+		}()
+	}
 
 	app = giode.New(giode.Config{
 		Title:     "MiddleLAN",
@@ -86,6 +129,9 @@ func run() error {
 		MinSize:   image.Pt(380, 560),
 		Resizable: true,
 		Center:    true,
+		// The interface language: the saved choice, else the system's.
+		Locale: st.Language,
+		Intl:   &giode.IntlOptions{FS: locales.FS, Dir: ".", Fallback: "en"},
 		// A custom title bar (ui/window_bar.go) replaces the OS frame on
 		// desktops; phones have none.
 		Frameless:  !isAndroid,
@@ -114,7 +160,10 @@ func run() error {
 
 	shell = ui.NewShell(ctx, ui.Services{
 		App: app, Collector: collector, Resolver: resolver, Settings: prefs, Inventory: inv, Scanner: scanner,
+		Router: gateway, Speed: speedlog.Open(dir), Updates: updates.New(giode.AppVersion),
+		Firewall: fw, Alerts: watcher, Threats: threats, Names: names,
 	})
+	gateway.OnChange = shell.Redraw
 	shell.OnSettingsChanged = func(s settings.Settings) { applyKeepAlive(app, s) }
 	resolver.OnChange(shell.Redraw)
 	scanner.OnChange = shell.Redraw
@@ -126,12 +175,37 @@ func run() error {
 		for _, d := range devs {
 			names = append(names, d.Name()+" ("+d.IP+")")
 		}
-		notify(app, "New device on your network", strings.Join(names, ", "))
+		notify(app, giode.Intl("New device on your network"), strings.Join(names, ", "))
 	}
 
-	setupTray(app, collector, shell)
+	tray = setupTray(app, collector, shell)
 	go collector.Run(ctx)
+	// The router is polled every 10 s while the window shows, every
+	// minute in the background.
+	go gateway.Run(ctx, func() time.Duration {
+		if app.WindowVisible() {
+			return 10 * time.Second
+		}
+		return time.Minute
+	})
+	shell.Start(ctx)
+	// The Android VPN: new flows obey the firewall rules, and the DNS
+	// answers it relays give domain names. (A no-op elsewhere.)
+	vpn.SetHooks(vpn.Hooks{
+		Block: func(app, pkg, ip string, port int) bool { return fw != nil && fw.Blocks(app, pkg, ip) },
+		DNS: func(resp []byte) {
+			for _, a := range dnslog.ParseResponse(resp, time.Now()) {
+				names.Add(a)
+			}
+		},
+	})
+	go threats.Run(ctx, 24*time.Hour, func() bool { return prefs.Get().ThreatAlerts })
 	go resolver.Run(ctx)
+	go func() {
+		if err := names.Run(ctx); err != nil {
+			log.Printf("domain names: %v", err)
+		}
+	}()
 	go scanner.RunPeriodic(ctx,
 		func() bool { return prefs.Get().BackgroundScan },
 		func() time.Duration { return time.Duration(prefs.Get().ScanEveryMinutes) * time.Minute })
@@ -140,8 +214,9 @@ func run() error {
 	return app.Run(shell.View)
 }
 
-// registerFonts loads Inter for the interface and the Go fonts for code
-// and fallback glyphs.
+// registerFonts loads Inter for the interface, Vazirmatn for Persian
+// (Arabic script, which Inter lacks) and the Go fonts for code and
+// fallback glyphs.
 func registerFonts() error {
 	weights := map[string]font.Weight{"Regular": font.Normal, "Medium": font.Medium, "SemiBold": font.SemiBold, "Bold": font.Bold}
 	var faces []font.FontFace
@@ -155,6 +230,17 @@ func registerFonts() error {
 			return fmt.Errorf("font %s: %w", name, err)
 		}
 		faces = append(faces, font.FontFace{Font: font.Font{Typeface: "Inter", Weight: w}, Face: face})
+	}
+	for name, w := range map[string]font.Weight{"Regular": font.Normal, "Bold": font.Bold} {
+		b, err := fs.ReadFile(assets.Fonts, "fonts/Vazirmatn-"+name+".ttf")
+		if err != nil {
+			return fmt.Errorf("font Vazirmatn %s: %w", name, err)
+		}
+		face, err := opentype.Parse(b)
+		if err != nil {
+			return fmt.Errorf("font Vazirmatn %s: %w", name, err)
+		}
+		faces = append(faces, font.FontFace{Font: font.Font{Typeface: "Vazirmatn", Weight: w}, Face: face})
 	}
 	giode.RegisterFonts(append(faces, gofont.Collection()...))
 	return nil

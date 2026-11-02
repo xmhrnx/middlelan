@@ -17,9 +17,9 @@ func destinationRow(d *destination) giode.Element {
 	if len(apps) > 3 {
 		apps = append(apps[:3], "+"+itoa(len(apps)-3))
 	}
-	place := d.Place
+	place := placeName(d.Place)
 	if place == "" {
-		place = "Locating…"
+		place = tr("Locating…")
 	}
 	right := plural(d.Conns, "connection", "connections")
 	if d.Bytes > 0 {

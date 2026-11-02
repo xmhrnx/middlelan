@@ -18,10 +18,10 @@ func rateChart(points []monitor.RatePoint, height int) giode.Element {
 	top := niceCeil(peak)
 	return giode.Stack(giode.Styles{Gap: 6, Width: -1},
 		giode.Row(giode.Styles{Gap: 16, Align: giode.AlignCenter},
-			legendDot("Download", colDown),
-			legendDot("Upload", colUp),
+			legendDot(tr("Download"), colDown),
+			legendDot(tr("Upload"), colUp),
 			giode.Box(giode.Styles{FlexGrow: 1}),
-			giode.Text("Scale "+formatRate(top), styleMuted),
+			giode.Text(tr("Scale {rate}", "rate", formatRate(top)), styleMuted),
 		),
 		giode.Canvas(giode.Styles{Width: -1, Height: props.Height(height)}, func(p *giode.Painter) {
 			w, h := p.Width(), p.Height()

@@ -14,6 +14,9 @@ import (
 type Settings struct {
 	// Theme is "dark", "light" or "system".
 	Theme string `json:"theme"`
+	// Language is the interface language ("es", "fa", ...); empty
+	// follows the system.
+	Language string `json:"language,omitempty"`
 	// OnlineLookups allows locating remote addresses through geojs.io.
 	OnlineLookups bool `json:"onlineLookups"`
 	// NotifyNewApps notifies when a program uses the network for the first time.

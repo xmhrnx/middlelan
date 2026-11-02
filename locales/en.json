@@ -1,0 +1,74 @@
+{
+ "{count} endpoints this session": {
+  "one": "{count} endpoint this session",
+  "other": "{count} endpoints this session"
+ },
+ "{count} listening ports": {
+  "one": "{count} listening port",
+  "other": "{count} listening ports"
+ },
+ "{count} connections": {
+  "one": "{count} connection",
+  "other": "{count} connections"
+ },
+ "{count} programs use the network": {
+  "one": "{count} program uses the network",
+  "other": "{count} programs use the network"
+ },
+ "{count} open sockets right now": {
+  "one": "{count} open socket right now",
+  "other": "{count} open sockets right now"
+ },
+ "{count} open connections": {
+  "one": "{count} open connection",
+  "other": "{count} open connections"
+ },
+ "{count} devices online · scanned {ago}": {
+  "one": "{count} device online · scanned {ago}",
+  "other": "{count} devices online · scanned {ago}"
+ },
+ "{count} more programs waiting": {
+  "one": "{count} more program waiting",
+  "other": "{count} more programs waiting"
+ },
+ "{count} networks": {
+  "one": "{count} network",
+  "other": "{count} networks"
+ },
+ "{count} remote networks": {
+  "one": "{count} remote network",
+  "other": "{count} remote networks"
+ },
+ "{count} open ports": {
+  "one": "{count} open port",
+  "other": "{count} open ports"
+ },
+ "{count} findings · checked {ago}": {
+  "one": "{count} finding · checked {ago}",
+  "other": "{count} findings · checked {ago}"
+ },
+ "{count} alerts need your attention": {
+  "one": "{count} alert needs your attention",
+  "other": "{count} alerts need your attention"
+ },
+ "{count} times": {
+  "one": "{count} time",
+  "other": "{count} times"
+ },
+ "{count} entries": {
+  "one": "{count} entry",
+  "other": "{count} entries"
+ },
+ "{count} tests in the last 30 days": {
+  "one": "{count} test in the last 30 days",
+  "other": "{count} tests in the last 30 days"
+ },
+ "{count} checks": {
+  "one": "{count} check",
+  "other": "{count} checks"
+ },
+ "Running · {count} open connections": {
+  "one": "Running · {count} open connection",
+  "other": "Running · {count} open connections"
+ }
+}

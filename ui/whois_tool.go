@@ -22,7 +22,7 @@ type whoisTool struct {
 
 func newWhoisTool(sh *Shell) *whoisTool {
 	w := &whoisTool{shell: sh, runner: toolRunner{shell: sh}}
-	w.query = giode.Input.Text("Domain or IP, e.g. example.com", styleField).Keyboard(giode.KeyboardURL)
+	w.query = textInputT("Domain or IP, e.g. example.com", styleField).Keyboard(giode.KeyboardURL)
 	w.query.Submit(func(string) { w.start() })
 	w.run = runButton("Look up", w.start, &w.runner)
 	return w
@@ -55,10 +55,10 @@ func (w *whoisTool) view(t *toolsScreen, info toolInfo) giode.Element {
 		results = append(results, noticeBanner("shield-alert", w.err, "theme.warning", nil))
 	}
 	if w.runner.running {
-		results = append(results, giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter}, giode.Spinner(giode.Styles{Width: 16, Color: "theme.primary"}), giode.Text("Asking the registry…", styleMuted)))
+		results = append(results, giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter}, giode.Spinner(giode.Styles{Width: 16, Color: "theme.primary"}), giode.Text(tr("Asking the registry…"), styleMuted)))
 	}
 	if w.result != "" {
-		results = append(results, card("Registration", nil,
+		results = append(results, card(tr("Registration"), nil,
 			giode.Text(w.result, giode.Styles{Color: "theme.text", FontSize: sizeSmall, FontFamily: fontMono, LineHeight: 18}).Selectable("whois")))
 	}
 	return t.toolFrame(info, formRow(w.query, syncRunLabel(w.run, "Look up", &w.runner)), results...)

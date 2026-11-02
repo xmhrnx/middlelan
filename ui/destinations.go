@@ -39,7 +39,7 @@ func groupDestinations(apps []monitor.App, res *geo.Resolver, activeOnly bool) [
 			}
 			owner := info.Owner()
 			if owner == "" {
-				owner = info.Host
+				owner = nonEmpty(info.Domain, info.Host)
 			}
 			if owner == "" {
 				owner = e.IP

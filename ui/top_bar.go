@@ -17,7 +17,8 @@ func newTopBar(sh *Shell) *topBar {
 		}
 		return giode.Box(giode.Styles{Padding: giode.UniformInset(8), BorderRadius: 10, Background: bg},
 			giode.Icon("settings", giode.Styles{Width: 20, Color: "theme.text"}))
-	}).Label("Settings").OnClick(func(giode.ClickEvent) { sh.navigate(screenSettings) })
+	}).OnClick(func(giode.ClickEvent) { sh.navigate(screenSettings) })
+	localized(func() { t.settings.Label(tr("Settings")) })
 	return t
 }
 

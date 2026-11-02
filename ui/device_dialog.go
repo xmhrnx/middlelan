@@ -30,26 +30,26 @@ type deviceDialog struct {
 
 func newDeviceDialog(sh *Shell) *deviceDialog {
 	dd := &deviceDialog{shell: sh}
-	dd.label = giode.Input.Text("Name this device", styleField)
-	dd.trusted = giode.Input.Switch("Known device (no alerts)", giode.Styles{Color: "theme.text", Width: -1})
-	dd.save = giode.Button("Save", stylePrimary).OnClick(dd.saveChanges)
+	dd.label = textInputT("Name this device", styleField)
+	dd.trusted = switchT("Known device (no alerts)", giode.Styles{Color: "theme.text", Width: -1}, nil)
+	dd.save = buttonT("Save", stylePrimary).OnClick(dd.saveChanges)
 	small := styleOutline.With(giode.Styles{Padding: giode.SymmetricInset(12, 7), FontSize: sizeSmall})
-	dd.ping = giode.Button("Ping", small).Variant(giode.VariantOutlined).Icon(giode.Icon("activity", giode.Styles{Width: 14})).OnClick(func() {
+	dd.ping = buttonT("Ping", small).Variant(giode.VariantOutlined).Icon(giode.Icon("activity", giode.Styles{Width: 14})).OnClick(func() {
 		dd.isOpen = false
 		sh.tools.openWith(toolPing, dd.dev.IP)
 	})
-	dd.ports = giode.Button("Scan ports", small).Variant(giode.VariantOutlined).Icon(giode.Icon("scan-search", giode.Styles{Width: 14})).OnClick(func() {
+	dd.ports = buttonT("Scan ports", small).Variant(giode.VariantOutlined).Icon(giode.Icon("scan-search", giode.Styles{Width: 14})).OnClick(func() {
 		dd.isOpen = false
 		sh.tools.openWith(toolPorts, dd.dev.IP)
 	})
-	dd.wake = giode.Button("Wake", small).Variant(giode.VariantOutlined).Icon(giode.Icon("power", giode.Styles{Width: 14})).OnClick(func() {
+	dd.wake = buttonT("Wake", small).Variant(giode.VariantOutlined).Icon(giode.Icon("power", giode.Styles{Width: 14})).OnClick(func() {
 		if err := nettools.WakeOnLAN(dd.dev.MAC, ""); err != nil {
-			sh.Toast(giode.ToastError, "Wake on LAN failed: "+err.Error())
+			sh.Toast(giode.ToastError, tr("Wake on LAN failed: {error}", "error", err.Error()))
 			return
 		}
-		sh.Toast(giode.ToastSuccess, "Wake-up packet sent to "+dd.dev.Name())
+		sh.Toast(giode.ToastSuccess, tr("Wake-up packet sent to {device}", "device", dd.dev.Name()))
 	})
-	dd.forget = giode.Button("Forget", small.With(giode.Styles{Color: "theme.danger", BorderColor: colDangerSoft})).Variant(giode.VariantOutlined).OnClick(func() {
+	dd.forget = buttonT("Forget", small.With(giode.Styles{Color: "theme.danger", BorderColor: colDangerSoft})).Variant(giode.VariantOutlined).OnClick(func() {
 		if err := sh.svc.Scanner.Inventory().Forget(dd.dev.Key); err != nil {
 			sh.Toast(giode.ToastError, err.Error())
 		}
@@ -72,7 +72,7 @@ func (dd *deviceDialog) saveChanges() {
 		d.Label, d.Trusted = label, trusted
 	})
 	if err != nil {
-		dd.shell.Toast(giode.ToastError, "Couldn't save: "+err.Error())
+		dd.shell.Toast(giode.ToastError, tr("Couldn't save: {error}", "error", err.Error()))
 		return
 	}
 	dd.isOpen = false
@@ -109,14 +109,42 @@ func (dd *deviceDialog) content() giode.Element {
 			),
 		),
 		giode.Stack(giode.Styles{Gap: 6, Width: -1},
-			fact("IP address", d.IP), fact("MAC address", strings.ToUpper(d.MAC)), fact("Maker", d.Vendor),
-			fact("Host name", d.Hostname), fact("Open ports", strings.Join(ports, ", ")),
-			fact("First seen", d.FirstSeen.Local().Format(time.DateTime)), fact("Last seen", d.LastSeen.Local().Format(time.DateTime)),
+			fact(tr("IP address"), d.IP), fact(tr("MAC address"), strings.ToUpper(d.MAC)), fact(tr("Maker"), d.Vendor),
+			fact(tr("Host name"), d.Hostname), fact(tr("Open ports"), strings.Join(ports, ", ")),
+			fact(tr("First seen"), d.FirstSeen.Local().Format(time.DateTime)), fact(tr("Last seen"), d.LastSeen.Local().Format(time.DateTime)),
 		),
+		dd.timeline(d),
 		giode.Row(giode.Styles{Gap: 8}, actions...),
 		giode.Divider(giode.Styles{Color: "theme.border"}),
 		dd.label,
 		dd.trusted,
 		giode.Row(giode.Styles{Justify: giode.JustifyEnd, Width: -1}, dd.save),
 	)
+}
+
+// timeline shows when the device was on the network: a 24-hour strip and
+// the latest joins and departures.
+func (dd *deviceDialog) timeline(d inventory.Device) giode.Element {
+	now := time.Now()
+	events := dd.shell.svc.Scanner.Inventory().Events(d.Key)
+	rows := []giode.Element{
+		giode.Row(giode.Styles{Width: -1, Justify: giode.JustifySpaceBetween},
+			giode.Text(tr("Last 24 hours"), styleLabel), giode.Text(tr("now"), styleMuted)),
+		presenceStrip(events, d.Online, 24*time.Hour, now),
+	}
+	for i := len(events) - 1; i >= 0 && len(rows) < 8; i-- {
+		e := events[i]
+		what, c := tr("Left the network"), giode.Color("theme.muted")
+		if e.Online {
+			what, c = tr("Joined the network"), "theme.success"
+		}
+		rows = append(rows, giode.Row(giode.Styles{Gap: 8, Align: giode.AlignCenter, Width: -1},
+			giode.Box(giode.Styles{Width: 8, Height: 8, BorderRadius: 4, Background: c}),
+			giode.Text(what, giode.Styles{Color: "theme.text", FontSize: sizeSmall, FlexGrow: 1}),
+			giode.Text(e.At.Local().Format("Mon Jan 2 15:04"), styleMuted)))
+	}
+	if len(events) == 0 {
+		rows = append(rows, giode.Text(tr("Background scans build this timeline as the device comes and goes."), styleMuted))
+	}
+	return giode.Stack(giode.Styles{Gap: 6, Width: -1}, rows...)
 }

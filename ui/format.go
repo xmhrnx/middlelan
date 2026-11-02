@@ -7,7 +7,9 @@ import (
 )
 
 // formatBytes formats a byte count: "0 B", "812 KB", "1.4 GB".
-func formatBytes(b uint64) string {
+func formatBytes(b uint64) string { return ltr(formatBytesRaw(b)) }
+
+func formatBytesRaw(b uint64) string {
 	const unit = 1000
 	if b < unit {
 		return strconv.FormatUint(b, 10) + " B"
@@ -27,7 +29,9 @@ func formatBytes(b uint64) string {
 
 // formatRate formats bytes per second as bits per second, the unit
 // networks are sold in: "0 bps", "12.4 Mbps".
-func formatRate(bytesPerSec float64) string {
+func formatRate(bytesPerSec float64) string { return ltr(formatRateRaw(bytesPerSec)) }
+
+func formatRateRaw(bytesPerSec float64) string {
 	bits := bytesPerSec * 8
 	switch {
 	case bits < 1:
@@ -52,24 +56,26 @@ func trimRate(v float64) string {
 // formatAgo formats how long ago t was: "now", "12s ago", "3h ago".
 func formatAgo(t time.Time, now time.Time) string {
 	if t.IsZero() {
-		return "never"
+		return tr("never")
 	}
 	d := now.Sub(t)
 	switch {
 	case d < 5*time.Second:
-		return "now"
+		return tr("now")
 	case d < time.Minute:
-		return fmt.Sprintf("%ds ago", int(d.Seconds()))
+		return tr("{n}s ago", "n", int(d.Seconds()))
 	case d < time.Hour:
-		return fmt.Sprintf("%dm ago", int(d.Minutes()))
+		return tr("{n}m ago", "n", int(d.Minutes()))
 	case d < 48*time.Hour:
-		return fmt.Sprintf("%dh ago", int(d.Hours()))
+		return tr("{n}h ago", "n", int(d.Hours()))
 	}
-	return fmt.Sprintf("%dd ago", int(d.Hours()/24))
+	return tr("{n}d ago", "n", int(d.Hours()/24))
 }
 
 // formatMs formats a duration in milliseconds: "12.3 ms".
-func formatMs(d time.Duration) string {
+func formatMs(d time.Duration) string { return ltr(formatMsRaw(d)) }
+
+func formatMsRaw(d time.Duration) string {
 	ms := float64(d) / float64(time.Millisecond)
 	if ms >= 100 {
 		return fmt.Sprintf("%.0f ms", ms)
@@ -77,12 +83,15 @@ func formatMs(d time.Duration) string {
 	return fmt.Sprintf("%.1f ms", ms)
 }
 
-// plural returns "1 app" or "3 apps".
+// plural returns "1 app" or "3 apps", translated. The message key is
+// "{count} " + many ("{count} apps"); its locale entries carry the plural
+// forms. Without an entry, one and many give the English forms.
 func plural(n int, one, many string) string {
-	if n == 1 {
+	s := trn("{count} "+many, n)
+	if n == 1 && s == "1 "+many {
 		return "1 " + one
 	}
-	return strconv.Itoa(n) + " " + many
+	return s
 }
 
 // endpointLabel joins an address and port, bracketing IPv6.

@@ -15,7 +15,7 @@ type netInfoTool struct {
 
 func newNetInfoTool(sh *Shell) *netInfoTool {
 	n := &netInfoTool{shell: sh}
-	n.refresh = giode.Button("Refresh", styleOutline).Variant(giode.VariantOutlined).
+	n.refresh = buttonT("Refresh", styleOutline).Variant(giode.VariantOutlined).
 		Icon(giode.Icon("refresh-cw", giode.Styles{Width: 14})).OnClick(func() { sh.RefreshNetwork(context.Background()) })
 	return n
 }
@@ -35,23 +35,23 @@ func (n *netInfoTool) view(t *toolsScreen, info toolInfo) giode.Element {
 	}
 	results := []giode.Element{}
 	if ni != nil {
-		results = append(results, card("This device", n.refresh,
-			fact("Host name", ni.Hostname), fact("Local IP", ni.LocalIP), fact("Subnet", ni.Subnet),
-			fact("Router", ni.Gateway), fact("DNS servers", strings.Join(ni.DNSServers, ", "))))
+		results = append(results, card(tr("This device"), n.refresh,
+			fact(tr("Host name"), ni.Hostname), fact(tr("Local IP"), ni.LocalIP), fact(tr("Subnet"), ni.Subnet),
+			fact(tr("Router"), ni.Gateway), fact(tr("DNS servers"), strings.Join(ni.DNSServers, ", "))))
 	}
 	if pub != nil {
-		results = append(results, card("Internet", nil,
-			fact("Public IP", pub.IP), fact("Provider", nonEmpty(pub.ISP, pub.Org)), fact("ASN", pub.ASN),
-			fact("Location", strings.Trim(strings.Join([]string{pub.City, pub.Region, pub.Country}, ", "), ", "))))
+		results = append(results, card(tr("Internet"), nil,
+			fact(tr("Public IP"), pub.IP), fact(tr("Provider"), nonEmpty(pub.ISP, pub.Org)), fact(tr("ASN"), pub.ASN),
+			fact(tr("Location"), strings.Trim(strings.Join([]string{pub.City, pub.Region, pub.Country}, ", "), ", "))))
 	} else if !n.shell.svc.Settings.Get().OnlineLookups {
-		results = append(results, noticeBanner("info", "Public IP lookup is off. Turn on online lookups in Settings to see it.", "theme.info", nil))
+		results = append(results, noticeBanner("info", tr("Public IP lookup is off. Turn on online lookups in Settings to see it."), "theme.info", nil))
 	}
 	if ni != nil {
 		rows := []giode.Element{}
 		for _, ifc := range ni.Interfaces {
-			st := pill("Down", "theme.muted")
+			st := pill(tr("Down"), "theme.muted")
 			if ifc.Up {
-				st = pill("Up", "theme.success")
+				st = pill(tr("Up"), "theme.success")
 			}
 			rows = append(rows, giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Width: -1, Padding: giode.SymmetricInset(2, 6), Wrap: giode.WrapNoWrap},
 				giode.Icon("plug", giode.Styles{Width: 18, Color: "theme.muted"}),
@@ -63,10 +63,10 @@ func (n *netInfoTool) view(t *toolsScreen, info toolInfo) giode.Element {
 				st,
 			))
 		}
-		results = append(results, card("Interfaces", nil, giode.Stack(giode.Styles{Width: -1}, withDividers(rows)...)))
+		results = append(results, card(tr("Interfaces"), nil, giode.Stack(giode.Styles{Width: -1}, withDividers(rows)...)))
 	}
 	if len(results) == 0 {
-		results = append(results, emptyState("network", "Reading network details…", "", n.refresh))
+		results = append(results, emptyState("network", tr("Reading network details…"), "", n.refresh))
 	}
 	return t.toolFrame(info, nil, results...)
 }

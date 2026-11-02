@@ -26,10 +26,10 @@ type pingTool struct {
 
 func newPingTool(sh *Shell) *pingTool {
 	p := &pingTool{shell: sh, runner: toolRunner{shell: sh}}
-	p.host = giode.Input.Text("Host or IP, e.g. 1.1.1.1", styleField).Keyboard(giode.KeyboardURL)
+	p.host = textInputT("Host or IP, e.g. 1.1.1.1", styleField).Keyboard(giode.KeyboardURL)
 	p.host.SetText("1.1.1.1")
 	p.host.Submit(func(string) { p.start() })
-	p.continuous = giode.Input.Switch("Keep pinging", giode.Styles{Color: "theme.text", Width: -1})
+	p.continuous = switchT("Keep pinging", giode.Styles{Color: "theme.text", Width: -1}, nil)
 	p.run = runButton("Ping", p.start, &p.runner)
 	return p
 }
@@ -104,13 +104,13 @@ func (p *pingTool) summary() giode.Element {
 	}
 	method := ""
 	if p.stats != nil {
-		method = "via " + p.stats.Method
+		method = tr("via {method}", "method", p.stats.Method)
 	}
 	return responsiveGrid(150, 4, 12,
-		statTile("activity", "Average", formatMs(avg), method, "theme.primary"),
-		statTile("arrow-down", "Fastest", formatMs(minRTT), "", "theme.success"),
-		statTile("arrow-up", "Slowest", formatMs(maxRTT), "", "theme.warning"),
-		statTile("signal", "Packet loss", fmt.Sprintf("%.0f%%", loss), fmt.Sprintf("%d of %d replied", recv, sent), "theme.danger"),
+		statTile("activity", tr("Average"), formatMs(avg), method, "theme.primary"),
+		statTile("arrow-down", tr("Fastest"), formatMs(minRTT), "", "theme.success"),
+		statTile("arrow-up", tr("Slowest"), formatMs(maxRTT), "", "theme.warning"),
+		statTile("signal", tr("Packet loss"), fmt.Sprintf("%.0f%%", loss), tr("{received} of {sent} replied", "received", recv, "sent", sent), "theme.danger"),
 	)
 }
 
@@ -119,7 +119,7 @@ func (p *pingTool) chart() giode.Element {
 	for _, r := range p.replies {
 		vals = append(vals, float64(r.RTT)/float64(time.Millisecond))
 	}
-	return card("Latency", nil, sparkline(vals, -1, 120, "theme.primary"))
+	return card(tr("Latency"), nil, sparkline(vals, -1, 120, "theme.primary"))
 }
 
 func (p *pingTool) log() giode.Element {
@@ -129,11 +129,11 @@ func (p *pingTool) log() giode.Element {
 		line := fmt.Sprintf("#%d  %s  time=%s  ttl=%d", r.Seq, r.Addr, formatMs(r.RTT), r.TTL)
 		c := giode.Color("theme.text")
 		if !r.OK {
-			line, c = fmt.Sprintf("#%d  %s", r.Seq, nonEmpty(r.Err, "timed out")), "theme.danger"
+			line, c = fmt.Sprintf("#%d  %s", r.Seq, nonEmpty(r.Err, tr("timed out"))), "theme.danger"
 		}
 		rows = append(rows, giode.Text(line, giode.Styles{Color: c, FontSize: sizeSmall, FontFamily: fontMono}))
 	}
-	return card("Replies", nil, giode.Stack(giode.Styles{Gap: 4}, rows...))
+	return card(tr("Replies"), nil, giode.Stack(giode.Styles{Gap: 4}, rows...))
 }
 
 func nonEmpty(s, fallback string) string {

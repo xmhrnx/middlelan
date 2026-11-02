@@ -30,10 +30,10 @@ const (
 
 func newAppsScreen(sh *Shell) *appsScreen {
 	a := &appsScreen{shell: sh}
-	a.search = searchField("Search apps")
-	a.filter = giode.Input.Segmented("Active", "All", "Listening")
-	a.sortBy = giode.Input.Select(styleField.With(giode.Styles{Width: 150}), "Busiest now", "Most today", "Name")
-	a.conns = giode.Button("All connections", styleOutline).Variant(giode.VariantOutlined).
+	a.search = searchField(msg("Search apps"))
+	a.filter = segmentedT("Active", "All", "Listening")
+	a.sortBy = selectT(styleField.With(giode.Styles{Width: 150}), "Busiest now", "Most today", "Name")
+	a.conns = buttonT("All connections", styleOutline).Variant(giode.VariantOutlined).
 		Icon(giode.Icon("waypoints", giode.Styles{Width: 16})).OnClick(func() { sh.navigate(screenConnections) })
 	a.list = giode.LazyList(
 		func() int { return len(a.rows) },
@@ -53,10 +53,10 @@ func (a *appsScreen) view() giode.Element {
 	}
 	var body giode.Element = a.list
 	if len(a.rows) == 0 {
-		body = emptyState("app-window", "No apps match", "Try another filter, or wait for apps to use the network.", nil)
+		body = emptyState("app-window", tr("No apps match"), tr("Try another filter, or wait for apps to use the network."), nil)
 	}
 	return pageBodyFill(
-		pageHeader("Apps", plural(len(snap.Apps), "program uses", "programs use")+" the network", a.conns),
+		pageHeader(tr("Apps"), trn("{count} programs use the network", len(snap.Apps)), a.conns),
 		toolbar(a.search, a.filter, a.sortBy),
 		cardStyled(giode.Styles{FlexGrow: 1, Height: -1, Padding: giode.UniformInset(8)}, body),
 	)

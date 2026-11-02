@@ -60,14 +60,14 @@ func (d *discoveryTool) start() {
 
 func (d *discoveryTool) view(t *toolsScreen, info toolInfo) giode.Element {
 	form := giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Width: -1},
-		giode.Text("Listens for smart TVs, speakers, printers, consoles and media servers announcing themselves.", giode.Styles{Color: "theme.muted", FontSize: sizeSmall, FlexGrow: 1}),
+		giode.Text(tr("Listens for smart TVs, speakers, printers, consoles and media servers announcing themselves."), giode.Styles{Color: "theme.muted", FontSize: sizeSmall, FlexGrow: 1}),
 		syncRunLabel(d.run, "Discover", &d.runner))
 	results := []giode.Element{}
 	for _, e := range d.errs {
 		results = append(results, noticeBanner("info", e, "theme.warning", nil))
 	}
 	if d.runner.running {
-		results = append(results, giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter}, giode.Spinner(giode.Styles{Width: 16, Color: "theme.primary"}), giode.Text("Listening for announcements…", styleMuted)))
+		results = append(results, giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter}, giode.Spinner(giode.Styles{Width: 16, Color: "theme.primary"}), giode.Text(tr("Listening for announcements…"), styleMuted)))
 	}
 	if len(d.upnp) > 0 {
 		rows := []giode.Element{}
@@ -76,7 +76,7 @@ func (d *discoveryTool) view(t *toolsScreen, info toolInfo) giode.Element {
 			sub := strings.Trim(strings.Join([]string{u.Manufacturer, u.ModelName, u.IP}, " · "), " ·")
 			rows = append(rows, discoveryRow("cast", name, sub))
 		}
-		results = append(results, card("UPnP devices", giode.Text(itoa(len(d.upnp)), styleMuted), giode.Stack(giode.Styles{Width: -1}, withDividers(rows)...)))
+		results = append(results, card(tr("UPnP devices"), giode.Text(itoa(len(d.upnp)), styleMuted), giode.Stack(giode.Styles{Width: -1}, withDividers(rows)...)))
 	}
 	if len(d.services) > 0 {
 		sort.Slice(d.services, func(i, j int) bool { return d.services[i].Service < d.services[j].Service })
@@ -88,10 +88,10 @@ func (d *discoveryTool) view(t *toolsScreen, info toolInfo) giode.Element {
 			}
 			rows = append(rows, discoveryRow("radio", nonEmpty(s.Instance, s.Host), sub))
 		}
-		results = append(results, card("Bonjour services", giode.Text(itoa(len(d.services)), styleMuted), giode.Stack(giode.Styles{Width: -1}, withDividers(rows)...)))
+		results = append(results, card(tr("Bonjour services"), giode.Text(itoa(len(d.services)), styleMuted), giode.Stack(giode.Styles{Width: -1}, withDividers(rows)...)))
 	}
 	if d.done && len(d.upnp) == 0 && len(d.services) == 0 {
-		results = append(results, emptyState("cast", "Nothing announced itself", "Devices may be asleep, or the network may block multicast.", nil))
+		results = append(results, emptyState("cast", tr("Nothing announced itself"), tr("Devices may be asleep, or the network may block multicast."), nil))
 	}
 	return t.toolFrame(info, form, results...)
 }

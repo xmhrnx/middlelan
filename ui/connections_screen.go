@@ -22,8 +22,8 @@ type connectionsScreen struct {
 
 func newConnectionsScreen(sh *Shell) *connectionsScreen {
 	c := &connectionsScreen{shell: sh}
-	c.search = searchField("Search by app, address, host or port")
-	c.filter = giode.Input.Segmented("Internet", "Local", "Listening", "All")
+	c.search = searchField(msg("Search by app, address, host or port"))
+	c.filter = segmentedT("Internet", "Local", "Listening", "All")
 	c.list = giode.LazyList(
 		func() int { return len(c.rows) },
 		func(i int) any { return c.rows[i].Key },
@@ -38,10 +38,10 @@ func (c *connectionsScreen) view() giode.Element {
 	c.rows = c.filtered(snap.Conns)
 	var body giode.Element = c.list
 	if len(c.rows) == 0 {
-		body = emptyState("waypoints", "No connections match", "Change the filter or search.", nil)
+		body = emptyState("waypoints", tr("No connections match"), tr("Change the filter or search."), nil)
 	}
 	return pageBodyFill(
-		pageHeader("Connections", plural(len(snap.Conns), "open socket", "open sockets")+" right now"),
+		pageHeader(tr("Connections"), trn("{count} open sockets right now", len(snap.Conns))),
 		toolbar(c.search, c.filter),
 		cardStyled(giode.Styles{FlexGrow: 1, Height: -1, Padding: giode.UniformInset(8)}, body),
 	)
@@ -68,7 +68,7 @@ func (c *connectionsScreen) filtered(conns []monitor.Conn) []monitor.Conn {
 		}
 		if q != "" {
 			info, _ := c.shell.svc.Resolver.Peek(conn.RemoteIP)
-			hay := strings.ToLower(strings.Join([]string{conn.Process, conn.RemoteIP, conn.LocalIP, itoa(conn.RemotePort), itoa(conn.LocalPort), info.Host, info.Owner(), info.Country}, " "))
+			hay := strings.ToLower(strings.Join([]string{conn.Process, conn.RemoteIP, conn.LocalIP, itoa(conn.RemotePort), itoa(conn.LocalPort), info.Domain, info.Host, info.Owner(), info.Country}, " "))
 			if !strings.Contains(hay, q) {
 				continue
 			}
@@ -88,14 +88,14 @@ func (c *connectionsScreen) filtered(conns []monitor.Conn) []monitor.Conn {
 func (c *connectionsScreen) row(conn monitor.Conn) giode.Element {
 	var where giode.Element
 	if conn.Listening() {
-		where = giode.Text("Listening on "+endpointLabel(conn.LocalIP, conn.LocalPort), giode.Styles{Color: "theme.text", FontSize: sizeSmall, FontFamily: fontMono})
+		where = giode.Text(tr("Listening on {address}", "address", endpointLabel(conn.LocalIP, conn.LocalPort)), giode.Styles{Color: "theme.text", FontSize: sizeSmall, FontFamily: fontMono})
 	} else {
 		info := c.shell.svc.Resolver.Get(conn.RemoteIP)
-		name := info.Host
+		name := info.Domain
 		if name == "" {
-			name = info.Owner()
+			name = nonEmpty(info.Host, info.Owner())
 		}
-		place := info.Place()
+		place := placeName(info.Place())
 		parts := []string{endpointLabel(conn.RemoteIP, conn.RemotePort)}
 		if name != "" {
 			parts = append(parts, name)

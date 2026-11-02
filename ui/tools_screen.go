@@ -23,6 +23,7 @@ const (
 	toolTLS
 	toolSubnet
 	toolUptime
+	toolWifi
 )
 
 // toolInfo describes a tool in the catalog.
@@ -35,19 +36,20 @@ type toolInfo struct {
 }
 
 var toolCatalog = []toolInfo{
-	{toolSpeed, "Speed test", "Download, upload, latency and jitter of your internet connection.", "gauge", "theme.primary"},
-	{toolUptime, "Internet monitor", "Watches latency and packet loss continuously and logs outages.", "signal", "theme.success"},
-	{toolRouter, "Router check", "Audits your router for risky open services and DNS hijacking.", "shield-check", "theme.warning"},
-	{toolDiscovery, "Service discovery", "Finds UPnP and Bonjour devices and services on the network.", "cast", "theme.accent"},
-	{toolPing, "Ping", "Measures round-trip time and packet loss to any host.", "activity", "theme.info"},
-	{toolTrace, "Traceroute", "Shows each router between you and a host.", "route", "theme.accent"},
-	{toolPorts, "Port scanner", "Finds open TCP ports and the services behind them.", "scan-search", "theme.danger"},
-	{toolDNS, "DNS lookup", "Queries A, AAAA, MX, TXT, NS and other records.", "search", "theme.primary"},
-	{toolWhois, "WHOIS", "Who owns a domain name or IP address.", "book-open", "theme.info"},
-	{toolTLS, "Certificate inspector", "Checks a site's TLS certificate, chain and expiry.", "lock", "theme.success"},
-	{toolWake, "Wake on LAN", "Turns on a sleeping computer over the network.", "power", "theme.warning"},
-	{toolNetInfo, "Network info", "Interfaces, addresses, router, DNS servers and public IP.", "network", "theme.accent"},
-	{toolSubnet, "Subnet calculator", "Network, broadcast, host range and mask of any CIDR.", "calculator", "theme.info"},
+	{toolSpeed, msg("Speed test"), msg("Download, upload, latency and jitter of your internet connection."), "gauge", "theme.primary"},
+	{toolUptime, msg("Internet monitor"), msg("Watches latency and packet loss continuously and logs outages."), "signal", "theme.success"},
+	{toolRouter, msg("Router check"), msg("Audits your router for risky open services and DNS hijacking."), "shield-check", "theme.warning"},
+	{toolWifi, msg("Wi-Fi analyzer"), msg("Signal strength, nearby networks, crowded channels and weak security."), "wifi", "theme.primary"},
+	{toolDiscovery, msg("Service discovery"), msg("Finds UPnP and Bonjour devices and services on the network."), "cast", "theme.accent"},
+	{toolPing, msg("Ping"), msg("Measures round-trip time and packet loss to any host."), "activity", "theme.info"},
+	{toolTrace, msg("Traceroute"), msg("Shows each router between you and a host."), "route", "theme.accent"},
+	{toolPorts, msg("Port scanner"), msg("Finds open TCP ports and the services behind them."), "scan-search", "theme.danger"},
+	{toolDNS, msg("DNS lookup"), msg("Queries A, AAAA, MX, TXT, NS and other records."), "search", "theme.primary"},
+	{toolWhois, msg("WHOIS"), msg("Who owns a domain name or IP address."), "book-open", "theme.info"},
+	{toolTLS, msg("Certificate inspector"), msg("Checks a site's TLS certificate, chain and expiry."), "lock", "theme.success"},
+	{toolWake, msg("Wake on LAN"), msg("Turns on a sleeping computer over the network."), "power", "theme.warning"},
+	{toolNetInfo, msg("Network info"), msg("Interfaces, addresses, router, DNS servers and public IP."), "network", "theme.accent"},
+	{toolSubnet, msg("Subnet calculator"), msg("Network, broadcast, host range and mask of any CIDR."), "calculator", "theme.info"},
 }
 
 // tool is one tool's page.
@@ -69,19 +71,20 @@ type toolsScreen struct {
 
 func newToolsScreen(sh *Shell) *toolsScreen {
 	t := &toolsScreen{shell: sh, cards: map[toolID]*giode.PressableElement{}}
-	t.back = giode.Button("Tools", styleGhost).Variant(giode.VariantGhost).
-		Icon(giode.Icon("chevron-left", giode.Styles{Width: 16})).OnClick(func() { t.active = toolNone })
+	t.back = backButton("Tools", func() { t.active = toolNone })
 	t.tools = map[toolID]tool{
 		toolSpeed: newSpeedTool(sh), toolPing: newPingTool(sh), toolTrace: newTraceTool(sh), toolPorts: newPortsTool(sh),
 		toolDNS: newDNSTool(sh), toolWhois: newWhoisTool(sh), toolWake: newWakeTool(sh), toolNetInfo: newNetInfoTool(sh),
 		toolDiscovery: newDiscoveryTool(sh), toolRouter: newRouterTool(sh), toolTLS: newTLSTool(sh),
-		toolSubnet: newSubnetTool(sh), toolUptime: newUptimeTool(sh),
+		toolSubnet: newSubnetTool(sh), toolUptime: newUptimeTool(sh), toolWifi: newWifiTool(sh),
 	}
 	for _, info := range toolCatalog {
 		info := info
-		t.cards[info.id] = giode.Pressable(func(s giode.PressState) giode.Element {
+		card := giode.Pressable(func(s giode.PressState) giode.Element {
 			return toolCard(info, s)
-		}).Label(info.name).OnClick(func(giode.ClickEvent) { t.open(info.id) })
+		}).OnClick(func(giode.ClickEvent) { t.open(info.id) })
+		localized(func() { card.Label(tr(info.name)) })
+		t.cards[info.id] = card
 	}
 	t.scroll = giode.Scroll(t.content, giode.Styles{Width: -1, Height: -1, ScrollBar: giode.ScrollBar{AutoHide: true, Width: 6}})
 	return t
@@ -117,7 +120,7 @@ func (t *toolsScreen) content() giode.Element {
 		cards = append(cards, t.cards[info.id])
 	}
 	return pageBody(
-		pageHeader("Tools", "Everything you need to diagnose and secure your network"),
+		pageHeader(tr("Tools"), tr("Everything you need to diagnose and secure your network")),
 		responsiveGrid(250, 3, 14, cards...),
 	)
 }
@@ -130,7 +133,7 @@ func toolCard(info toolInfo, s giode.PressState) giode.Element {
 	}
 	return giode.Box(styleCard.With(giode.Styles{BorderColor: border, Gap: 10, Height: 150, Width: -1}),
 		iconBadge(info.icon, info.color, 40),
-		giode.Text(info.name, giode.Styles{Color: "theme.text", FontSize: 15, FontWeight: giode.FontWeightSemiBold}),
-		giode.Text(info.desc, giode.Styles{Color: "theme.muted", FontSize: sizeSmall, MaxLines: 2}),
+		giode.Text(tr(info.name), giode.Styles{Color: "theme.text", FontSize: 15, FontWeight: giode.FontWeightSemiBold}),
+		giode.Text(tr(info.desc), giode.Styles{Color: "theme.muted", FontSize: sizeSmall, MaxLines: 2}),
 	)
 }

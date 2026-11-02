@@ -24,7 +24,7 @@ type routerTool struct {
 
 func newRouterTool(sh *Shell) *routerTool {
 	r := &routerTool{shell: sh, runner: toolRunner{shell: sh}}
-	r.gateway = giode.Input.Text("Router address (found automatically)", styleField)
+	r.gateway = textInputT("Router address (found automatically)", styleField)
 	r.run = runButton("Check router", r.start, &r.runner)
 	return r
 }
@@ -40,7 +40,7 @@ func (r *routerTool) start() {
 		}
 	}
 	if gw == "" {
-		r.err = "The router's address isn't known yet. Type it in, e.g. 192.168.1.1."
+		r.err = tr("The router's address isn't known yet. Type it in, e.g. 192.168.1.1.")
 		return
 	}
 	r.findings, r.err = nil, ""
@@ -64,20 +64,20 @@ func (r *routerTool) view(t *toolsScreen, info toolInfo) giode.Element {
 		results = append(results, noticeBanner("shield-alert", r.err, "theme.warning", nil))
 	}
 	if r.runner.running {
-		results = append(results, giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter}, giode.Spinner(giode.Styles{Width: 16, Color: "theme.primary"}), giode.Text("Checking services and DNS…", styleMuted)))
+		results = append(results, giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter}, giode.Spinner(giode.Styles{Width: 16, Color: "theme.primary"}), giode.Text(tr("Checking services and DNS…"), styleMuted)))
 	}
 	if len(r.findings) > 0 {
 		worst := nettools.SevInfo
 		for _, f := range r.findings {
 			worst = max(worst, f.Severity)
 		}
-		score := map[nettools.Severity]string{nettools.SevInfo: "Looks good", nettools.SevLow: "Minor issues", nettools.SevMedium: "Needs attention", nettools.SevHigh: "At risk"}[worst]
+		score := tr(map[nettools.Severity]string{nettools.SevInfo: msg("Looks good"), nettools.SevLow: msg("Minor issues"), nettools.SevMedium: msg("Needs attention"), nettools.SevHigh: msg("At risk")}[worst])
 		results = append(results, cardStyled(giode.Styles{},
 			giode.Row(giode.Styles{Gap: 14, Align: giode.AlignCenter},
 				iconBadge(map[bool]string{true: "shield-check", false: "shield-alert"}[worst <= nettools.SevLow], severityColor(worst), 48),
 				giode.Stack(giode.Styles{Gap: 3},
 					giode.Text(score, styleHeading),
-					giode.Text(plural(len(r.findings), "finding", "findings")+" · checked "+formatAgo(r.checked, time.Now()), styleMuted)))))
+					giode.Text(trn("{count} findings · checked {ago}", len(r.findings), "ago", formatAgo(r.checked, time.Now())), styleMuted)))))
 		for _, f := range r.findings {
 			results = append(results, findingCard(f))
 		}

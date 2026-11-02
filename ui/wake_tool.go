@@ -18,15 +18,15 @@ type wakeTool struct {
 
 func newWakeTool(sh *Shell) *wakeTool {
 	w := &wakeTool{shell: sh}
-	w.mac = giode.Input.Text("MAC address, e.g. 3C:22:FB:12:34:56", styleField)
-	w.bcst = giode.Input.Text("Broadcast address (optional)", styleField)
-	w.send = giode.Button("Send", stylePrimary).Icon(giode.Icon("power", giode.Styles{Width: 16})).OnClick(func() {
+	w.mac = textInputT("MAC address, e.g. 3C:22:FB:12:34:56", styleField)
+	w.bcst = textInputT("Broadcast address (optional)", styleField)
+	w.send = buttonT("Send", stylePrimary).Icon(giode.Icon("power", giode.Styles{Width: 16})).OnClick(func() {
 		mac := strings.TrimSpace(w.mac.Text())
 		if err := nettools.WakeOnLAN(mac, strings.TrimSpace(w.bcst.Text())); err != nil {
 			sh.Toast(giode.ToastError, err.Error())
 			return
 		}
-		sh.Toast(giode.ToastSuccess, "Magic packet sent to "+mac)
+		sh.Toast(giode.ToastSuccess, tr("Magic packet sent to {mac}", "mac", mac))
 	})
 	return w
 }
@@ -56,9 +56,9 @@ func (w *wakeTool) view(t *toolsScreen, info toolInfo) giode.Element {
 	}
 	results := []giode.Element{}
 	if len(rows) > 0 {
-		results = append(results, card("Known devices", giode.Text("Tap to fill in", styleMuted), giode.Stack(giode.Styles{Width: -1}, rows...)))
+		results = append(results, card(tr("Known devices"), giode.Text(tr("Tap to fill in"), styleMuted), giode.Stack(giode.Styles{Width: -1}, rows...)))
 	}
 	form := giode.Stack(giode.Styles{Gap: 12, Width: -1}, formRow(w.mac, w.send), w.bcst,
-		giode.Text("The computer must have Wake-on-LAN enabled in its firmware and be wired to the network.", styleMuted))
+		giode.Text(tr("The computer must have Wake-on-LAN enabled in its firmware and be wired to the network."), styleMuted))
 	return t.toolFrame(info, form, results...)
 }

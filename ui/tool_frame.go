@@ -8,8 +8,8 @@ func (t *toolsScreen) toolFrame(info toolInfo, form giode.Element, results ...gi
 	head := giode.Row(giode.Styles{Gap: 14, Align: giode.AlignCenter, Width: -1, Wrap: giode.WrapNoWrap},
 		iconBadge(info.icon, info.color, 46),
 		giode.Stack(giode.Styles{Gap: 3, FlexGrow: 1, Width: -1},
-			giode.Text(info.name, styleTitle),
-			giode.Text(info.desc, giode.Styles{Color: "theme.muted", FontSize: sizeSmall}),
+			giode.Text(tr(info.name), styleTitle),
+			giode.Text(tr(info.desc), giode.Styles{Color: "theme.muted", FontSize: sizeSmall}),
 		),
 	)
 	kids := []giode.Element{giode.Row(giode.Styles{}, t.back), head}
@@ -43,9 +43,9 @@ func runButton(label string, onRun func(), r *toolRunner) *giode.ButtonElement {
 // syncRunLabel updates a run button's label to the runner's state.
 func syncRunLabel(b *giode.ButtonElement, label string, r *toolRunner) *giode.ButtonElement {
 	if r.running {
-		b.Label("Stop")
+		b.Label(tr("Stop"))
 	} else {
-		b.Label(label)
+		b.Label(tr(label))
 	}
 	return b
 }

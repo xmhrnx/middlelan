@@ -8,6 +8,7 @@ import (
 	"github.com/mehran9675/giode"
 	"github.com/mehran9675/giode/components/copybutton"
 	"github.com/mehran9675/giode/components/scroll"
+	"github.com/xmhrnx/middlelan/internal/firewall"
 	"github.com/xmhrnx/middlelan/internal/monitor"
 )
 
@@ -19,13 +20,15 @@ type appDetailScreen struct {
 	scroll *scroll.Scroll
 	back   *giode.ButtonElement
 	copy   *copybutton.CopyButton
+	block  *giode.ButtonElement
 }
 
 func newAppDetailScreen(sh *Shell) *appDetailScreen {
 	d := &appDetailScreen{shell: sh}
 	d.scroll = giode.Scroll(d.content, giode.Styles{Width: -1, Height: -1, ScrollBar: giode.ScrollBar{AutoHide: true, Width: 6}})
-	d.back = giode.Button("Apps", styleGhost).Variant(giode.VariantGhost).
-		Icon(giode.Icon("chevron-left", giode.Styles{Width: 16})).OnClick(func() { sh.navigate(screenApps) })
+	d.back = backButton("Apps", func() { sh.navigate(screenApps) })
+	d.block = buttonT("Block", styleOutline.With(giode.Styles{Color: "theme.danger", BorderColor: colDangerSoft, Padding: giode.SymmetricInset(12, 7), FontSize: sizeSmall})).
+		Variant(giode.VariantOutlined).Icon(giode.Icon("ban", giode.Styles{Width: 14})).OnClick(d.toggleBlock)
 	d.copy = giode.CopyButton(func() string {
 		a, _ := sh.findApp(d.name)
 		return a.Exe
@@ -51,14 +54,14 @@ func (d *appDetailScreen) content() giode.Element {
 		giode.Row(giode.Styles{}, d.back),
 		d.header(a),
 		responsiveGrid(170, 4, 14,
-			statTile("gauge", "Right now", rateOrDash(a), "↓ "+formatRate(a.RateRx)+"  ↑ "+formatRate(a.RateTx), colDown),
-			statTile("activity", "Today", formatBytes(a.TodayRx+a.TodayTx), formatBytes(a.TodayRx)+" down · "+formatBytes(a.TodayTx)+" up", "theme.success"),
-			statTile("clock", "This session", formatBytes(a.SessionRx+a.SessionTx), "Since MiddleLAN started", colUp),
-			statTile("waypoints", "Connections", itoa(a.Active), plural(a.Listening, "listening port", "listening ports"), "theme.warning"),
+			statTile("gauge", tr("Right now"), rateOrDash(a), "↓ "+formatRate(a.RateRx)+"  ↑ "+formatRate(a.RateTx), colDown),
+			statTile("activity", tr("Today"), formatBytes(a.TodayRx+a.TodayTx), formatBytes(a.TodayRx)+" down · "+formatBytes(a.TodayTx)+" up", "theme.success"),
+			statTile("clock", tr("This session"), formatBytes(a.SessionRx+a.SessionTx), "Since MiddleLAN started", colUp),
+			statTile("waypoints", tr("Connections"), itoa(a.Active), plural(a.Listening, "listening port", "listening ports"), "theme.warning"),
 		),
 		responsiveGrid(380, 2, 18,
-			card("Activity", nil, sparkline(a.History, -1, 110, colDown), giode.Text("Last "+itoa(len(a.History))+" samples", styleMuted)),
-			card("Last 7 days", nil, usageBars(store.Daily(a.Name, 7, now), 110)),
+			card(tr("Activity"), nil, sparkline(a.History, -1, 110, colDown), giode.Text("Last "+itoa(len(a.History))+" samples", styleMuted)),
+			card(tr("Last 7 days"), nil, usageBars(store.Daily(a.Name, 7, now), 110)),
 		),
 		d.liveEndpoints(a, now),
 		d.history(a, now),
@@ -76,7 +79,7 @@ func rateOrDash(a monitor.App) string {
 func (d *appDetailScreen) header(a monitor.App) giode.Element {
 	sub := a.Exe
 	if sub == "" {
-		sub = "Executable path unavailable"
+		sub = tr("Executable path unavailable")
 	}
 	meta := []string{}
 	if len(a.PIDs) > 0 {
@@ -87,15 +90,23 @@ func (d *appDetailScreen) header(a monitor.App) giode.Element {
 		meta = append(meta, "PID "+strings.Join(ids, ", "))
 	}
 	if !a.FirstSeen.IsZero() {
-		meta = append(meta, "First seen "+a.FirstSeen.Format("Jan 2, 2006"))
+		meta = append(meta, tr("First seen {date}", "date", a.FirstSeen.Format("Jan 2, 2006")))
 	}
-	status := pill("Idle", "theme.muted")
+	status := pill(tr("Idle"), "theme.muted")
 	if a.Active > 0 {
-		status = pill("Online", "theme.success")
+		status = pill(tr("Online"), "theme.success")
 	}
 	right := []giode.Element{status}
 	if a.Exe != "" {
 		right = append(right, d.copy)
+	}
+	if fw := d.shell.svc.Firewall; fw != nil && fw.Capabilities().PerApp {
+		if d.blockRule(a.Name) != "" {
+			d.block.Label(tr("Unblock"))
+		} else {
+			d.block.Label(tr("Block"))
+		}
+		right = append(right, d.block)
 	}
 	return giode.Row(giode.Styles{Align: giode.AlignCenter, Gap: 16, Width: -1, Wrap: giode.WrapNoWrap},
 		giode.Avatar(a.Name, giode.Styles{Width: 56}),
@@ -118,9 +129,9 @@ func (d *appDetailScreen) liveEndpoints(a monitor.App, now time.Time) giode.Elem
 		rows = append(rows, endpointRow(info, e.Port, e.Proto, e.Rx+e.Tx, e.Active, e.LastSeen, now))
 	}
 	if len(rows) == 0 {
-		rows = append(rows, emptyState("globe", "No connections seen yet", "Places this app connects to appear here while MiddleLAN runs.", nil))
+		rows = append(rows, emptyState("globe", tr("No connections seen yet"), tr("Places this app connects to appear here while MiddleLAN runs."), nil))
 	}
-	return card("Where it connects", giode.Text(plural(len(a.Endpoints), "endpoint", "endpoints")+" this session", styleMuted),
+	return card(tr("Where it connects"), giode.Text(trn("{count} endpoints this session", len(a.Endpoints)), styleMuted),
 		giode.Stack(giode.Styles{Gap: 0, Width: -1}, withDividers(rows)...))
 }
 
@@ -140,7 +151,7 @@ func (d *appDetailScreen) history(a monitor.App, now time.Time) giode.Element {
 		info := d.shell.svc.Resolver.Get(dst.IP)
 		rows = append(rows, endpointRow(info, dst.Port, "tcp", dst.Rx+dst.Tx, false, dst.LastSeen, now))
 	}
-	return card("Known destinations", giode.Text("Remembered across sessions", styleMuted),
+	return card(tr("Known destinations"), giode.Text(tr("Remembered across sessions"), styleMuted),
 		giode.Stack(giode.Styles{Width: -1}, withDividers(rows)...))
 }
 
@@ -150,9 +161,9 @@ func (d *appDetailScreen) listening(a monitor.App) giode.Element {
 		if !c.Listening() {
 			continue
 		}
-		scope := "Reachable from the network"
+		scope := tr("Reachable from the network")
 		if c.LocalIP == "127.0.0.1" || c.LocalIP == "::1" {
-			scope = "This device only"
+			scope = tr("This device only")
 		}
 		rows = append(rows, giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Padding: giode.SymmetricInset(4, 6), Width: -1},
 			iconBadge("ear", "theme.warning", 28),
@@ -164,7 +175,7 @@ func (d *appDetailScreen) listening(a monitor.App) giode.Element {
 	if len(rows) == 0 {
 		return nil
 	}
-	return card("Listening ports", nil, giode.Stack(giode.Styles{Width: -1}, rows...))
+	return card(tr("Listening ports"), nil, giode.Stack(giode.Styles{Width: -1}, rows...))
 }
 
 // serviceName is a port's well-known name, or "".
@@ -180,4 +191,23 @@ func withDividers(rows []giode.Element) []giode.Element {
 		out = append(out, r)
 	}
 	return out
+}
+
+// blockRule returns the ID of the rule blocking the whole app, or "".
+func (d *appDetailScreen) blockRule(name string) string {
+	for _, r := range d.shell.svc.Firewall.Rules() {
+		if r.App == name && r.Dest == "" {
+			return r.ID
+		}
+	}
+	return ""
+}
+
+func (d *appDetailScreen) toggleBlock() {
+	a, _ := d.shell.findApp(d.name)
+	if id := d.blockRule(d.name); id != "" {
+		d.shell.firewallChange(func(fw *firewall.Firewall) error { return fw.Remove(id) })
+		return
+	}
+	d.shell.blockRule(firewall.Rule{App: d.name, Exe: a.Exe, Note: tr("Blocked from the app's page")})
 }

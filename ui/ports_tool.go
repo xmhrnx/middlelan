@@ -26,10 +26,10 @@ type portsTool struct {
 
 func newPortsTool(sh *Shell) *portsTool {
 	p := &portsTool{shell: sh, runner: toolRunner{shell: sh}}
-	p.host = giode.Input.Text("Host or IP, e.g. 192.168.1.1", styleField).Keyboard(giode.KeyboardURL)
+	p.host = textInputT("Host or IP, e.g. 192.168.1.1", styleField).Keyboard(giode.KeyboardURL)
 	p.host.Submit(func(string) { p.start() })
-	p.custom = giode.Input.Text("Ports, e.g. 22,80,8000-8100", styleField)
-	p.preset = giode.Input.Segmented("Common", "1–1024", "Custom")
+	p.custom = textInputT("Ports, e.g. 22,80,8000-8100", styleField)
+	p.preset = segmentedT("Common", "1–1024", "Custom")
 	p.run = runButton("Scan", p.start, &p.runner)
 	return p
 }
@@ -83,7 +83,7 @@ func (p *portsTool) view(t *toolsScreen, info toolInfo) giode.Element {
 	if p.preset.Selected() == 2 {
 		formKids = append(formKids, p.custom)
 	}
-	formKids = append(formKids, giode.Text("Only scan devices you own or are allowed to test.", styleMuted))
+	formKids = append(formKids, giode.Text(tr("Only scan devices you own or are allowed to test."), styleMuted))
 	results := []giode.Element{}
 	if p.err != "" {
 		results = append(results, noticeBanner("shield-alert", p.err, "theme.danger", nil))
@@ -91,13 +91,13 @@ func (p *portsTool) view(t *toolsScreen, info toolInfo) giode.Element {
 	if p.total > 0 && (p.runner.running || p.done > 0) {
 		prog := float32(p.done) / float32(max(p.total, 1))
 		rows := []giode.Element{
-			giode.Text(itoa(p.done)+" of "+itoa(p.total)+" ports checked · "+plural(len(p.open), "open port", "open ports"), styleMuted),
+			giode.Text(tr("{done} of {total} ports checked", "done", p.done, "total", p.total)+" · "+plural(len(p.open), "open port", "open ports"), styleMuted),
 			giode.Progress(prog, giode.Styles{Color: "theme.danger", Background: colGrid, Height: 6}),
 		}
 		for _, r := range p.open {
 			rows = append(rows, portRow(r))
 		}
-		results = append(results, card("Open ports", nil, giode.Stack(giode.Styles{Gap: 8, Width: -1}, rows...)))
+		results = append(results, card(tr("Open ports"), nil, giode.Stack(giode.Styles{Gap: 8, Width: -1}, rows...)))
 	}
 	return t.toolFrame(info, giode.Stack(giode.Styles{Gap: 12, Width: -1}, formKids...), results...)
 }
@@ -105,7 +105,7 @@ func (p *portsTool) view(t *toolsScreen, info toolInfo) giode.Element {
 func portRow(r nettools.PortResult) giode.Element {
 	svc := r.Service
 	if svc == "" {
-		svc = "Unknown service"
+		svc = tr("Unknown service")
 	}
 	kids := []giode.Element{
 		giode.Box(giode.Styles{Width: 64}, giode.Text(itoa(r.Port), giode.Styles{Color: "theme.text", FontSize: sizeBody, FontWeight: giode.FontWeightBold, FontFamily: fontMono})),

@@ -7,5 +7,5 @@ import (
 
 // searchField is a text field styled for filtering lists.
 func searchField(placeholder string) *input.Input {
-	return giode.Input.Text(placeholder, styleField.With(giode.Styles{Padding: giode.SymmetricInset(12, 9)}))
+	return textInputT(placeholder, styleField.With(giode.Styles{Padding: giode.SymmetricInset(12, 9)}))
 }

@@ -15,7 +15,7 @@ func newBottomNav(sh *Shell) *bottomNav {
 			continue
 		}
 		n := n
-		b.items = append(b.items, giode.Pressable(func(s giode.PressState) giode.Element {
+		item := giode.Pressable(func(s giode.PressState) giode.Element {
 			active := sh.current == n.screen || (n.screen == screenApps && (sh.current == screenAppDetail || sh.current == screenConnections))
 			fg, bg := giode.Color("theme.muted"), giode.Color("transparent")
 			if active {
@@ -24,9 +24,11 @@ func newBottomNav(sh *Shell) *bottomNav {
 			return giode.Stack(giode.Styles{Align: giode.AlignCenter, Gap: 3, Padding: giode.SymmetricInset(4, 8), Width: -1},
 				giode.Box(giode.Styles{Padding: giode.SymmetricInset(14, 4), BorderRadius: 99, Background: bg},
 					giode.Icon(n.icon, giode.Styles{Width: 20, Color: fg})),
-				giode.Text(n.label, giode.Styles{Color: fg, FontSize: sizeTiny, FontWeight: giode.FontWeightMedium}),
+				giode.Text(tr(n.label), giode.Styles{Color: fg, FontSize: sizeTiny, FontWeight: giode.FontWeightMedium}),
 			)
-		}, giode.Styles{FlexGrow: 1}).Label(n.label).OnClick(func(giode.ClickEvent) { sh.navigate(n.screen) }))
+		}, giode.Styles{FlexGrow: 1}).OnClick(func(giode.ClickEvent) { sh.navigate(n.screen) })
+		localized(func() { item.Label(tr(n.label)) })
+		b.items = append(b.items, item)
 	}
 	return b
 }
