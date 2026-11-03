@@ -96,6 +96,7 @@ mcp ui_snapshot '{}' > "$OUT/snapshot-apps.json"
 
 # Leaving and coming back: the app must draw again (not stay on the
 # splash screen). Checked after Home and after Back, with the VPN on.
+stuck=0
 alive() { # alive LABEL: does the app draw and answer after returning?
   sleep 8
   shot "return-$1"
@@ -108,6 +109,7 @@ alive() { # alive LABEL: does the app draw and answer after returning?
   fi
   local frames; frames=$(mcp frame_stats '{}' | grep -oE 'frames[^0-9]{1,6}[0-9]+' | head -1)
   echo "[$1] frame stats: $frames" | tee -a "$OUT/steps.txt"
+  case "$frames" in *[1-9]*) ;; *) echo "[$1] FAILED: no frames drawn after returning" | tee -a "$OUT/steps.txt"; stuck=1 ;; esac
   mcp frame_stats '{"reset":true}' >/dev/null
 }
 log "leave with Home, come back"
@@ -177,4 +179,5 @@ echo "app pid: ${pid:-not running}" | tee -a "$OUT/steps.txt"
 } | grep -v "avc:  denied" | sort -u -k1,2 > "$OUT/logcat-relevant.txt"
 echo "--- relevant logcat ($(wc -l < "$OUT/logcat-relevant.txt") lines)"
 tail -150 "$OUT/logcat-relevant.txt"
+if [ "$stuck" = 1 ]; then echo "The app stopped drawing after it was left and reopened."; exit 1; fi
 exit 0
