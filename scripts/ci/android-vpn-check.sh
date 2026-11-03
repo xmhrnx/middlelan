@@ -52,8 +52,13 @@ adb install -r -g "$APK" 2>&1 | tee -a "$OUT/steps.txt"
 adb logcat -c
 log "launch"
 adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
-sleep 20
 adb forward tcp:7600 tcp:7600
+# Wait until the app's automation server answers (cold starts vary).
+for i in $(seq 1 60); do
+  if mcp ui_snapshot '{"query":"Security"}' | grep -q '"result"'; then echo "app ready after ${i}x2s"; break; fi
+  sleep 2
+done
+sleep 3
 mcp ui_snapshot '{}' > "$OUT/snapshot-start.json"
 shot 01-launched
 
@@ -107,6 +112,12 @@ done
 adb logcat -d -v threadtime > "$OUT/logcat.txt"
 pid=$(adb shell pidof $PKG | tr -d '\r')
 echo "app pid: ${pid:-not running}" | tee -a "$OUT/steps.txt"
-grep -iE "middle|VpnService|vpndialogs|gio|AndroidRuntime|FATAL|ForegroundService|panic|SecurityException" "$OUT/logcat.txt" | grep -v "^--" > "$OUT/logcat-relevant.txt"
-tail -80 "$OUT/logcat-relevant.txt"
+# The app's own lines, plus what the system says about VPNs, foreground
+# services and crashes.
+{
+  [ -n "$pid" ] && grep -E "^\S+ \S+ +$pid " "$OUT/logcat.txt"
+  grep -E "Vpn|vpndialogs|ActivityManager.*(middlelan|ForegroundService)|AndroidRuntime|FATAL|middlelan" "$OUT/logcat.txt"
+} | grep -v "avc:  denied" | sort -u -k1,2 > "$OUT/logcat-relevant.txt"
+echo "--- relevant logcat ($(wc -l < "$OUT/logcat-relevant.txt") lines)"
+tail -150 "$OUT/logcat-relevant.txt"
 exit 0
