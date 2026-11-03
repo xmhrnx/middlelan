@@ -1,8 +1,8 @@
-# MiddleLAN
+# MiddleMan
 
 **See every connection. Know every device.**
 
-MiddleLAN is a cross-platform network monitor built with [Giode](https://github.com/xmhrnx/giode)
+MiddleMan is a cross-platform network monitor built with [Giode](https://github.com/xmhrnx/giode)
 (Go + Gio, GPU-rendered, no webview). It watches every app's network connections, shows where
 each one connects (host, owner, country, map), finds the devices on your local network, and
 includes a full toolbox of network diagnostics.
@@ -81,10 +81,10 @@ In English, Español, Deutsch, Français, Português and فارسی (right to le
 | Linux | netlink `sock_diag` (falls back to `/proc/net`), owners from `/proc/*/fd` | per-socket `tcp_info` counters, no root needed |
 | Windows | `GetExtendedTcpTable` / `GetExtendedUdpTable` | per-connection extended stats (needs **Run as administrator**, offered in-app) |
 | macOS | `lsof` | `nettop` per-process counters |
-| Android | Android 10+ hides other apps' sockets; MiddleLAN's on-device VPN (Security) shows them | `NetworkStatsManager` per-app usage (grant **Usage access**, offered in-app), split by destination with the VPN |
+| Android | Android 10+ hides other apps' sockets; MiddleMan's on-device VPN (Security) shows them | `NetworkStatsManager` per-app usage (grant **Usage access**, offered in-app), split by destination with the VPN |
 
 Without administrator rights, desktops hide the program names of other users' and system
-sockets; MiddleLAN labels those sockets *hidden* and offers to restart elevated.
+sockets; MiddleMan labels those sockets *hidden* and offers to restart elevated.
 
 **Updates:** desktop builds check GitHub Releases daily (can be turned off). With a signed
 update feed (`giode update-key`, then `[update]` in giode.toml) they also install updates.

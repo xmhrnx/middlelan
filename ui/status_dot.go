@@ -3,7 +3,7 @@ package ui
 import "github.com/xmhrnx/giode"
 
 // statusDot is a status dot with a soft halo. It's deliberately static:
-// an animation would redraw the window continuously, and MiddleLAN must
+// an animation would redraw the window continuously, and MiddleMan must
 // stay light on resources.
 func statusDot(c giode.Color, live bool) giode.Element {
 	return giode.Canvas(giode.Styles{Width: 14, Height: 14}, func(p *giode.Painter) {

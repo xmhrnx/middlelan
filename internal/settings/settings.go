@@ -1,4 +1,4 @@
-// Package settings loads and saves MiddleLAN's preferences.
+// Package settings loads and saves MiddleMan's preferences.
 package settings
 
 import (
@@ -46,7 +46,7 @@ type Settings struct {
 	// FirewallAsk asks what to do when a program connects for the first
 	// time (only while the firewall is on).
 	FirewallAsk bool `json:"firewallAsk"`
-	// CheckUpdates looks for a newer MiddleLAN once a day.
+	// CheckUpdates looks for a newer MiddleMan once a day.
 	CheckUpdates bool `json:"checkUpdates"`
 	// OnboardingDone hides the welcome card.
 	OnboardingDone bool `json:"onboardingDone"`

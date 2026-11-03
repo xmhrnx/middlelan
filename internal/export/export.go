@@ -1,4 +1,4 @@
-// Package export writes MiddleLAN's history as CSV or JSON, for
+// Package export writes MiddleMan's history as CSV or JSON, for
 // spreadsheets, reports or another tool.
 package export
 

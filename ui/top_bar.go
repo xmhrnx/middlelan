@@ -28,7 +28,7 @@ func (t *topBar) view() giode.Element {
 		Width: -1, Align: giode.AlignCenter, Gap: 10, Padding: giode.SymmetricInset(14, 10), Background: colSidebar, Wrap: giode.WrapNoWrap,
 	},
 		logoMark(28),
-		giode.Text("MiddleLAN", giode.Styles{Color: "theme.text", FontSize: 16, FontWeight: giode.FontWeightBold, FlexGrow: 1}),
+		giode.Text("MiddleMan", giode.Styles{Color: "theme.text", FontSize: 16, FontWeight: giode.FontWeightBold, FlexGrow: 1}),
 		ratePair(formatRate(snap.RateRx), formatRate(snap.RateTx), 11),
 		t.settings,
 	)

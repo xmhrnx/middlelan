@@ -1,4 +1,4 @@
-// Package ui is MiddleLAN's interface: the app shell, screens and the
+// Package ui is MiddleMan's interface: the app shell, screens and the
 // components they share. It reads data from the internal packages and
 // never does network or file work while building a frame.
 package ui

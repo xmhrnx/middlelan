@@ -100,7 +100,7 @@ func (s *securityScreen) setFirewall(on bool) {
 			case on:
 				s.shell.Toast(giode.ToastSuccess, tr("Firewall on. Only the programs and addresses you block are affected."))
 			default:
-				s.shell.Toast(giode.ToastSuccess, tr("Firewall off. Every rule MiddleLAN added was removed."))
+				s.shell.Toast(giode.ToastSuccess, tr("Firewall off. Every rule MiddleMan added was removed."))
 			}
 		})
 	}()
@@ -111,7 +111,7 @@ func (s *securityScreen) confirmContent() giode.Element {
 	points := []string{
 		tr("Nothing is blocked until you block a program or an address yourself."),
 		tr("Your system's own firewall settings and defaults are never changed."),
-		tr("Turning it off removes every rule MiddleLAN added."),
+		tr("Turning it off removes every rule MiddleMan added."),
 	}
 	if caps.NeedsAdmin {
 		points = append(points, tr("Applying rules needs administrator rights."))
@@ -225,13 +225,13 @@ func (s *securityScreen) firewallCard() giode.Element {
 	s.fwSwitch.SetChecked(st.Enabled)
 	kids := []giode.Element{
 		s.fwSwitch,
-		giode.Text(tr("Off by default. MiddleLAN never changes your system's firewall defaults: it only adds the block rules you create here, and turning it off removes all of them.")+" "+caps.Backend+".", styleMuted),
+		giode.Text(tr("Off by default. MiddleMan never changes your system's firewall defaults: it only adds the block rules you create here, and turning it off removes all of them.")+" "+caps.Backend+".", styleMuted),
 	}
 	if s.busy {
 		kids = append(kids, giode.Row(giode.Styles{Gap: 8, Align: giode.AlignCenter}, giode.Spinner(giode.Styles{Width: 14, Color: "theme.primary"}), giode.Text(tr("Applying…"), styleMuted)))
 	}
 	if st.SystemFirewallOff {
-		kids = append(kids, noticeBanner("shield-alert", tr("Your system's firewall is turned off, so these rules have no effect. MiddleLAN won't turn it on for you."), "theme.warning", nil))
+		kids = append(kids, noticeBanner("shield-alert", tr("Your system's firewall is turned off, so these rules have no effect. MiddleMan won't turn it on for you."), "theme.warning", nil))
 	}
 	for _, e := range st.Errors {
 		kids = append(kids, noticeBanner("info", e, "theme.warning", nil))
@@ -359,6 +359,6 @@ func (s *securityScreen) namesCard() giode.Element {
 		action = s.shell.dashboard.notices.elevate
 	}
 	return card(tr("Domain names"), action,
-		giode.Text(tr("How MiddleLAN learns which sites apps look up: {method}.", "method", s.shell.svc.Names.Method()), giode.Styles{Color: "theme.text", FontSize: sizeSmall}),
+		giode.Text(tr("How MiddleMan learns which sites apps look up: {method}.", "method", s.shell.svc.Names.Method()), giode.Styles{Color: "theme.text", FontSize: sizeSmall}),
 		giode.Text(tr("Names from encrypted DNS (DNS over HTTPS, used by some browsers) can't be seen; reverse DNS fills in where possible."), styleMuted))
 }

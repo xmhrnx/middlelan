@@ -86,7 +86,7 @@ func (d *DB) refresh(ctx context.Context, src *source, old *list) (*list, error)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "MiddleLAN")
+	req.Header.Set("User-Agent", "MiddleMan")
 	if old.loaded {
 		if old.etag != "" {
 			req.Header.Set("If-None-Match", old.etag)

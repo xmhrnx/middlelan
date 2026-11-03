@@ -5,7 +5,7 @@ import (
 	"net/netip"
 )
 
-// protectedRange is traffic MiddleLAN never blocks.
+// protectedRange is traffic MiddleMan never blocks.
 type protectedRange struct {
 	prefix netip.Prefix
 	why    string
@@ -37,7 +37,7 @@ func protectedRanges(dns []netip.Addr) []protectedRange {
 func checkProtected(p netip.Prefix, ranges []protectedRange) error {
 	for _, r := range ranges {
 		if p.Overlaps(r.prefix) {
-			return fmt.Errorf("%w: %s includes %s, which MiddleLAN never blocks", ErrProtected, prefixString(p), r.why)
+			return fmt.Errorf("%w: %s includes %s, which MiddleMan never blocks", ErrProtected, prefixString(p), r.why)
 		}
 	}
 	return nil

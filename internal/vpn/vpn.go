@@ -1,8 +1,8 @@
-// Package vpn is MiddleLAN's on-device VPN: a userspace TCP/IP stack
+// Package vpn is MiddleMan's on-device VPN: a userspace TCP/IP stack
 // (gVisor's netstack) on a TUN file descriptor that terminates every
-// connection the device's apps make and re-makes it from MiddleLAN's own
+// connection the device's apps make and re-makes it from MiddleMan's own
 // sockets. Nothing leaves the device through a remote server; the tunnel
-// only exists so MiddleLAN can see, attribute and block each flow.
+// only exists so MiddleMan can see, attribute and block each flow.
 //
 // Android has hidden other apps' sockets since Android 10. A local
 // VpnService (the approach of NetGuard and PCAPdroid) gives per-app
@@ -79,7 +79,7 @@ type Flow struct {
 	Blocked    bool
 }
 
-// Hooks connect the engine to the rest of MiddleLAN. Every hook is
+// Hooks connect the engine to the rest of MiddleMan. Every hook is
 // optional and may be called from many goroutines at once.
 type Hooks struct {
 	// Owner names the app owning a new flow; proto is the IP protocol
@@ -372,7 +372,7 @@ func (e *Engine) addRecv(f *flow, n int) {
 	f.touch()
 }
 
-// netDial makes a real connection from MiddleLAN's own sockets (which
+// netDial makes a real connection from MiddleMan's own sockets (which
 // bypass the tunnel).
 func netDial(ctx context.Context, network, address string) (net.Conn, error) {
 	var d net.Dialer

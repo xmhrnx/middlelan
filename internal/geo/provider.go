@@ -51,7 +51,7 @@ func lookupBatch(ctx context.Context, ips []string) ([]Info, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "MiddleLAN")
+	req.Header.Set("User-Agent", "MiddleMan")
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err

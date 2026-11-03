@@ -69,7 +69,7 @@ type Status struct {
 	// Backend names the enforcement mechanism.
 	Backend string
 	// SystemFirewallOff is true when the operating system's firewall is off,
-	// so MiddleLAN's rules have no effect. MiddleLAN never turns it on.
+	// so MiddleMan's rules have no effect. MiddleMan never turns it on.
 	SystemFirewallOff bool
 }
 
@@ -143,7 +143,7 @@ var (
 	// a destination, which would cut the device off the network.
 	ErrBlocksEverything = errors.New("a rule needs a program or a destination: blocking all traffic would cut this device off the network")
 	// ErrProtected is returned for a destination that includes loopback,
-	// DHCP or a configured DNS server, which MiddleLAN never blocks.
+	// DHCP or a configured DNS server, which MiddleMan never blocks.
 	ErrProtected = errors.New("destination is protected")
 	// ErrNotFound is returned for an unknown rule ID.
 	ErrNotFound = errors.New("no such rule")

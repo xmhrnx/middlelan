@@ -181,7 +181,7 @@ func (f *Firewall) Enable() error {
 	return errors.Join(err, clearErr, saveErr)
 }
 
-// Disable turns the firewall off and removes every rule MiddleLAN created,
+// Disable turns the firewall off and removes every rule MiddleMan created,
 // including leftovers from earlier runs. It can be called again after a
 // failure.
 func (f *Firewall) Disable() error {
@@ -213,7 +213,7 @@ func (f *Firewall) Refresh() error {
 	return nil
 }
 
-// Uninstall removes every rule MiddleLAN created and deletes the rules file.
+// Uninstall removes every rule MiddleMan created and deletes the rules file.
 // If the system rules can't be removed the file is kept, so Uninstall can be
 // retried.
 func (f *Firewall) Uninstall() error {
@@ -306,7 +306,7 @@ func (f *Firewall) check(r Rule) (Rule, error) {
 	}
 	for _, a := range addrs {
 		if isProtectedAddr(a, protected) {
-			return r, fmt.Errorf("%w: %s resolves to %s, which MiddleLAN never blocks (loopback, DHCP or a DNS server)", ErrProtected, r.Dest, a)
+			return r, fmt.Errorf("%w: %s resolves to %s, which MiddleMan never blocks (loopback, DHCP or a DNS server)", ErrProtected, r.Dest, a)
 		}
 	}
 	f.mu.Lock()
@@ -454,7 +454,7 @@ func (f *Firewall) resolve(rules []Rule) ([]Rule, map[string][]netip.Prefix, []P
 			}
 			for _, q := range hosts[host] {
 				if isProtectedAddr(q.Addr(), protected) {
-					problems = append(problems, Problem{r.ID, fmt.Sprintf("%s resolves to %s, which MiddleLAN never blocks; that address is left open", host, q.Addr())})
+					problems = append(problems, Problem{r.ID, fmt.Sprintf("%s resolves to %s, which MiddleMan never blocks; that address is left open", host, q.Addr())})
 					continue
 				}
 				ps = append(ps, q)
@@ -513,7 +513,7 @@ func addrPrefixes(addrs []netip.Addr) []netip.Prefix {
 // is installed any more.
 func (f *Firewall) clear() error {
 	if err := f.b.Clear(); err != nil {
-		f.setErrs(fmt.Sprintf("couldn't remove MiddleLAN's firewall rules: %v", err))
+		f.setErrs(fmt.Sprintf("couldn't remove MiddleMan's firewall rules: %v", err))
 		return fmt.Errorf("removing firewall rules: %w", err)
 	}
 	f.mu.Lock()

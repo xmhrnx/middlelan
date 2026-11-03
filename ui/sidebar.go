@@ -85,7 +85,7 @@ func (sb *sidebar) view() giode.Element {
 		giode.Row(giode.Styles{Align: giode.AlignCenter, Gap: 10, Padding: giode.Inset{Start: 8, Bottom: 18, Top: 4}},
 			logoMark(34),
 			giode.Stack(giode.Styles{Gap: 1},
-				giode.Text("MiddleLAN", giode.Styles{Color: "theme.text", FontSize: 17, FontWeight: giode.FontWeightBold}),
+				giode.Text("MiddleMan", giode.Styles{Color: "theme.text", FontSize: 17, FontWeight: giode.FontWeightBold}),
 				giode.Text(tr("Network monitor"), giode.Styles{Color: "theme.muted", FontSize: sizeTiny}),
 			),
 		),

@@ -34,7 +34,7 @@ func ssdpSearch(ctx context.Context, st string, timeout time.Duration) ([]ssdpRe
 	if mx > 5 {
 		mx = 5
 	}
-	req := fmt.Sprintf("M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\nMX: %d\r\nST: %s\r\nUSER-AGENT: MiddleLAN/1.0 UPnP/1.1\r\n\r\n", mx, st)
+	req := fmt.Sprintf("M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\nMX: %d\r\nST: %s\r\nUSER-AGENT: MiddleMan/1.0 UPnP/1.1\r\n\r\n", mx, st)
 	deadline := time.Now().Add(timeout)
 	if d, ok := ctx.Deadline(); ok && d.Before(deadline) {
 		deadline = d

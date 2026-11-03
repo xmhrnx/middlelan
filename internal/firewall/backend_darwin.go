@@ -11,13 +11,13 @@ import (
 )
 
 var (
-	// errDarwinAdmin is returned when MiddleLAN doesn't run as root.
+	// errDarwinAdmin is returned when MiddleMan doesn't run as root.
 	errDarwinAdmin = errors.New("changing pf rules needs administrator (root) rights")
-	// errPFDisabled is returned when pf is off. MiddleLAN never enables it.
-	errPFDisabled = errors.New("the macOS packet filter (pf) is disabled, so blocking rules wouldn't take effect; MiddleLAN won't turn it on for you (an administrator can run \"sudo pfctl -E\")")
+	// errPFDisabled is returned when pf is off. MiddleMan never enables it.
+	errPFDisabled = errors.New("the macOS packet filter (pf) is disabled, so blocking rules wouldn't take effect; MiddleMan won't turn it on for you (an administrator can run \"sudo pfctl -E\")")
 )
 
-// pfBackend enforces destination rules in MiddleLAN's pf anchor. macOS pf
+// pfBackend enforces destination rules in MiddleMan's pf anchor. macOS pf
 // can't tell programs apart, so rules can't target a program.
 type pfBackend struct {
 	mu         sync.Mutex

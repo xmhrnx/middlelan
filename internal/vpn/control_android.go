@@ -44,7 +44,7 @@ func init() {
 // Supported reports whether this platform has the on-device VPN.
 func Supported() bool { return bridge != nil }
 
-// Prepare reports whether the user already allowed MiddleLAN to run a
+// Prepare reports whether the user already allowed MiddleMan to run a
 // VPN. If not, it shows the system consent dialog and returns false; call
 // Granted (or Prepare again) once the user has answered.
 func Prepare() (granted bool, err error) {
@@ -72,7 +72,7 @@ func Start() error {
 		return ErrUnsupported
 	}
 	if !Granted() {
-		return errors.New("vpn: MiddleLAN isn't allowed to run a VPN yet")
+		return errors.New("vpn: MiddleMan isn't allowed to run a VPN yet")
 	}
 	ok, err := bridge.start()
 	if err != nil {

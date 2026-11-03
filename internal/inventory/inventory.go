@@ -1,5 +1,5 @@
 // Package inventory remembers the devices seen on the local network, so
-// MiddleLAN can tell which are new and keep the names the user gave them.
+// MiddleMan can tell which are new and keep the names the user gave them.
 package inventory
 
 import (

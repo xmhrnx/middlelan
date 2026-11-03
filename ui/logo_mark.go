@@ -5,7 +5,7 @@ import (
 	props "github.com/xmhrnx/giode/styles/properties"
 )
 
-// logoMark draws the MiddleLAN emblem, the "M" whose strokes meet in the
+// logoMark draws the MiddleMan emblem, the "M" whose strokes meet in the
 // node in the middle, at the given size.
 func logoMark(size int) giode.Element {
 	return giode.Box(giode.Styles{
