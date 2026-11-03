@@ -9,7 +9,7 @@ import (
 )
 
 // vpnControl is the on-device VPN switch (Android only): with it on,
-// MiddleLAN sees every app's connections and domain names and can block
+// MiddleMan sees every app's connections and domain names and can block
 // them, all on the device.
 type vpnControl struct {
 	shell    *Shell
@@ -69,7 +69,7 @@ func (v *vpnControl) card() giode.Element {
 	}
 	kids := []giode.Element{
 		v.sw,
-		giode.Text(tr("Android hides other apps' connections. This local VPN relays traffic on the phone itself, never through a server, so MiddleLAN can show which app connects where, capture domain names and apply your firewall rules."), styleMuted),
+		giode.Text(tr("Android hides other apps' connections. This local VPN relays traffic on the phone itself, never through a server, so MiddleMan can show which app connects where, capture domain names and apply your firewall rules."), styleMuted),
 	}
 	switch {
 	case v.starting:

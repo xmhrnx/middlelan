@@ -82,7 +82,7 @@ func (d *devicesScreen) content() giode.Element {
 	}
 	var list giode.Element = giode.Stack(giode.Styles{Gap: 2, Width: -1}, rows...)
 	if len(rows) == 0 {
-		list = emptyState("radar", tr("No devices yet"), tr("Scan to find the phones, computers, TVs and gadgets on your network. MiddleLAN remembers them and tells you when a new one joins."), nil)
+		list = emptyState("radar", tr("No devices yet"), tr("Scan to find the phones, computers, TVs and gadgets on your network. MiddleMan remembers them and tells you when a new one joins."), nil)
 	}
 	kids = append(kids, card(tr("On this network"), d.filter, list))
 	return pageBody(kids...)

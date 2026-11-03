@@ -15,7 +15,7 @@ func newWindowBar(sh *Shell) *titlebar.TitleBar {
 	if isMobile {
 		return nil
 	}
-	bar := giode.TitleBar(sh.svc.App, "MiddleLAN", giode.Styles{
+	bar := giode.TitleBar(sh.svc.App, "MiddleMan", giode.Styles{
 		Background: colSidebar, Color: "theme.muted", Height: 38, FontSize: sizeSmall,
 		FontWeight: giode.FontWeightSemiBold, BorderWidth: 1, BorderColor: "theme.border",
 	}).

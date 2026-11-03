@@ -47,5 +47,5 @@ func (sh *Shell) saveExport(name string, write func(export.Data, io.Writer) erro
 
 // exportName is a file name with today's date.
 func exportName(what, ext string) string {
-	return fmt.Sprintf("middlelan-%s-%s.%s", what, time.Now().Format("2006-01-02"), ext)
+	return fmt.Sprintf("middleman-%s-%s.%s", what, time.Now().Format("2006-01-02"), ext)
 }

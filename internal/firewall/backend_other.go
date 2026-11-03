@@ -2,7 +2,7 @@
 
 package firewall
 
-// unsupportedBackend is used where MiddleLAN can't enforce rules.
+// unsupportedBackend is used where MiddleMan can't enforce rules.
 type unsupportedBackend struct{}
 
 // DefaultBackend returns the firewall backend for this platform.

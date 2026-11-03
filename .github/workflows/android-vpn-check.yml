@@ -1,0 +1,68 @@
+# Runs MiddleMan in an Android emulator and turns the on-device VPN on the
+# way a user does, to catch problems no unit test sees (manifest, consent,
+# foreground service, JNI). Uploads logcat, screenshots and UI snapshots.
+name: android-vpn-check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ccr-0ff7da25-kagnto]
+    paths:
+      - .github/workflows/android-vpn-check.yml
+      - scripts/ci/android-vpn-check.sh
+      - internal/vpn/**
+      - android/**
+      - ui/vpn_card.go
+      - main.go
+
+jobs:
+  emulator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Build a test APK (x86_64, with the automation server)
+        run: |
+          go install github.com/xmhrnx/giode-cli/cmd/giode@latest
+          sed -i 's/^package = "\."/package = "."\ntags = "mcpdebug"/' giode.toml
+          sed -i 's/^\[android\]/[android]\narch = ["amd64"]/' giode.toml
+          giode build android
+          ls -la dist/android
+      - name: Inspect the APK
+        run: |
+          mkdir -p vpn-check
+          apk=$(ls dist/android/*.apk | head -1)
+          bt=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$bt/aapt2" dump xmltree --file AndroidManifest.xml "$apk" > vpn-check/manifest.txt
+          grep -n -A12 "MiddleVpnService" vpn-check/manifest.txt || echo "MiddleVpnService NOT in manifest"
+          grep -n "permission" vpn-check/manifest.txt | head -40
+          unzip -o -q "$apk" 'lib/*' -d apk-libs
+          nm=$(ls "$ANDROID_HOME"/ndk/*/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-nm | tail -1)
+          "$nm" -D --defined-only apk-libs/lib/x86_64/libgio.so | grep -i "VpnBridge" | tee vpn-check/jni-symbols.txt || echo "no VpnBridge symbols"
+          unzip -p "$apk" classes.dex | strings | grep -c "MiddleVpnService" || true
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Turn the VPN on in the emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          script: bash scripts/ci/android-vpn-check.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vpn-check
+          path: vpn-check

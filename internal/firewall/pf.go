@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// pfAnchor is MiddleLAN's pf anchor. macOS's /etc/pf.conf evaluates every
+// pfAnchor is MiddleMan's pf anchor. macOS's /etc/pf.conf evaluates every
 // anchor under "com.apple/", so rules there take effect without editing the
 // main ruleset; nothing outside the anchor is ever changed.
 const pfAnchor = "com.apple/com.middlelan"

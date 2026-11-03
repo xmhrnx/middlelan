@@ -1,4 +1,4 @@
-// Package nettools implements the network diagnostics used by MiddleLAN:
+// Package nettools implements the network diagnostics used by MiddleMan:
 // ping, traceroute, port scanning, DNS and WHOIS lookups, Wake-on-LAN,
 // speed testing, subnet math, TLS inspection, local/public network
 // information, MAC vendor lookup, LAN device discovery, UPnP/mDNS browsing

@@ -56,7 +56,7 @@ func (d *appDetailScreen) content() giode.Element {
 		responsiveGrid(170, 4, 14,
 			statTile("gauge", tr("Right now"), rateOrDash(a), "↓ "+formatRate(a.RateRx)+"  ↑ "+formatRate(a.RateTx), colDown),
 			statTile("activity", tr("Today"), formatBytes(a.TodayRx+a.TodayTx), formatBytes(a.TodayRx)+" down · "+formatBytes(a.TodayTx)+" up", "theme.success"),
-			statTile("clock", tr("This session"), formatBytes(a.SessionRx+a.SessionTx), "Since MiddleLAN started", colUp),
+			statTile("clock", tr("This session"), formatBytes(a.SessionRx+a.SessionTx), "Since MiddleMan started", colUp),
 			statTile("waypoints", tr("Connections"), itoa(a.Active), plural(a.Listening, "listening port", "listening ports"), "theme.warning"),
 		),
 		responsiveGrid(380, 2, 18,
@@ -129,7 +129,7 @@ func (d *appDetailScreen) liveEndpoints(a monitor.App, now time.Time) giode.Elem
 		rows = append(rows, endpointRow(info, e.Port, e.Proto, e.Rx+e.Tx, e.Active, e.LastSeen, now))
 	}
 	if len(rows) == 0 {
-		rows = append(rows, emptyState("globe", tr("No connections seen yet"), tr("Places this app connects to appear here while MiddleLAN runs."), nil))
+		rows = append(rows, emptyState("globe", tr("No connections seen yet"), tr("Places this app connects to appear here while MiddleMan runs."), nil))
 	}
 	return card(tr("Where it connects"), giode.Text(trn("{count} endpoints this session", len(a.Endpoints)), styleMuted),
 		giode.Stack(giode.Styles{Gap: 0, Width: -1}, withDividers(rows)...))

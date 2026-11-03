@@ -11,7 +11,7 @@ import android.os.Build;
 import android.widget.RemoteViews;
 
 /**
- * MiddleLAN's home screen widget: live speeds, today's usage and the
+ * MiddleMan's home screen widget: live speeds, today's usage and the
  * busiest app. Go pushes new values with {@link #update}; the widget keeps
  * the last ones in SharedPreferences so it redraws after a reboot.
  * Its layout and provider info come from android/libs/middlelan-widget.aar.
@@ -24,7 +24,7 @@ public class UsageWidget extends AppWidgetProvider {
         render(ctx, mgr, ids);
     }
 
-    /** Saves new values and redraws every MiddleLAN widget. Called from Go. */
+    /** Saves new values and redraws every MiddleMan widget. Called from Go. */
     public static void update(Context ctx, String down, String up, String today, String top) {
         SharedPreferences.Editor e = ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit();
         e.putString("down", down).putString("up", up).putString("today", today).putString("top", top).apply();

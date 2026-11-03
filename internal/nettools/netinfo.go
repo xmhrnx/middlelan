@@ -224,7 +224,7 @@ func getJSON(ctx context.Context, url string, v any) error {
 		return err
 	}
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", "MiddleLAN")
+	req.Header.Set("User-Agent", "MiddleMan")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err

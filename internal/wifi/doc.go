@@ -1,4 +1,4 @@
-// Package wifi reports the Wi-Fi link MiddleLAN's device is connected to
+// Package wifi reports the Wi-Fi link MiddleMan's device is connected to
 // and the networks around it: signal, channel, band, security and link
 // rates, plus helpers that flag weak security and summarize channel
 // congestion.

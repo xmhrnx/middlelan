@@ -82,7 +82,7 @@ func (u *uptimeTool) add(r nettools.PingReply) {
 	u.misses++
 	if u.misses == outageAfter {
 		u.outages = append(u.outages, outage{from: now.Add(-time.Duration(outageAfter-1) * uptimeInterval)})
-		if err := u.shell.svc.App.Notify(tr("Internet connection lost"), tr("MiddleLAN can't reach {host}.", "host", u.host.Text())); err != nil {
+		if err := u.shell.svc.App.Notify(tr("Internet connection lost"), tr("MiddleMan can't reach {host}.", "host", u.host.Text())); err != nil {
 			u.shell.Toast(giode.ToastError, tr("Internet connection lost"))
 		}
 	}
@@ -136,7 +136,7 @@ func (u *uptimeTool) view(t *toolsScreen, info toolInfo) giode.Element {
 	}
 	form := giode.Stack(giode.Styles{Gap: 10, Width: -1},
 		formRow(u.host, syncRunLabel(u.run, "Start monitoring", &u.runner)),
-		giode.Text(tr("Keeps running in the background while MiddleLAN is open, and notifies you of outages."), styleMuted))
+		giode.Text(tr("Keeps running in the background while MiddleMan is open, and notifies you of outages."), styleMuted))
 	return t.toolFrame(info, form, results...)
 }
 

@@ -1,15 +1,15 @@
-# giode.toml configures how the giode CLI builds MiddleLAN.
+# giode.toml configures how the giode CLI builds MiddleMan.
 # Reference: https://github.com/xmhrnx/giode-cli#giodetoml
 
 [app]
-name = "MiddleLAN"
+name = "MiddleMan"
 id = "com.middlelan.app"
 version = "1.0.0"
 build = 1
 icon = "assets/icon.png"
 package = "."
 platforms = ["windows", "macos", "linux", "android"]
-publisher = "MiddleLAN"
+publisher = "MiddleMan"
 description = "See which apps use your network, where they connect, and every device on your LAN."
 website = "https://github.com/xmhrnx/middlelan"
 
@@ -51,7 +51,7 @@ desktop_shortcut = true
 [windows.msix]
 # The signing certificate's subject (or the Partner Center publisher ID for
 # the Microsoft Store); must match the certificate that signs the package.
-publisher = "CN=MiddleLAN"
+publisher = "CN=MiddleMan"
 startup_task = true          # lets "Start in the tray when I log in" work in the MSIX
 
 [windows.signing]

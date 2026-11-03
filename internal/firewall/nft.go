@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// nftTable is MiddleLAN's own nftables table. Nothing outside it is ever
+// nftTable is MiddleMan's own nftables table. Nothing outside it is ever
 // changed.
 const nftTable = "inet middlelan"
 
@@ -28,7 +28,7 @@ type cgroupRef struct {
 	Level int
 }
 
-// nftScript returns an nft -f script that atomically replaces MiddleLAN's
+// nftScript returns an nft -f script that atomically replaces MiddleMan's
 // table with one holding these rules. The table's chain accepts by default
 // and only drops matching traffic: loopback, DHCP and DNS to the given
 // servers are accepted first, so they are never dropped. Other tables and
@@ -104,7 +104,7 @@ func nftSet(ps []netip.Prefix) string {
 	return "{ " + strings.Join(parts, ", ") + " }"
 }
 
-// nftClearScript returns an nft -f script that deletes MiddleLAN's table
+// nftClearScript returns an nft -f script that deletes MiddleMan's table
 // and succeeds whether or not it exists.
 func nftClearScript() string {
 	return fmt.Sprintf("add table %s\ndelete table %s\n", nftTable, nftTable)

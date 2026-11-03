@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generates MiddleLAN's icons from SVG with rsvg-convert.
+"""Generates MiddleMan's icons from SVG with rsvg-convert.
 
 Run from this folder: python3 make_icons.py
 Outputs (in ../): icon.png (desktop + store, 1024), android-foreground.png,

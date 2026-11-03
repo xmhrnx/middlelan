@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-// Windows Firewall rules created by MiddleLAN are named rulePrefix+ID
+// Windows Firewall rules created by MiddleMan are named rulePrefix+ID
 // and described windowsTag+" fp=<fingerprint>", so they can be found and
 // compared with the wanted rules.
 const (
@@ -57,7 +57,7 @@ func windowsAddArgs(r Rule, ips []netip.Prefix) []string {
 }
 
 // windowsDeleteArgs returns the netsh arguments that delete every rule with
-// this name, which must be one of MiddleLAN's.
+// this name, which must be one of MiddleMan's.
 func windowsDeleteArgs(name string) []string {
 	return []string{"advfirewall", "firewall", "delete", "rule", `name="` + name + `"`}
 }
@@ -72,7 +72,7 @@ func netshCmdLine(exe string, args []string) string {
 	return `"` + exe + `" ` + strings.Join(args, " ")
 }
 
-// parseNetshRules finds MiddleLAN's rules in "netsh advfirewall firewall
+// parseNetshRules finds MiddleMan's rules in "netsh advfirewall firewall
 // show rule name=all verbose" output, mapping each name to the fingerprints
 // of the rules with that name ("" when a rule has none). It matches values,
 // not the (translated) field labels.
@@ -105,7 +105,7 @@ type windowsAdd struct {
 
 // windowsPlan compares the wanted rules with the existing ones and returns
 // the names to delete and the rules to add. A rule whose single existing
-// copy has the right fingerprint is kept; anything else with MiddleLAN's
+// copy has the right fingerprint is kept; anything else with MiddleMan's
 // prefix is deleted.
 func windowsPlan(want []windowsAdd, existing map[string][]string) (deletes []string, adds []windowsAdd) {
 	wanted := map[string]bool{}

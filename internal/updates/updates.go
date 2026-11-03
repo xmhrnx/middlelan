@@ -1,4 +1,4 @@
-// Package updates tells the user when a newer MiddleLAN is out. With a
+// Package updates tells the user when a newer MiddleMan is out. With a
 // signed update feed configured (giode.toml [update]) desktop builds can
 // download and install it; otherwise it points at the GitHub release.
 package updates
@@ -75,7 +75,7 @@ func (c *Checker) latestOnGitHub(ctx context.Context) (*Release, error) {
 		return nil, err
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("User-Agent", "MiddleLAN")
+	req.Header.Set("User-Agent", "MiddleMan")
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err

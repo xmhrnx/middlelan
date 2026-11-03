@@ -10,9 +10,9 @@ import (
 )
 
 // errLinuxAdmin is returned when nft is refused for lack of privileges.
-var errLinuxAdmin = errors.New("changing nftables rules needs root (or CAP_NET_ADMIN): run MiddleLAN with administrator rights")
+var errLinuxAdmin = errors.New("changing nftables rules needs root (or CAP_NET_ADMIN): run MiddleMan with administrator rights")
 
-// nftBackend enforces rules in MiddleLAN's own nftables table. It never
+// nftBackend enforces rules in MiddleMan's own nftables table. It never
 // touches other tables, chains or policies.
 type nftBackend struct {
 	mu sync.Mutex
@@ -28,11 +28,11 @@ func (*nftBackend) Capabilities() Capabilities {
 		PerApp: true, PerDestination: true, NeedsAdmin: true, Backend: "nftables",
 		Notes: "Rules live in the nftables table \"inet middlelan\". A program can be blocked only while it runs " +
 			"in a cgroup of its own, as apps started from the desktop usually do; rules are refreshed whenever " +
-			"MiddleLAN applies them again.",
+			"MiddleMan applies them again.",
 	}
 	if _, err := findTool("nft"); err != nil {
 		c.Backend = "nftables (not installed)"
-		c.Notes = "Install nftables (the nft command) to use MiddleLAN's firewall."
+		c.Notes = "Install nftables (the nft command) to use MiddleMan's firewall."
 	}
 	return c
 }
@@ -45,7 +45,7 @@ func (*nftBackend) Validate(r Rule) error {
 	return nil
 }
 
-// SystemFirewallOff is always false: MiddleLAN's table works whether or not
+// SystemFirewallOff is always false: MiddleMan's table works whether or not
 // another firewall front end is active.
 func (*nftBackend) SystemFirewallOff() bool { return false }
 

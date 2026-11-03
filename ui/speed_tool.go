@@ -179,7 +179,7 @@ func (s *speedTool) reportCard() giode.Element {
 func (s *speedTool) scheduleCard() giode.Element {
 	note := tr("Off. Each test transfers about 100 MB, so leave this off on metered connections.")
 	if s.shell.svc.Settings.Get().ScheduledSpeedTests {
-		note = tr("Runs in the background while MiddleLAN is open.")
+		note = tr("Runs in the background while MiddleMan is open.")
 		if last, ok := s.shell.svc.Speed.Last(); ok {
 			note += " " + tr("Last test {ago}.", "ago", formatAgo(last.When, time.Now()))
 		}

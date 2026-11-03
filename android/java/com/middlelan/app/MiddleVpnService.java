@@ -18,10 +18,10 @@ import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 
 /**
- * MiddleLAN's on-device VPN. It routes every app's traffic into a local
+ * MiddleMan's on-device VPN. It routes every app's traffic into a local
  * tunnel whose packets Go (internal/vpn) terminates and re-sends from
- * MiddleLAN's own sockets, so each connection can be attributed to its
- * app and blocked. Nothing goes to a remote server. MiddleLAN itself is
+ * MiddleMan's own sockets, so each connection can be attributed to its
+ * app and blocked. Nothing goes to a remote server. MiddleMan itself is
  * left out of the tunnel, so Go's sockets reach the network directly.
  */
 public class MiddleVpnService extends VpnService {
@@ -77,7 +77,7 @@ public class MiddleVpnService extends VpnService {
         if (!loadGo()) return false;
         String dns = VpnBridge.dnsServers(this);
         Builder b = new Builder();
-        b.setSession("MiddleLAN");
+        b.setSession("MiddleMan");
         b.addAddress("10.111.0.1", 32);
         b.addAddress("fd00:111::1", 128);
         b.addRoute("0.0.0.0", 0);
@@ -247,7 +247,7 @@ public class MiddleVpnService extends VpnService {
             NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (nm != null && nm.getNotificationChannel(CHANNEL) == null) {
                 NotificationChannel ch = new NotificationChannel(CHANNEL, "Network monitor (VPN)", NotificationManager.IMPORTANCE_LOW);
-                ch.setDescription("Shown while MiddleLAN watches this device's connections through its local VPN.");
+                ch.setDescription("Shown while MiddleMan watches this device's connections through its local VPN.");
                 ch.setShowBadge(false);
                 nm.createNotificationChannel(ch);
             }
@@ -259,8 +259,8 @@ public class MiddleVpnService extends VpnService {
         int icon = getApplicationInfo().icon;
         if (icon == 0) icon = android.R.drawable.stat_sys_warning;
         nb.setSmallIcon(icon)
-          .setContentTitle("MiddleLAN is monitoring connections")
-          .setContentText("Traffic stays on this device; tap to open MiddleLAN.")
+          .setContentTitle("MiddleMan is monitoring connections")
+          .setContentText("Traffic stays on this device; tap to open MiddleMan.")
           .setOngoing(true)
           .setShowWhen(false);
         PendingIntent open = openAppIntent();

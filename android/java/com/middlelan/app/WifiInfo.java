@@ -12,7 +12,7 @@ import android.os.Build;
 import java.util.List;
 
 /**
- * Wi-Fi link and scan details for MiddleLAN, called from Go
+ * Wi-Fi link and scan details for MiddleMan, called from Go
  * (internal/wifi/wifi_android.go) through giode's android package.
  * Results are tab-separated strings parsed by internal/wifi/parse_wifiinfo.go;
  * failures are returned as "ERR:" and a reason ("off", "nowifi",

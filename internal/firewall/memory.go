@@ -6,7 +6,7 @@ import (
 )
 
 // memoryBackend only records the rules it is given; something else, such
-// as MiddleLAN's Android VPN through Firewall.Blocks, enforces them.
+// as MiddleMan's Android VPN through Firewall.Blocks, enforces them.
 type memoryBackend struct {
 	mu    sync.Mutex
 	caps  Capabilities

@@ -1,4 +1,4 @@
-// Package assets embeds MiddleLAN's icons, fonts and map data.
+// Package assets embeds MiddleMan's icons, fonts and map data.
 package assets
 
 import (

@@ -70,7 +70,7 @@ func icmpSweep(ctx context.Context, hosts []net.IP, wait time.Duration) map[stri
 		if ctx.Err() != nil {
 			break
 		}
-		msg := icmp.Message{Type: ipv4.ICMPTypeEcho, Body: &icmp.Echo{ID: id, Seq: i & 0xffff, Data: []byte("MiddleLAN")}}
+		msg := icmp.Message{Type: ipv4.ICMPTypeEcho, Body: &icmp.Echo{ID: id, Seq: i & 0xffff, Data: []byte("MiddleMan")}}
 		b, err := msg.Marshal(nil)
 		if err != nil {
 			continue

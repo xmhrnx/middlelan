@@ -1,4 +1,4 @@
-// Command middlelan is MiddleLAN, a network monitor: it shows which apps
+// Command middlelan is MiddleMan, a network monitor: it shows which apps
 // use the network and where they connect, finds the devices on the local
 // network, and carries a full set of network tools.
 package main
@@ -124,7 +124,7 @@ func run() error {
 	}
 
 	app = giode.New(giode.Config{
-		Title:     "MiddleLAN",
+		Title:     "MiddleMan",
 		Size:      image.Pt(1240, 800),
 		MinSize:   image.Pt(380, 560),
 		Resizable: true,
@@ -137,6 +137,7 @@ func run() error {
 		Frameless:  !isAndroid,
 		Background: "theme.background",
 		Icon:       assets.Icon,
+		MCP:        debugMCP,
 		// Closing hides to the tray so monitoring continues; Quit ends it.
 		CloseToTray: st.CloseToTray && giode.TraySupported(),
 		// Started at login (Settings → Start in the tray), the window
@@ -246,13 +247,23 @@ func registerFonts() error {
 	return nil
 }
 
-// dataDir is where MiddleLAN keeps its settings and history.
+// dataDir is where MiddleMan keeps its settings and history.
 func dataDir() (string, error) {
 	base, err := gioapp.DataDir()
 	if err != nil {
 		return "", fmt.Errorf("data folder: %w", err)
 	}
-	dir := filepath.Join(base, "MiddleLAN")
+	dir := filepath.Join(base, "MiddleMan")
+	// The app was called MiddleLAN: move its data over on first start,
+	// so history, devices and firewall rules carry over.
+	old := filepath.Join(base, "MiddleLAN")
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		if _, err := os.Stat(old); err == nil {
+			if err := os.Rename(old, dir); err != nil {
+				log.Printf("data folder: couldn't move %s to %s: %v", old, dir, err)
+			}
+		}
+	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return "", fmt.Errorf("data folder: %w", err)
 	}

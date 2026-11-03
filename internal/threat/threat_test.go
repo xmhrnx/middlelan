@@ -315,7 +315,7 @@ func newListServer(t *testing.T) *listServer {
 	}
 	s.Server = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		s.requests.Add(1)
-		if r.UserAgent() != "MiddleLAN" {
+		if r.UserAgent() != "MiddleMan" {
 			http.Error(w, "bad agent", http.StatusForbidden)
 			return
 		}

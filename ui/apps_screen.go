@@ -68,7 +68,9 @@ func (a *appsScreen) filtered(s *monitor.Snapshot) []monitor.App {
 	for _, app := range s.Apps {
 		switch a.filter.Selected() {
 		case filterActive:
-			if app.Active == 0 && app.RateRx+app.RateTx == 0 {
+			// Where the platform shows no live connections (Android
+			// without the VPN), "active" means it used the network today.
+			if app.Active == 0 && app.RateRx+app.RateTx == 0 && (len(s.Conns) > 0 || app.TodayRx+app.TodayTx == 0) {
 				continue
 			}
 		case filterListening:

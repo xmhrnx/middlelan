@@ -11,7 +11,7 @@ import (
 	"github.com/xmhrnx/middlelan/ui"
 )
 
-// trayPanel is MiddleLAN in the system tray (the menu bar on macOS): a
+// trayPanel is MiddleMan in the system tray (the menu bar on macOS): a
 // small live panel in the menu - speeds, today's total, the busiest apps
 // - so a glance doesn't need the window.
 type trayPanel struct {
@@ -32,7 +32,7 @@ func setupTray(app *giode.App, c *monitor.Collector, sh *ui.Shell) *trayPanel {
 		return nil
 	}
 	t := &trayPanel{app: app, c: c, shell: sh}
-	app.Tray().SetIcon(assets.Tray).SetTemplateIcon(assets.TrayTemplate).SetTooltip("MiddleLAN")
+	app.Tray().SetIcon(assets.Tray).SetTemplateIcon(assets.TrayTemplate).SetTooltip("MiddleMan")
 	t.refresh(true)
 	return t
 }
@@ -70,7 +70,7 @@ func (t *trayPanel) refresh(force bool) {
 		pause = giode.Intl("Resume monitoring")
 	}
 	items = append(items,
-		giode.TrayAction(giode.Intl("Open MiddleLAN"), func() {
+		giode.TrayAction(giode.Intl("Open MiddleMan"), func() {
 			t.app.ShowWindow()
 			t.c.SetVisible(true)
 		}),
@@ -89,7 +89,7 @@ func (t *trayPanel) refresh(force bool) {
 	}
 	t.mu.Unlock()
 	if changed {
-		t.app.Tray().SetMenu(items...).SetTooltip("MiddleLAN  " + rates)
+		t.app.Tray().SetMenu(items...).SetTooltip("MiddleMan  " + rates)
 		// macOS shows a short live title next to the menu bar icon.
 		t.app.Tray().SetTitle("↓" + ui.FormatRate(s.RateRx))
 	}

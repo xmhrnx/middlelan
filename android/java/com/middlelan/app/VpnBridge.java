@@ -68,9 +68,10 @@ public final class VpnBridge {
             return false;
         }
         if (consent == null) return true;
-        consent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         try {
-            ctx.startActivity(consent);
+            // Not ctx.startActivity(consent): the dialog must be started
+            // for a result from an activity, or it grants nothing.
+            VpnConsentActivity.show(ctx);
         } catch (Exception e) {
             // No activity to show it (very old or locked-down devices).
         }

@@ -53,7 +53,7 @@ func (s *androidSource) Sample() (Sample, error) {
 		if socks, _, err := s.linux.sockets(); err == nil && len(socks) > 0 {
 			smp.Conns = s.linux.owners.resolve(socks)
 		} else {
-			limits = append(limits, "Android hides other apps' connections. Turn on MiddleLAN's VPN in Security to see where each app connects.")
+			limits = append(limits, "Android hides other apps' connections. Turn on MiddleMan's VPN in Security to see where each app connects.")
 		}
 	}
 	if t, err := android.CallString(netStatsClass, "totals", "()Ljava/lang/String;"); err == nil {

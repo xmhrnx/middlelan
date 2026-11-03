@@ -127,7 +127,7 @@ func (s *settingsScreen) content() giode.Element {
 		monitoring = append(monitoring, s.tray, s.login)
 	}
 	return pageBody(
-		pageHeader(tr("Settings"), tr("Make MiddleLAN yours")),
+		pageHeader(tr("Settings"), tr("Make MiddleMan yours")),
 		section(tr("Appearance"), giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Width: -1, Wrap: giode.WrapNoWrap},
 			giode.Text(tr("Theme"), giode.Styles{Color: "theme.text", FontSize: sizeBody, FlexGrow: 1}), s.theme),
 			giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Width: -1, Wrap: giode.WrapNoWrap},
@@ -171,7 +171,7 @@ func (s *settingsScreen) about() giode.Element {
 		giode.Row(giode.Styles{Gap: 14, Align: giode.AlignCenter},
 			logoMark(48),
 			giode.Stack(giode.Styles{Gap: 3},
-				giode.Text("MiddleLAN", styleHeading),
+				giode.Text("MiddleMan", styleHeading),
 				giode.Text(tr("Version {version}", "version", version), styleMuted),
 				giode.Text(tr("See every connection. Know every device."), styleMuted),
 			)),

@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Per-app network usage for MiddleLAN, called from Go through giode's
+ * Per-app network usage for MiddleMan, called from Go through giode's
  * android package. Android doesn't let apps see other apps' sockets, so
  * traffic per app comes from NetworkStatsManager, which needs the user to
  * grant Usage Access.

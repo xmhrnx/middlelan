@@ -43,12 +43,12 @@ func (sh *Shell) checkUpdates(manual bool) {
 					sh.Toast(giode.ToastWarning, tr("Couldn't check for updates: {error}", "error", err.Error()))
 				}
 			case rel != nil:
-				sh.Toast(giode.ToastInfo, tr("MiddleLAN {version} is available. See Settings → About.", "version", rel.Version))
+				sh.Toast(giode.ToastInfo, tr("MiddleMan {version} is available. See Settings → About.", "version", rel.Version))
 				if !manual {
-					notify(sh.svc.App, tr("MiddleLAN {version} is available", "version", rel.Version), tr("Open MiddleLAN to update."))
+					notify(sh.svc.App, tr("MiddleMan {version} is available", "version", rel.Version), tr("Open MiddleMan to update."))
 				}
 			case manual:
-				sh.Toast(giode.ToastSuccess, tr("MiddleLAN is up to date."))
+				sh.Toast(giode.ToastSuccess, tr("MiddleMan is up to date."))
 			}
 		})
 	}()

@@ -89,7 +89,7 @@ func (h icmpHandle) echo(ip net.IP, ttl int, timeoutMs uint32) (icmpEchoResult, 
 	}
 	// IPAddr is the address in network byte order as laid out in memory.
 	dst := *(*uint32)(unsafe.Pointer(&ip4[0]))
-	payload := []byte("MiddleLAN-ping-x")
+	payload := []byte("MiddleMan-ping-x")
 	reply := make([]byte, int(unsafe.Sizeof(icmpEchoReply{}))+len(payload)+8+64)
 	var opts *ipOptionInformation
 	if ttl > 0 {
