@@ -7,19 +7,19 @@ import (
 	"github.com/xmhrnx/giode"
 )
 
-// Palettes: warm graphite with champagne gold and ivory. Download
+// Palettes: neutral graphite with champagne gold. Download
 // traffic is always gold and upload platinum, so the two read the same
 // in every chart, list and tile.
 var (
 	darkPalette = giode.Palette{
-		Primary: "#d9b36c", Secondary: "#a8a29a", Background: "#0c0b0a", Surface: "#161513",
-		Text: "#f1ede4", Border: "#2a2723", OnPrimary: "#1a1408", Muted: "#9a948a",
-		Accent: "#c9c4ba", Success: "#7fc79a", Warning: "#e8975a", Danger: "#e5736b", Info: "#a7b4c2",
+		Primary: "#d9b36c", Secondary: "#a3a3a6", Background: "#0b0b0c", Surface: "#151516",
+		Text: "#f2f2f0", Border: "#27272a", OnPrimary: "#1a1408", Muted: "#98989d",
+		Accent: "#c8c8cc", Success: "#7fc79a", Warning: "#e8975a", Danger: "#e5736b", Info: "#a7b4c2",
 	}
 	lightPalette = giode.Palette{
-		Primary: "#9c7130", Secondary: "#78716c", Background: "#f6f4ef", Surface: "#ffffff",
-		Text: "#1c1a17", Border: "#e6e1d7", OnPrimary: "#ffffff", Muted: "#6e685e",
-		Accent: "#5f5a53", Success: "#2f8a55", Warning: "#b8611e", Danger: "#c0392b", Info: "#4f6478",
+		Primary: "#9c7130", Secondary: "#737378", Background: "#f5f5f6", Surface: "#ffffff",
+		Text: "#18181b", Border: "#e4e4e7", OnPrimary: "#ffffff", Muted: "#6b6b72",
+		Accent: "#5a5a60", Success: "#2f8a55", Warning: "#b8611e", Danger: "#c0392b", Info: "#4f6478",
 	}
 )
 
@@ -31,7 +31,7 @@ var (
 	colSurface2                = giode.Mix("theme.text", "theme.surface", 0.04)
 	colSurface3                = giode.Mix("theme.text", "theme.surface", 0.08)
 	colHover                   = giode.Mix("theme.text", "theme.surface", 0.06)
-	colSelected                = giode.Mix("theme.primary", "theme.surface", 0.14)
+	colSelected                = giode.Mix("theme.text", "theme.surface", 0.09)
 	colDownSoft                = giode.Mix("theme.primary", "theme.surface", 0.16)
 	colUpSoft                  = giode.Mix("theme.accent", "theme.surface", 0.16)
 	colSuccessSoft             = giode.Mix("theme.success", "theme.surface", 0.16)

@@ -88,7 +88,7 @@ func (d *dashboardScreen) tiles(s *monitor.Snapshot) giode.Element {
 		statTile("arrow-up", tr("Upload"), formatRate(s.RateTx), tr("Peak {rate}", "rate", formatRate(peakTx)), colUp),
 		statTile("activity", tr("Today"), formatBytes(s.TodayRx+s.TodayTx),
 			tr("{down} down · {up} up", "down", formatBytes(s.TodayRx), "up", formatBytes(s.TodayTx)), "theme.success"),
-		statTile("app-window", tr("Apps online"), itoa(active), plural(conns, "open connection", "open connections"), "theme.warning"),
+		statTile("app-window", tr("Apps online"), itoa(active), plural(conns, "open connection", "open connections"), "theme.info"),
 	)
 }
 

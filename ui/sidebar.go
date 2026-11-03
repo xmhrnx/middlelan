@@ -81,15 +81,8 @@ func (sb *sidebar) statusView(s giode.PressState) giode.Element {
 // Layout draws the sidebar.
 func (sb *sidebar) view() giode.Element {
 	snap := sb.shell.svc.Collector.Snapshot()
-	kids := []giode.Element{
-		giode.Row(giode.Styles{Align: giode.AlignCenter, Gap: 10, Padding: giode.Inset{Start: 8, Bottom: 18, Top: 4}},
-			logoMark(34),
-			giode.Stack(giode.Styles{Gap: 1},
-				giode.Text("MiddleMan", giode.Styles{Color: "theme.text", FontSize: 17, FontWeight: giode.FontWeightBold}),
-				giode.Text(tr("Network monitor"), giode.Styles{Color: "theme.muted", FontSize: sizeTiny}),
-			),
-		),
-	}
+	// The window's title bar carries the logo and name.
+	kids := []giode.Element{giode.Box(giode.Styles{Height: 4})}
 	for _, it := range sb.items {
 		kids = append(kids, it)
 	}

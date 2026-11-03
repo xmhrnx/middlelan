@@ -340,7 +340,6 @@
  "Every {interval}": "هر {interval}",
  "Paused": "متوقف",
  "Click to resume": "برای ادامه بزنید",
- "Network monitor": "پایشگر شبکه",
  "Scheduled speed test failed: {error}": "تست سرعت زمان‌بندی‌شده ناموفق بود: {error}",
  "Uses Cloudflare's speed test servers. A test transfers about 100 MB.": "از سرورهای تست سرعت Cloudflare استفاده می‌کند. هر تست حدود ۱۰۰ مگابایت داده منتقل می‌کند.",
  "The test failed: {error}": "تست ناموفق بود: {error}",

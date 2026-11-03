@@ -69,7 +69,7 @@ TLS certificate inspector · Wake on LAN · Network info (interfaces, gateway, D
 ISP) · Subnet calculator.
 
 ### Design
-Dark and light themes in graphite, champagne gold and ivory, the Inter typeface, and a custom title bar on desktops (traffic lights on
+Dark and light themes in graphite and champagne gold, the Inter typeface, and a custom title bar on desktops (traffic lights on
 macOS) instead of the OS frame. Layouts are responsive: a sidebar on desktops and a bottom
 navigation bar on phones.
 In English, Español, Deutsch, Français, Português and فارسی (right to left), following the system language or the one chosen in Settings → Appearance (translations live in `locales/`).
@@ -136,8 +136,8 @@ ui/                              Giode UI: shell, screens, components (one per f
 
 ## Icon
 
-The emblem is a gold "M" on warm graphite whose strokes meet in a node in the middle: the man in
-the middle that every packet passes through. On Android it ships as an adaptive icon with a full-bleed
+The emblem is the man in the middle: a gold figure between two linked devices, on graphite, the
+point every packet passes through. On Android it ships as an adaptive icon with a full-bleed
 background layer and the emblem inside the 66 dp safe zone, so launchers never draw a white
 frame around it. There is also a monochrome layer for Android 13 themed icons.
 

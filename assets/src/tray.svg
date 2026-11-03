@@ -12,9 +12,11 @@
     </radialGradient>
   </defs>
 <g transform="translate(-92.15999999999997 -162.15999999999997) scale(1.18)">
-  <path d="M300 742 V292 L512 552 L724 292 V742" fill="none" stroke="#000" stroke-opacity="0.4" stroke-width="58" stroke-linecap="square" stroke-linejoin="miter" transform="translate(0 8)"/>
-  <path d="M300 742 V292 L512 552 L724 292 V742" fill="none" stroke="url(#gold)" stroke-width="56" stroke-linecap="square" stroke-linejoin="miter"/>
-  <circle cx="512" cy="552" r="104" fill="#121110"/>
-  <circle cx="512" cy="552" r="80" fill="none" stroke="url(#gold)" stroke-width="10"/>
-  <circle cx="512" cy="552" r="44" fill="url(#pearl)"/>
+  <circle cx="512" cy="402" r="96" fill="#000" fill-opacity="0.4"/>
+  <path d="M340 742 V684 C340 600 404 540 484 532 L512 560 L540 532 C620 540 684 600 684 684 V742 Z" fill="#000" fill-opacity="0.4" transform="translate(0 10)"/>
+  <circle cx="512" cy="392" r="96" fill="url(#gold)"/>
+  <path d="M340 742 V684 C340 600 404 540 484 532 L512 560 L540 532 C620 540 684 600 684 684 V742 Z" fill="url(#gold)"/>
+  <path d="M466 536 L512 650 L558 536 L540 532 L512 560 L484 532 Z" fill="#141415"/>
+  <path d="M512 566 L530 590 L520 604 L534 700 L512 726 L490 700 L504 604 L494 590 Z" fill="url(#pearl)"/>
+  <path d="M150 640 H306" stroke="#e7c983" stroke-opacity="0.9" stroke-width="14" stroke-linecap="round" stroke-dasharray="2 32"/><path d="M738 640 H810" stroke="#e7c983" stroke-opacity="0.9" stroke-width="14" stroke-linecap="round" stroke-dasharray="2 32"/><circle cx="150" cy="640" r="44" fill="#121213" stroke="url(#gold)" stroke-width="12"/><circle cx="150" cy="640" r="16" fill="url(#pearl)"/><circle cx="874" cy="640" r="44" fill="#121213" stroke="url(#gold)" stroke-width="12"/><circle cx="874" cy="640" r="16" fill="url(#pearl)"/>
 </g></svg>

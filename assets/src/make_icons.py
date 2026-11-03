@@ -9,18 +9,18 @@ tray-template.png.
 """
 import subprocess
 
-# Warm graphite with a soft light from above, a hairline gold rim and
+# Neutral graphite with a soft light from above, a hairline gold rim and
 # champagne gold artwork: black, gold and ivory.
 BG = """
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1f1d1a"/>
-      <stop offset="0.6" stop-color="#121110"/>
-      <stop offset="1" stop-color="#0b0a09"/>
+      <stop offset="0" stop-color="#1c1c1d"/>
+      <stop offset="0.6" stop-color="#111112"/>
+      <stop offset="1" stop-color="#09090a"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.5" cy="0.5" r="0.55">
-      <stop offset="0" stop-color="#e9c77f" stop-opacity="0.16"/>
-      <stop offset="1" stop-color="#e9c77f" stop-opacity="0"/>
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <rect width="1024" height="1024" fill="url(#bg)"/>
@@ -28,7 +28,7 @@ BG = """
 """
 
 # A hairline gold rim inside the rounded square (desktop icon only).
-RIM = '<rect x="10" y="10" width="1004" height="1004" rx="218" fill="none" stroke="#e9c77f" stroke-opacity="0.28" stroke-width="5"/>'
+RIM = '<rect x="10" y="10" width="1004" height="1004" rx="218" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="5"/>'
 
 EMBLEM_DEFS = """
   <defs>
@@ -45,28 +45,40 @@ EMBLEM_DEFS = """
   </defs>
 """
 
-# The "M": two uprights whose strokes meet in the middle node, the man in
-# the middle that every packet passes through.
-M_PATH = "M300 742 V292 L512 552 L724 292 V742"
-NODE = (512, 552)
+# The man in the middle: a figure between two linked devices, every
+# packet passing through him.
+HEAD = (512, 392, 96)
+BODY = "M340 742 V684 C340 600 404 540 484 532 L512 560 L540 532 C620 540 684 600 684 684 V742 Z"
+# The open collar and the tie, cut out of the jacket.
+COLLAR = "M466 536 L512 650 L558 536 L540 532 L512 560 L484 532 Z"
+TIE = "M512 566 L530 590 L520 604 L534 700 L512 726 L490 700 L504 604 L494 590 Z"
+LINKS = ["M150 640 H306", "M738 640 H810"]
+NODES = [(150, 640), (874, 640)]
 
 
 def emblem(color=None):
     """The emblem in gold, or in one flat color for monochrome uses."""
-    x, y = NODE
+    hx, hy, hr = HEAD
     if color:
+        nodes = "".join(f'<circle cx="{x}" cy="{y}" r="44" fill="none" stroke="{color}" stroke-width="16"/><circle cx="{x}" cy="{y}" r="16" fill="{color}"/>' for x, y in NODES)
+        links = "".join(f'<path d="{d}" stroke="{color}" stroke-width="16" stroke-linecap="round" stroke-dasharray="2 34"/>' for d in LINKS)
         return f"""
-  <mask id="gap"><rect width="1024" height="1024" fill="#fff"/><circle cx="{x}" cy="{y}" r="104" fill="#000"/></mask>
-  <path d="{M_PATH}" fill="none" stroke="{color}" stroke-width="60" stroke-linecap="square" stroke-linejoin="miter" mask="url(#gap)"/>
-  <circle cx="{x}" cy="{y}" r="78" fill="none" stroke="{color}" stroke-width="14"/>
-  <circle cx="{x}" cy="{y}" r="40" fill="{color}"/>
+  <mask id="cut"><rect width="1024" height="1024" fill="#fff"/><path d="{COLLAR}" fill="#000"/></mask>
+  <circle cx="{hx}" cy="{hy}" r="{hr}" fill="{color}"/>
+  <path d="{BODY}" fill="{color}" mask="url(#cut)"/>
+  <path d="{TIE}" fill="{color}"/>
+  {links}{nodes}
 """
+    nodes = "".join(f'<circle cx="{x}" cy="{y}" r="44" fill="#121213" stroke="url(#gold)" stroke-width="12"/><circle cx="{x}" cy="{y}" r="16" fill="url(#pearl)"/>' for x, y in NODES)
+    links = "".join(f'<path d="{d}" stroke="#e7c983" stroke-opacity="0.9" stroke-width="14" stroke-linecap="round" stroke-dasharray="2 32"/>' for d in LINKS)
     return f"""
-  <path d="{M_PATH}" fill="none" stroke="#000" stroke-opacity="0.4" stroke-width="58" stroke-linecap="square" stroke-linejoin="miter" transform="translate(0 8)"/>
-  <path d="{M_PATH}" fill="none" stroke="url(#gold)" stroke-width="56" stroke-linecap="square" stroke-linejoin="miter"/>
-  <circle cx="{x}" cy="{y}" r="104" fill="#121110"/>
-  <circle cx="{x}" cy="{y}" r="80" fill="none" stroke="url(#gold)" stroke-width="10"/>
-  <circle cx="{x}" cy="{y}" r="44" fill="url(#pearl)"/>
+  <circle cx="{hx}" cy="{hy + 10}" r="{hr}" fill="#000" fill-opacity="0.4"/>
+  <path d="{BODY}" fill="#000" fill-opacity="0.4" transform="translate(0 10)"/>
+  <circle cx="{hx}" cy="{hy}" r="{hr}" fill="url(#gold)"/>
+  <path d="{BODY}" fill="url(#gold)"/>
+  <path d="{COLLAR}" fill="#141415"/>
+  <path d="{TIE}" fill="url(#pearl)"/>
+  {links}{nodes}
 """
 
 

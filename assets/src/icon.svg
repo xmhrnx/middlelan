@@ -14,21 +14,23 @@
 <clipPath id="r"><rect width="1024" height="1024" rx="228"/></clipPath><g clip-path="url(#r)">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1f1d1a"/>
-      <stop offset="0.6" stop-color="#121110"/>
-      <stop offset="1" stop-color="#0b0a09"/>
+      <stop offset="0" stop-color="#1c1c1d"/>
+      <stop offset="0.6" stop-color="#111112"/>
+      <stop offset="1" stop-color="#09090a"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.5" cy="0.5" r="0.55">
-      <stop offset="0" stop-color="#e9c77f" stop-opacity="0.16"/>
-      <stop offset="1" stop-color="#e9c77f" stop-opacity="0"/>
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <rect width="1024" height="1024" fill="url(#bg)"/>
   <rect width="1024" height="1024" fill="url(#glow)"/>
 <g transform="translate(0.0 -24.0) scale(1.0)">
-  <path d="M300 742 V292 L512 552 L724 292 V742" fill="none" stroke="#000" stroke-opacity="0.4" stroke-width="58" stroke-linecap="square" stroke-linejoin="miter" transform="translate(0 8)"/>
-  <path d="M300 742 V292 L512 552 L724 292 V742" fill="none" stroke="url(#gold)" stroke-width="56" stroke-linecap="square" stroke-linejoin="miter"/>
-  <circle cx="512" cy="552" r="104" fill="#121110"/>
-  <circle cx="512" cy="552" r="80" fill="none" stroke="url(#gold)" stroke-width="10"/>
-  <circle cx="512" cy="552" r="44" fill="url(#pearl)"/>
-</g><rect x="10" y="10" width="1004" height="1004" rx="218" fill="none" stroke="#e9c77f" stroke-opacity="0.28" stroke-width="5"/></g></svg>
+  <circle cx="512" cy="402" r="96" fill="#000" fill-opacity="0.4"/>
+  <path d="M340 742 V684 C340 600 404 540 484 532 L512 560 L540 532 C620 540 684 600 684 684 V742 Z" fill="#000" fill-opacity="0.4" transform="translate(0 10)"/>
+  <circle cx="512" cy="392" r="96" fill="url(#gold)"/>
+  <path d="M340 742 V684 C340 600 404 540 484 532 L512 560 L540 532 C620 540 684 600 684 684 V742 Z" fill="url(#gold)"/>
+  <path d="M466 536 L512 650 L558 536 L540 532 L512 560 L484 532 Z" fill="#141415"/>
+  <path d="M512 566 L530 590 L520 604 L534 700 L512 726 L490 700 L504 604 L494 590 Z" fill="url(#pearl)"/>
+  <path d="M150 640 H306" stroke="#e7c983" stroke-opacity="0.9" stroke-width="14" stroke-linecap="round" stroke-dasharray="2 32"/><path d="M738 640 H810" stroke="#e7c983" stroke-opacity="0.9" stroke-width="14" stroke-linecap="round" stroke-dasharray="2 32"/><circle cx="150" cy="640" r="44" fill="#121213" stroke="url(#gold)" stroke-width="12"/><circle cx="150" cy="640" r="16" fill="url(#pearl)"/><circle cx="874" cy="640" r="44" fill="#121213" stroke="url(#gold)" stroke-width="12"/><circle cx="874" cy="640" r="16" fill="url(#pearl)"/>
+</g><rect x="10" y="10" width="1004" height="1004" rx="218" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="5"/></g></svg>

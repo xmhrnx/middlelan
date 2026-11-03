@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024"><g transform="translate(143.36 125.36000000000001) scale(0.72)">
-  <mask id="gap"><rect width="1024" height="1024" fill="#fff"/><circle cx="512" cy="552" r="104" fill="#000"/></mask>
-  <path d="M300 742 V292 L512 552 L724 292 V742" fill="none" stroke="#ffffff" stroke-width="60" stroke-linecap="square" stroke-linejoin="miter" mask="url(#gap)"/>
-  <circle cx="512" cy="552" r="78" fill="none" stroke="#ffffff" stroke-width="14"/>
-  <circle cx="512" cy="552" r="40" fill="#ffffff"/>
+  <mask id="cut"><rect width="1024" height="1024" fill="#fff"/><path d="M466 536 L512 650 L558 536 L540 532 L512 560 L484 532 Z" fill="#000"/></mask>
+  <circle cx="512" cy="392" r="96" fill="#ffffff"/>
+  <path d="M340 742 V684 C340 600 404 540 484 532 L512 560 L540 532 C620 540 684 600 684 684 V742 Z" fill="#ffffff" mask="url(#cut)"/>
+  <path d="M512 566 L530 590 L520 604 L534 700 L512 726 L490 700 L504 604 L494 590 Z" fill="#ffffff"/>
+  <path d="M150 640 H306" stroke="#ffffff" stroke-width="16" stroke-linecap="round" stroke-dasharray="2 34"/><path d="M738 640 H810" stroke="#ffffff" stroke-width="16" stroke-linecap="round" stroke-dasharray="2 34"/><circle cx="150" cy="640" r="44" fill="none" stroke="#ffffff" stroke-width="16"/><circle cx="150" cy="640" r="16" fill="#ffffff"/><circle cx="874" cy="640" r="44" fill="none" stroke="#ffffff" stroke-width="16"/><circle cx="874" cy="640" r="16" fill="#ffffff"/>
 </g></svg>

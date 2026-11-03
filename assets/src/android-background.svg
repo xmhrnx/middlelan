@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1f1d1a"/>
-      <stop offset="0.6" stop-color="#121110"/>
-      <stop offset="1" stop-color="#0b0a09"/>
+      <stop offset="0" stop-color="#1c1c1d"/>
+      <stop offset="0.6" stop-color="#111112"/>
+      <stop offset="1" stop-color="#09090a"/>
     </linearGradient>
     <radialGradient id="glow" cx="0.5" cy="0.5" r="0.55">
-      <stop offset="0" stop-color="#e9c77f" stop-opacity="0.16"/>
-      <stop offset="1" stop-color="#e9c77f" stop-opacity="0"/>
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <rect width="1024" height="1024" fill="url(#bg)"/>
