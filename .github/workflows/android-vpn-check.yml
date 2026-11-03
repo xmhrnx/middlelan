@@ -14,6 +14,7 @@ on:
       - android/**
       - ui/vpn_card.go
       - main.go
+      - ui/**
 
 jobs:
   emulator:
@@ -47,6 +48,8 @@ jobs:
           nm=$(ls "$ANDROID_HOME"/ndk/*/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-nm | tail -1)
           "$nm" -D --defined-only apk-libs/lib/x86_64/libgio.so | grep -i "VpnBridge" | tee vpn-check/jni-symbols.txt || echo "no VpnBridge symbols"
           unzip -p "$apk" classes.dex | strings | grep -c "MiddleVpnService" || true
+          echo "--- activity theme variants"
+          "$bt/aapt2" dump resources "$apk" | grep -A8 "style/Theme.GioApp" | head -40
       - name: Enable KVM
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules

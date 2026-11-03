@@ -94,6 +94,46 @@ sleep 3
 shot 05-apps
 mcp ui_snapshot '{}' > "$OUT/snapshot-apps.json"
 
+# Leaving and coming back: the app must draw again (not stay on the
+# splash screen). Checked after Home and after Back, with the VPN on.
+alive() { # alive LABEL: does the app draw and answer after returning?
+  sleep 8
+  shot "return-$1"
+  local top; top=$(adb shell dumpsys activity activities | grep -m1 -E "topResumedActivity|mResumedActivity" | tr -d '\r')
+  echo "[$1] resumed: $top" | tee -a "$OUT/steps.txt"
+  if mcp ui_snapshot '{"query":"Security"}' | grep -q '"result"'; then
+    echo "[$1] app answers: yes" | tee -a "$OUT/steps.txt"
+  else
+    echo "[$1] app answers: NO" | tee -a "$OUT/steps.txt"
+  fi
+  local frames; frames=$(mcp frame_stats '{}' | grep -o '"frames": *[0-9]*' | head -1)
+  echo "[$1] frame stats: $frames" | tee -a "$OUT/steps.txt"
+  mcp frame_stats '{"reset":true}' >/dev/null
+}
+log "leave with Home, come back"
+mcp frame_stats '{"reset":true}' >/dev/null
+adb shell input keyevent KEYCODE_HOME; sleep 6
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+alive home
+log "leave with Back, come back"
+adb shell input keyevent KEYCODE_BACK; sleep 2
+adb shell input keyevent KEYCODE_BACK; sleep 6
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+alive back
+log "leave with Home for 40 s, come back"
+adb shell input keyevent KEYCODE_HOME; sleep 40
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+alive long
+# Freezes: Android writes the main thread's stack when the app stops
+# responding.
+adb root >/dev/null 2>&1; sleep 3
+adb shell 'ls /data/anr/ 2>/dev/null' | tee -a "$OUT/steps.txt"
+adb shell 'cat /data/anr/anr_* 2>/dev/null' > "$OUT/anr.txt"
+if [ -s "$OUT/anr.txt" ]; then
+  echo "--- ANR main thread"
+  awk '/"main"/,/^$/' "$OUT/anr.txt" | head -60
+fi
+
 # What the app shows, as text: the job log is where results are read.
 for f in security after apps; do
   echo "--- UI text: $f"
@@ -116,7 +156,7 @@ echo "app pid: ${pid:-not running}" | tee -a "$OUT/steps.txt"
 # services and crashes.
 {
   [ -n "$pid" ] && grep -E "^\S+ \S+ +$pid " "$OUT/logcat.txt"
-  grep -E "Vpn|vpndialogs|ActivityManager.*(middlelan|ForegroundService)|AndroidRuntime|FATAL|middlelan" "$OUT/logcat.txt"
+  grep -E "Vpn|vpndialogs|ActivityManager.*(middlelan|ForegroundService)|ANR in|Input dispatching|AndroidRuntime|FATAL|middlelan|SplashScreen" "$OUT/logcat.txt"
 } | grep -v "avc:  denied" | sort -u -k1,2 > "$OUT/logcat-relevant.txt"
 echo "--- relevant logcat ($(wc -l < "$OUT/logcat-relevant.txt") lines)"
 tail -150 "$OUT/logcat-relevant.txt"
