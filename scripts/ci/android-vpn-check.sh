@@ -106,7 +106,7 @@ alive() { # alive LABEL: does the app draw and answer after returning?
   else
     echo "[$1] app answers: NO" | tee -a "$OUT/steps.txt"
   fi
-  local frames; frames=$(mcp frame_stats '{}' | grep -o '"frames": *[0-9]*' | head -1)
+  local frames; frames=$(mcp frame_stats '{}' | grep -oE 'frames[^0-9]{1,6}[0-9]+' | head -1)
   echo "[$1] frame stats: $frames" | tee -a "$OUT/steps.txt"
   mcp frame_stats '{"reset":true}' >/dev/null
 }
@@ -126,20 +126,21 @@ adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 alive long
 # Android destroying the activity while the process lives on (the VPN
 # keeps it): what happens after swiping the app away, on Back before
-# Android 12, or when the system reclaims memory. "Don't keep
-# activities" destroys it on every leave.
-log "activity destroyed while the process lives, come back"
+# Android 12, or when the system reclaims memory. Starting it with
+# CLEAR_TASK finishes the activity and creates a new one in the same
+# process.
+log "activity re-created while the process lives, come back"
 pid_before=$(adb shell pidof $PKG | tr -d '\r')
-adb shell settings put global always_finish_activities 1
-adb shell input keyevent KEYCODE_HOME; sleep 6
-adb shell dumpsys activity activities | grep -c "$PKG/" | sed 's/^/[destroyed] activity records: /' | tee -a "$OUT/steps.txt"
-adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
-alive destroyed
-echo "[destroyed] pid before: $pid_before after: $(adb shell pidof $PKG | tr -d '\r')" | tee -a "$OUT/steps.txt"
+adb shell input keyevent KEYCODE_HOME; sleep 4
+timeout 30 adb shell am start -n $PKG/org.gioui.GioActivity -f 0x10008000 2>&1 | tee -a "$OUT/steps.txt"
+alive recreated
+echo "[recreated] pid before: $pid_before after: $(adb shell pidof $PKG | tr -d '\r')" | tee -a "$OUT/steps.txt"
+adb shell input keyevent KEYCODE_HOME; sleep 4
+timeout 30 adb shell am start -n $PKG/org.gioui.GioActivity -f 0x10008000 2>&1 | tee -a "$OUT/steps.txt"
+alive recreated-again
 adb shell input keyevent KEYCODE_HOME; sleep 4
 adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
-alive destroyed-again
-adb shell settings put global always_finish_activities 0
+alive recreated-then-icon
 # Freezes: Android writes the main thread's stack when the app stops
 # responding.
 adb root >/dev/null 2>&1; sleep 3
