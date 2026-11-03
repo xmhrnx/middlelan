@@ -7,18 +7,19 @@ import (
 	"github.com/xmhrnx/giode"
 )
 
-// Palettes. Download traffic is always cyan and upload violet, so the two
-// read the same in every chart, list and tile.
+// Palettes: warm graphite with champagne gold and ivory. Download
+// traffic is always gold and upload platinum, so the two read the same
+// in every chart, list and tile.
 var (
 	darkPalette = giode.Palette{
-		Primary: "#22d3ee", Secondary: "#94a3b8", Background: "#080b16", Surface: "#10142a",
-		Text: "#e8ebf7", Border: "#1f2547", OnPrimary: "#031018", Muted: "#8188ad",
-		Accent: "#a78bfa", Success: "#34d399", Warning: "#fbbf24", Danger: "#f87171", Info: "#60a5fa",
+		Primary: "#d9b36c", Secondary: "#a8a29a", Background: "#0c0b0a", Surface: "#161513",
+		Text: "#f1ede4", Border: "#2a2723", OnPrimary: "#1a1408", Muted: "#9a948a",
+		Accent: "#c9c4ba", Success: "#7fc79a", Warning: "#e8975a", Danger: "#e5736b", Info: "#a7b4c2",
 	}
 	lightPalette = giode.Palette{
-		Primary: "#0891b2", Secondary: "#64748b", Background: "#f3f5fb", Surface: "#ffffff",
-		Text: "#0e1225", Border: "#e2e6f2", OnPrimary: "#ffffff", Muted: "#5c6386",
-		Accent: "#7c3aed", Success: "#059669", Warning: "#d97706", Danger: "#dc2626", Info: "#2563eb",
+		Primary: "#9c7130", Secondary: "#78716c", Background: "#f6f4ef", Surface: "#ffffff",
+		Text: "#1c1a17", Border: "#e6e1d7", OnPrimary: "#ffffff", Muted: "#6e685e",
+		Accent: "#5f5a53", Success: "#2f8a55", Warning: "#b8611e", Danger: "#c0392b", Info: "#4f6478",
 	}
 )
 
@@ -58,7 +59,7 @@ var (
 	styleCard = giode.Styles{
 		FlexDirection: giode.FlexDirectionColumn, Padding: giode.UniformInset(18), Gap: 12,
 		Background: "theme.surface", BorderRadius: 16, BorderWidth: 1, BorderColor: "theme.border",
-		BoxShadow: giode.BoxShadow{Y: 6, Blur: 24, Color: "#0000001f"},
+		BoxShadow: giode.BoxShadow{Y: 6, Blur: 24, Color: "#00000029"},
 	}
 	styleTitle   = giode.Styles{Color: "theme.text", FontSize: sizeTitle, FontWeight: giode.FontWeightBold}
 	styleHeading = giode.Styles{Color: "theme.text", FontSize: sizeHeading, FontWeight: giode.FontWeightSemiBold}

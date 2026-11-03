@@ -156,7 +156,7 @@ func (h *historyScreen) breakdown(hourly bool) giode.Element {
 		}
 		share := float64(r.c.Rx+r.c.Tx) / float64(max(total, 1))
 		els = append(els, giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Width: -1, Padding: giode.SymmetricInset(2, 6), Wrap: giode.WrapNoWrap},
-			giode.Avatar(r.name, giode.Styles{Width: 30}),
+			appAvatar(r.name, 30),
 			giode.Stack(giode.Styles{Gap: 4, FlexGrow: 1, Width: -1},
 				giode.Row(giode.Styles{Width: -1, Wrap: giode.WrapNoWrap},
 					giode.Text(r.name, giode.Styles{Color: "theme.text", FontSize: sizeBody, FontWeight: giode.FontWeightMedium, FlexGrow: 1}),

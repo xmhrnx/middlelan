@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="MiddleMan"
-        android:textColor="#FF8188AD"
+        android:textColor="#FF9A948A"
         android:textSize="12sp"
         android:textStyle="bold" />
 
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="↓ —"
-            android:textColor="#FF22D3EE"
+            android:textColor="#FFD9B36C"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="↑ —"
-            android:textColor="#FFC084FC"
+            android:textColor="#FFC9C4BA"
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -48,7 +48,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Today —"
-        android:textColor="#FFE8EBF7"
+        android:textColor="#FFF1EDE4"
         android:textSize="14sp" />
 
     <TextView
@@ -59,6 +59,6 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:text=""
-        android:textColor="#FF8188AD"
+        android:textColor="#FF9A948A"
         android:textSize="12sp" />
 </LinearLayout>

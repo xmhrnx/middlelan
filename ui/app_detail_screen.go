@@ -109,7 +109,7 @@ func (d *appDetailScreen) header(a monitor.App) giode.Element {
 		right = append(right, d.block)
 	}
 	return giode.Row(giode.Styles{Align: giode.AlignCenter, Gap: 16, Width: -1, Wrap: giode.WrapNoWrap},
-		giode.Avatar(a.Name, giode.Styles{Width: 56}),
+		appAvatar(a.Name, 56),
 		giode.Stack(giode.Styles{Gap: 4, FlexGrow: 1, Width: -1},
 			giode.Text(a.Name, styleTitle),
 			giode.Text(sub, giode.Styles{Color: "theme.muted", FontSize: sizeSmall, FontFamily: fontMono, TextOverflow: giode.TextOverflowEllipsis}),

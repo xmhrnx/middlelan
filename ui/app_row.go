@@ -24,7 +24,7 @@ func appRow(a monitor.App, share float64, s giode.PressState, compact bool) giod
 		info = append(info, shareBar(share))
 	}
 	kids := []giode.Element{
-		giode.Avatar(a.Name, giode.Styles{Width: 36}),
+		appAvatar(a.Name, 36),
 		giode.Stack(giode.Styles{Gap: 4, FlexGrow: 1, Width: -1}, info...),
 	}
 	if !compact && len(a.History) > 1 {

@@ -1,7 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024"><g transform="translate(143.36 125.36000000000001) scale(0.72)">
-  <path d="M262 730 L330 318 L512 566 L694 318 L762 730" fill="none" stroke="#ffffff" stroke-width="70" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="512" cy="566" r="128" fill="none" stroke="#ffffff" stroke-width="22"/>
-  <circle cx="512" cy="566" r="74" fill="#ffffff"/>
-  <circle cx="262" cy="730" r="54" fill="#ffffff"/>
-  <circle cx="762" cy="730" r="54" fill="#ffffff"/>
+  <mask id="gap"><rect width="1024" height="1024" fill="#fff"/><circle cx="512" cy="552" r="104" fill="#000"/></mask>
+  <path d="M300 742 V292 L512 552 L724 292 V742" fill="none" stroke="#ffffff" stroke-width="60" stroke-linecap="square" stroke-linejoin="miter" mask="url(#gap)"/>
+  <circle cx="512" cy="552" r="78" fill="none" stroke="#ffffff" stroke-width="14"/>
+  <circle cx="512" cy="552" r="40" fill="#ffffff"/>
 </g></svg>

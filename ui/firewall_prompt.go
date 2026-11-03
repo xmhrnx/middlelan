@@ -83,7 +83,7 @@ func (p *firewallPrompt) content() giode.Element {
 	}
 	return giode.Stack(giode.Styles{Gap: 14, Width: -1},
 		giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter},
-			giode.Avatar(name, giode.Styles{Width: 44}),
+			appAvatar(name, 44),
 			giode.Stack(giode.Styles{Gap: 3}, giode.Text(name, styleHeading), giode.Text(tr("New program on the network"), styleMuted))),
 		giode.Text(sub, giode.Styles{Color: "theme.text", FontSize: sizeSmall}),
 		giode.Text(tr("Blocking adds a firewall rule you can remove in Security at any time."), styleMuted),
