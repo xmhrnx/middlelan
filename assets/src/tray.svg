@@ -1,30 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
   <defs>
-    <linearGradient id="stroke" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#22d3ee"/>
-      <stop offset="0.5" stop-color="#818cf8"/>
-      <stop offset="1" stop-color="#c084fc"/>
+    <linearGradient id="gold" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#f8e7bd"/>
+      <stop offset="0.45" stop-color="#ddb46a"/>
+      <stop offset="1" stop-color="#a87b34"/>
     </linearGradient>
-    <radialGradient id="core" cx="0.38" cy="0.32" r="0.75">
-      <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.35" stop-color="#a5f3fc"/>
-      <stop offset="1" stop-color="#22d3ee"/>
-    </radialGradient>
-    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+    <radialGradient id="pearl" cx="0.38" cy="0.32" r="0.8">
+      <stop offset="0" stop-color="#fffdf7"/>
+      <stop offset="0.5" stop-color="#f3e6c8"/>
+      <stop offset="1" stop-color="#c9a15a"/>
     </radialGradient>
   </defs>
 <g transform="translate(-92.15999999999997 -162.15999999999997) scale(1.18)">
-  <circle cx="512" cy="566" r="230" fill="url(#halo)"/>
-  <path d="M262 730 L330 318 L512 566 L694 318 L762 730" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="74" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 14)"/>
-  <path d="M262 730 L330 318 L512 566 L694 318 L762 730" fill="none" stroke="url(#stroke)" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M262 730 L330 318 L512 566 L694 318 L762 730" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 -14)"/>
-  <circle cx="512" cy="566" r="128" fill="#0f1232" fill-opacity="0.7" stroke="url(#stroke)" stroke-width="16"/>
-  <circle cx="512" cy="566" r="128" fill="none" stroke="#a5f3fc" stroke-opacity="0.5" stroke-width="4" stroke-dasharray="18 22"/>
-  <circle cx="512" cy="566" r="76" fill="url(#core)"/>
-  <circle cx="262" cy="730" r="56" fill="#0f1232" stroke="#22d3ee" stroke-width="18"/>
-  <circle cx="262" cy="730" r="22" fill="#67e8f9"/>
-  <circle cx="762" cy="730" r="56" fill="#0f1232" stroke="#c084fc" stroke-width="18"/>
-  <circle cx="762" cy="730" r="22" fill="#e9d5ff"/>
+  <circle cx="512" cy="402" r="96" fill="#000" fill-opacity="0.4"/>
+  <path d="M340 742 V684 C340 600 404 540 484 532 L512 560 L540 532 C620 540 684 600 684 684 V742 Z" fill="#000" fill-opacity="0.4" transform="translate(0 10)"/>
+  <circle cx="512" cy="392" r="96" fill="url(#gold)"/>
+  <path d="M340 742 V684 C340 600 404 540 484 532 L512 560 L540 532 C620 540 684 600 684 684 V742 Z" fill="url(#gold)"/>
+  <path d="M466 536 L512 650 L558 536 L540 532 L512 560 L484 532 Z" fill="#141415"/>
+  <path d="M512 566 L530 590 L520 604 L534 700 L512 726 L490 700 L504 604 L494 590 Z" fill="url(#pearl)"/>
+  <path d="M150 640 H306" stroke="#e7c983" stroke-opacity="0.9" stroke-width="14" stroke-linecap="round" stroke-dasharray="2 32"/><path d="M738 640 H810" stroke="#e7c983" stroke-opacity="0.9" stroke-width="14" stroke-linecap="round" stroke-dasharray="2 32"/><circle cx="150" cy="640" r="44" fill="#121213" stroke="url(#gold)" stroke-width="12"/><circle cx="150" cy="640" r="16" fill="url(#pearl)"/><circle cx="874" cy="640" r="44" fill="#121213" stroke="url(#gold)" stroke-width="12"/><circle cx="874" cy="640" r="16" fill="url(#pearl)"/>
 </g></svg>

@@ -9,73 +9,76 @@ tray-template.png.
 """
 import subprocess
 
+# Neutral graphite with a soft light from above, a hairline gold rim and
+# champagne gold artwork: black, gold and ivory.
 BG = """
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0d1330"/>
-      <stop offset="0.55" stop-color="#15123f"/>
-      <stop offset="1" stop-color="#241052"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c1c1d"/>
+      <stop offset="0.6" stop-color="#111112"/>
+      <stop offset="1" stop-color="#09090a"/>
     </linearGradient>
-    <radialGradient id="glow" cx="0.5" cy="0.56" r="0.5">
-      <stop offset="0" stop-color="#2dd4bf" stop-opacity="0.38"/>
-      <stop offset="0.45" stop-color="#6366f1" stop-opacity="0.16"/>
-      <stop offset="1" stop-color="#6366f1" stop-opacity="0"/>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.55">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
     </radialGradient>
-    <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse">
-      <path d="M64 0H0V64" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="2"/>
-    </pattern>
   </defs>
   <rect width="1024" height="1024" fill="url(#bg)"/>
-  <rect width="1024" height="1024" fill="url(#grid)"/>
   <rect width="1024" height="1024" fill="url(#glow)"/>
 """
 
+# A hairline gold rim inside the rounded square (desktop icon only).
+RIM = '<rect x="10" y="10" width="1004" height="1004" rx="218" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="5"/>'
+
 EMBLEM_DEFS = """
   <defs>
-    <linearGradient id="stroke" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#22d3ee"/>
-      <stop offset="0.5" stop-color="#818cf8"/>
-      <stop offset="1" stop-color="#c084fc"/>
+    <linearGradient id="gold" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#f8e7bd"/>
+      <stop offset="0.45" stop-color="#ddb46a"/>
+      <stop offset="1" stop-color="#a87b34"/>
     </linearGradient>
-    <radialGradient id="core" cx="0.38" cy="0.32" r="0.75">
-      <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.35" stop-color="#a5f3fc"/>
-      <stop offset="1" stop-color="#22d3ee"/>
-    </radialGradient>
-    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#22d3ee" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#22d3ee" stop-opacity="0"/>
+    <radialGradient id="pearl" cx="0.38" cy="0.32" r="0.8">
+      <stop offset="0" stop-color="#fffdf7"/>
+      <stop offset="0.5" stop-color="#f3e6c8"/>
+      <stop offset="1" stop-color="#c9a15a"/>
     </radialGradient>
   </defs>
 """
 
-# The "M": two uprights meeting in the middle node, the man in the middle
-# that every packet passes through.
-M_PATH = "M262 730 L330 318 L512 566 L694 318 L762 730"
+# The man in the middle: a figure between two linked devices, every
+# packet passing through him.
+HEAD = (512, 392, 96)
+BODY = "M340 742 V684 C340 600 404 540 484 532 L512 560 L540 532 C620 540 684 600 684 684 V742 Z"
+# The open collar and the tie, cut out of the jacket.
+COLLAR = "M466 536 L512 650 L558 536 L540 532 L512 560 L484 532 Z"
+TIE = "M512 566 L530 590 L520 604 L534 700 L512 726 L490 700 L504 604 L494 590 Z"
+LINKS = ["M150 640 H306", "M738 640 H810"]
+NODES = [(150, 640), (874, 640)]
 
 
 def emblem(color=None):
-    """The emblem in color, or in one flat color for monochrome uses."""
+    """The emblem in gold, or in one flat color for monochrome uses."""
+    hx, hy, hr = HEAD
     if color:
+        nodes = "".join(f'<circle cx="{x}" cy="{y}" r="44" fill="none" stroke="{color}" stroke-width="16"/><circle cx="{x}" cy="{y}" r="16" fill="{color}"/>' for x, y in NODES)
+        links = "".join(f'<path d="{d}" stroke="{color}" stroke-width="16" stroke-linecap="round" stroke-dasharray="2 34"/>' for d in LINKS)
         return f"""
-  <path d="{M_PATH}" fill="none" stroke="{color}" stroke-width="70" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="512" cy="566" r="128" fill="none" stroke="{color}" stroke-width="22"/>
-  <circle cx="512" cy="566" r="74" fill="{color}"/>
-  <circle cx="262" cy="730" r="54" fill="{color}"/>
-  <circle cx="762" cy="730" r="54" fill="{color}"/>
+  <mask id="cut"><rect width="1024" height="1024" fill="#fff"/><path d="{COLLAR}" fill="#000"/></mask>
+  <circle cx="{hx}" cy="{hy}" r="{hr}" fill="{color}"/>
+  <path d="{BODY}" fill="{color}" mask="url(#cut)"/>
+  <path d="{TIE}" fill="{color}"/>
+  {links}{nodes}
 """
+    nodes = "".join(f'<circle cx="{x}" cy="{y}" r="44" fill="#121213" stroke="url(#gold)" stroke-width="12"/><circle cx="{x}" cy="{y}" r="16" fill="url(#pearl)"/>' for x, y in NODES)
+    links = "".join(f'<path d="{d}" stroke="#e7c983" stroke-opacity="0.9" stroke-width="14" stroke-linecap="round" stroke-dasharray="2 32"/>' for d in LINKS)
     return f"""
-  <circle cx="512" cy="566" r="230" fill="url(#halo)"/>
-  <path d="{M_PATH}" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="74" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 14)"/>
-  <path d="{M_PATH}" fill="none" stroke="url(#stroke)" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="{M_PATH}" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" transform="translate(0 -14)"/>
-  <circle cx="512" cy="566" r="128" fill="#0f1232" fill-opacity="0.7" stroke="url(#stroke)" stroke-width="16"/>
-  <circle cx="512" cy="566" r="128" fill="none" stroke="#a5f3fc" stroke-opacity="0.5" stroke-width="4" stroke-dasharray="18 22"/>
-  <circle cx="512" cy="566" r="76" fill="url(#core)"/>
-  <circle cx="262" cy="730" r="56" fill="#0f1232" stroke="#22d3ee" stroke-width="18"/>
-  <circle cx="262" cy="730" r="22" fill="#67e8f9"/>
-  <circle cx="762" cy="730" r="56" fill="#0f1232" stroke="#c084fc" stroke-width="18"/>
-  <circle cx="762" cy="730" r="22" fill="#e9d5ff"/>
+  <circle cx="{hx}" cy="{hy + 10}" r="{hr}" fill="#000" fill-opacity="0.4"/>
+  <path d="{BODY}" fill="#000" fill-opacity="0.4" transform="translate(0 10)"/>
+  <circle cx="{hx}" cy="{hy}" r="{hr}" fill="url(#gold)"/>
+  <path d="{BODY}" fill="url(#gold)"/>
+  <path d="{COLLAR}" fill="#141415"/>
+  <path d="{TIE}" fill="url(#pearl)"/>
+  {links}{nodes}
 """
 
 
@@ -101,7 +104,7 @@ def render(name, content, size=1024):
 # corners (never white), the emblem large.
 render("icon", svg(
     f'<clipPath id="r"><rect width="1024" height="1024" rx="228"/></clipPath>'
-    f'<g clip-path="url(#r)">{BG}{scaled(emblem(), 1.0, -24)}</g>', EMBLEM_DEFS))
+    f'<g clip-path="url(#r)">{BG}{scaled(emblem(), 1.0, -24)}{RIM}</g>', EMBLEM_DEFS))
 
 # Android adaptive icon: the background fills the whole 108dp canvas edge
 # to edge, so launchers never add a white frame; the foreground keeps the

@@ -385,7 +385,6 @@
  "Every {interval}": "A cada {interval}",
  "Paused": "Pausado",
  "Click to resume": "Clique para retomar",
- "Network monitor": "Monitor de rede",
  "Scheduled speed test failed: {error}": "O teste de velocidade agendado falhou: {error}",
  "Uses Cloudflare's speed test servers. A test transfers about 100 MB.": "Usa os servidores de teste de velocidade da Cloudflare. Um teste transfere cerca de 100 MB.",
  "The test failed: {error}": "O teste falhou: {error}",

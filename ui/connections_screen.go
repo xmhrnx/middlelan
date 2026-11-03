@@ -114,7 +114,7 @@ func (c *connectionsScreen) row(conn monitor.Conn) giode.Element {
 		state = "—"
 	}
 	return giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Padding: giode.SymmetricInset(10, 8), Width: -1, Wrap: giode.WrapNoWrap},
-		giode.Avatar(conn.Process, giode.Styles{Width: 28}),
+		appAvatar(conn.Process, 28),
 		giode.Stack(giode.Styles{Gap: 3, FlexGrow: 1, Width: -1},
 			giode.Row(giode.Styles{Gap: 8, Align: giode.AlignCenter, Wrap: giode.WrapNoWrap},
 				giode.Text(conn.Process, giode.Styles{Color: "theme.text", FontSize: sizeBody, FontWeight: giode.FontWeightSemiBold, TextOverflow: giode.TextOverflowEllipsis}),
