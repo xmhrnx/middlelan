@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- The app icon's background (assets/src/make_icons.py). -->
-    <color name="middleman_splash">#FF15123F</color>
-</resources>

@@ -12,6 +12,9 @@ platforms = ["windows", "macos", "linux", "android"]
 publisher = "MiddleMan"
 description = "See which apps use your network, where they connect, and every device on your LAN."
 website = "https://github.com/xmhrnx/middlelan"
+# Fills the screen until the first frame (Android's splash screen): the
+# icon's dark indigo instead of white, in light and dark mode alike.
+splash_color = "#15123F"
 
 [android]
 min_sdk = 23                 # NetworkStatsManager (per-app usage) needs Android 6
