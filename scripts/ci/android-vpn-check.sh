@@ -124,6 +124,22 @@ log "leave with Home for 40 s, come back"
 adb shell input keyevent KEYCODE_HOME; sleep 40
 adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 alive long
+# Android destroying the activity while the process lives on (the VPN
+# keeps it): what happens after swiping the app away, on Back before
+# Android 12, or when the system reclaims memory. "Don't keep
+# activities" destroys it on every leave.
+log "activity destroyed while the process lives, come back"
+pid_before=$(adb shell pidof $PKG | tr -d '\r')
+adb shell settings put global always_finish_activities 1
+adb shell input keyevent KEYCODE_HOME; sleep 6
+adb shell dumpsys activity activities | grep -c "$PKG/" | sed 's/^/[destroyed] activity records: /' | tee -a "$OUT/steps.txt"
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+alive destroyed
+echo "[destroyed] pid before: $pid_before after: $(adb shell pidof $PKG | tr -d '\r')" | tee -a "$OUT/steps.txt"
+adb shell input keyevent KEYCODE_HOME; sleep 4
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+alive destroyed-again
+adb shell settings put global always_finish_activities 0
 # Freezes: Android writes the main thread's stack when the app stops
 # responding.
 adb root >/dev/null 2>&1; sleep 3
