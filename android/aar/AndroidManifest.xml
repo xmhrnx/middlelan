@@ -10,6 +10,15 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <!-- The VPN runs as a foreground service of type specialUse (Android 14+). -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- Android 11+ hides other apps from an app unless it says which it
+         needs to see. Seeing launcher apps lets MiddleMan name the apps
+         behind connections and usage instead of showing "uid 10143". -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
     <application>
         <!-- BIND_VPN_SERVICE guards the service so only the system binds it. -->
         <service
