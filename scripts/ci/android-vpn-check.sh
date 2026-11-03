@@ -50,6 +50,22 @@ PY
 log "install $APK"
 adb install -r -g "$APK" 2>&1 | tee -a "$OUT/steps.txt"
 adb logcat -c
+stuck=0
+alive() { # alive LABEL: does the app draw and answer after returning?
+  sleep "${2:-8}"
+  shot "return-$1"
+  local top; top=$(adb shell dumpsys activity activities | grep -m1 -E "topResumedActivity|mResumedActivity" | tr -d '\r')
+  echo "[$1] resumed: $top" | tee -a "$OUT/steps.txt"
+  if mcp ui_snapshot '{"query":"Security"}' | grep -q '"result"'; then
+    echo "[$1] app answers: yes" | tee -a "$OUT/steps.txt"
+  else
+    echo "[$1] app answers: NO" | tee -a "$OUT/steps.txt"
+  fi
+  local frames; frames=$(mcp frame_stats '{}' | grep -oE 'frames[^0-9]{1,6}[0-9]+' | head -1)
+  echo "[$1] frame stats: $frames" | tee -a "$OUT/steps.txt"
+  case "$frames" in *[1-9]*) ;; *) echo "[$1] FAILED: no frames drawn after returning" | tee -a "$OUT/steps.txt"; stuck=1 ;; esac
+  mcp frame_stats '{"reset":true}' >/dev/null
+}
 log "launch"
 adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 adb forward tcp:7600 tcp:7600
@@ -61,6 +77,7 @@ done
 sleep 3
 mcp ui_snapshot '{}' > "$OUT/snapshot-start.json"
 shot 01-launched
+alive launch 0
 
 log "open Security"
 id=$(node_id "Security" button); echo "security button: $id" | tee -a "$OUT/steps.txt"
@@ -96,22 +113,6 @@ mcp ui_snapshot '{}' > "$OUT/snapshot-apps.json"
 
 # Leaving and coming back: the app must draw again (not stay on the
 # splash screen). Checked after Home and after Back, with the VPN on.
-stuck=0
-alive() { # alive LABEL: does the app draw and answer after returning?
-  sleep 8
-  shot "return-$1"
-  local top; top=$(adb shell dumpsys activity activities | grep -m1 -E "topResumedActivity|mResumedActivity" | tr -d '\r')
-  echo "[$1] resumed: $top" | tee -a "$OUT/steps.txt"
-  if mcp ui_snapshot '{"query":"Security"}' | grep -q '"result"'; then
-    echo "[$1] app answers: yes" | tee -a "$OUT/steps.txt"
-  else
-    echo "[$1] app answers: NO" | tee -a "$OUT/steps.txt"
-  fi
-  local frames; frames=$(mcp frame_stats '{}' | grep -oE 'frames[^0-9]{1,6}[0-9]+' | head -1)
-  echo "[$1] frame stats: $frames" | tee -a "$OUT/steps.txt"
-  case "$frames" in *[1-9]*) ;; *) echo "[$1] FAILED: no frames drawn after returning" | tee -a "$OUT/steps.txt"; stuck=1 ;; esac
-  mcp frame_stats '{"reset":true}' >/dev/null
-}
 log "leave with Home, come back"
 mcp frame_stats '{"reset":true}' >/dev/null
 adb shell input keyevent KEYCODE_HOME; sleep 6
@@ -126,6 +127,11 @@ log "leave with Home for 40 s, come back"
 adb shell input keyevent KEYCODE_HOME; sleep 40
 adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 alive long
+# A configuration change the activity doesn't handle (dark mode)
+# re-creates it in the same process.
+log "switch to dark mode and back"
+adb shell cmd uimode night yes; alive night-on
+adb shell cmd uimode night no; alive night-off
 # Android destroying the activity while the process lives on (the VPN
 # keeps it): what happens after swiping the app away, on Back before
 # Android 12, or when the system reclaims memory. Starting it with
