@@ -29,6 +29,10 @@
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity android:name="com.middlelan.app.VpnConsentActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <receiver android:name="com.middlelan.app.UsageWidget" android:exported="false" android:label="MiddleMan">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
