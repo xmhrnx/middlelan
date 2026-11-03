@@ -61,11 +61,8 @@ log "open Security"
 id=$(node_id "Security" button); echo "security button: $id" | tee -a "$OUT/steps.txt"
 [ -n "$id" ] && mcp ui_click "{\"id\":\"$id\"}" >/dev/null
 sleep 3
-sw=$(node_id "See and filter every app's connections")
-if [ -z "$sw" ]; then
-  mcp ui_scroll "{\"until\":\"See and filter every app's connections\"}" >/dev/null; sleep 1
-  sw=$(node_id "See and filter every app's connections")
-fi
+mcp ui_scroll "{\"until\":\"See and filter every app's connections\"}" >/dev/null; sleep 1
+sw=$(node_id "See and filter every app's connections" checkbox)
 echo "vpn switch: $sw" | tee -a "$OUT/steps.txt"
 mcp ui_snapshot '{}' > "$OUT/snapshot-security.json"
 shot 02-security
