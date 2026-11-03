@@ -50,6 +50,22 @@ PY
 log "install $APK"
 adb install -r -g "$APK" 2>&1 | tee -a "$OUT/steps.txt"
 adb logcat -c
+stuck=0
+alive() { # alive LABEL: does the app draw and answer after returning?
+  sleep "${2:-8}"
+  shot "return-$1"
+  local top; top=$(adb shell dumpsys activity activities | grep -m1 -E "topResumedActivity|mResumedActivity" | tr -d '\r')
+  echo "[$1] resumed: $top" | tee -a "$OUT/steps.txt"
+  if mcp ui_snapshot '{"query":"Security"}' | grep -q '"result"'; then
+    echo "[$1] app answers: yes" | tee -a "$OUT/steps.txt"
+  else
+    echo "[$1] app answers: NO" | tee -a "$OUT/steps.txt"
+  fi
+  local frames; frames=$(mcp frame_stats '{}' | grep -oE 'frames[^0-9]{1,6}[0-9]+' | head -1)
+  echo "[$1] frame stats: $frames" | tee -a "$OUT/steps.txt"
+  case "$frames" in *[1-9]*) ;; *) echo "[$1] FAILED: no frames drawn after returning" | tee -a "$OUT/steps.txt"; stuck=1 ;; esac
+  mcp frame_stats '{"reset":true}' >/dev/null
+}
 log "launch"
 adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 adb forward tcp:7600 tcp:7600
@@ -61,6 +77,7 @@ done
 sleep 3
 mcp ui_snapshot '{}' > "$OUT/snapshot-start.json"
 shot 01-launched
+alive launch 0
 
 log "open Security"
 id=$(node_id "Security" button); echo "security button: $id" | tee -a "$OUT/steps.txt"
@@ -94,6 +111,54 @@ sleep 3
 shot 05-apps
 mcp ui_snapshot '{}' > "$OUT/snapshot-apps.json"
 
+# Leaving and coming back: the app must draw again (not stay on the
+# splash screen). Checked after Home and after Back, with the VPN on.
+log "leave with Home, come back"
+mcp frame_stats '{"reset":true}' >/dev/null
+adb shell input keyevent KEYCODE_HOME; sleep 6
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+alive home
+log "leave with Back, come back"
+adb shell input keyevent KEYCODE_BACK; sleep 2
+adb shell input keyevent KEYCODE_BACK; sleep 6
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+alive back
+log "leave with Home for 40 s, come back"
+adb shell input keyevent KEYCODE_HOME; sleep 40
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+alive long
+# A configuration change the activity doesn't handle (dark mode)
+# re-creates it in the same process.
+log "switch to dark mode and back"
+adb shell cmd uimode night yes; alive night-on
+adb shell cmd uimode night no; alive night-off
+# Android destroying the activity while the process lives on (the VPN
+# keeps it): what happens after swiping the app away, on Back before
+# Android 12, or when the system reclaims memory. Starting it with
+# CLEAR_TASK finishes the activity and creates a new one in the same
+# process.
+log "activity re-created while the process lives, come back"
+pid_before=$(adb shell pidof $PKG | tr -d '\r')
+adb shell input keyevent KEYCODE_HOME; sleep 4
+timeout 30 adb shell am start -n $PKG/org.gioui.GioActivity -f 0x10008000 2>&1 | tee -a "$OUT/steps.txt"
+alive recreated
+echo "[recreated] pid before: $pid_before after: $(adb shell pidof $PKG | tr -d '\r')" | tee -a "$OUT/steps.txt"
+adb shell input keyevent KEYCODE_HOME; sleep 4
+timeout 30 adb shell am start -n $PKG/org.gioui.GioActivity -f 0x10008000 2>&1 | tee -a "$OUT/steps.txt"
+alive recreated-again
+adb shell input keyevent KEYCODE_HOME; sleep 4
+adb shell monkey -p $PKG -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+alive recreated-then-icon
+# Freezes: Android writes the main thread's stack when the app stops
+# responding.
+adb root >/dev/null 2>&1; sleep 3
+adb shell 'ls /data/anr/ 2>/dev/null' | tee -a "$OUT/steps.txt"
+adb shell 'cat /data/anr/anr_* 2>/dev/null' > "$OUT/anr.txt"
+if [ -s "$OUT/anr.txt" ]; then
+  echo "--- ANR main thread"
+  awk '/"main"/,/^$/' "$OUT/anr.txt" | head -60
+fi
+
 # What the app shows, as text: the job log is where results are read.
 for f in security after apps; do
   echo "--- UI text: $f"
@@ -116,8 +181,9 @@ echo "app pid: ${pid:-not running}" | tee -a "$OUT/steps.txt"
 # services and crashes.
 {
   [ -n "$pid" ] && grep -E "^\S+ \S+ +$pid " "$OUT/logcat.txt"
-  grep -E "Vpn|vpndialogs|ActivityManager.*(middlelan|ForegroundService)|AndroidRuntime|FATAL|middlelan" "$OUT/logcat.txt"
+  grep -E "Vpn|vpndialogs|ActivityManager.*(middlelan|ForegroundService)|ANR in|Input dispatching|AndroidRuntime|FATAL|middlelan|SplashScreen" "$OUT/logcat.txt"
 } | grep -v "avc:  denied" | sort -u -k1,2 > "$OUT/logcat-relevant.txt"
 echo "--- relevant logcat ($(wc -l < "$OUT/logcat-relevant.txt") lines)"
 tail -150 "$OUT/logcat-relevant.txt"
+if [ "$stuck" = 1 ]; then echo "The app stopped drawing after it was left and reopened."; exit 1; fi
 exit 0

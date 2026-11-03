@@ -212,7 +212,10 @@ func run() error {
 		func() time.Duration { return time.Duration(prefs.Get().ScanEveryMinutes) * time.Minute })
 	shell.RefreshNetwork(ctx)
 
-	return app.Run(shell.View)
+	return app.Run(func() giode.Element {
+		allowViewReattach()
+		return shell.View()
+	})
 }
 
 // registerFonts loads Inter for the interface, Vazirmatn for Persian
