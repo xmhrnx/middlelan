@@ -516,5 +516,17 @@
  "Another VPN app can't run at the same time; Android allows one VPN.": "برنامهٔ VPN دیگری هم‌زمان نمی‌تواند اجرا شود؛ اندروید فقط یک VPN را اجازه می‌دهد.",
  "On-device VPN": "VPN روی دستگاه",
  "No router answered over UPnP. To see every device's internet traffic here, turn on UPnP in your router's settings.": "هیچ روتری از طریق UPnP پاسخ نداد. برای دیدن ترافیک اینترنت همهٔ دستگاه‌ها در اینجا، UPnP را در تنظیمات روتر روشن کنید.",
- "Couldn't scan: {error}": "اسکن ممکن نشد: {error}"
+ "Couldn't scan: {error}": "اسکن ممکن نشد: {error}",
+ "Copied {text}": "کپی شد: {text}",
+ "Open details": "نمایش جزئیات",
+ "Show its connections": "نمایش اتصال‌ها",
+ "Block network access": "مسدود کردن دسترسی به شبکه",
+ "Copy name": "کپی نام",
+ "Copy program path": "کپی مسیر برنامه",
+ "Copy address": "کپی نشانی",
+ "Copy host name": "کپی نام میزبان",
+ "Block this address": "مسدود کردن این نشانی",
+ "Blocked from a connection": "از روی یک اتصال مسدود شد",
+ "Details…": "جزئیات…",
+ "Copy MAC address": "کپی نشانی MAC"
 }

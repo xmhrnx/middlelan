@@ -570,5 +570,17 @@
  "Another VPN app can't run at the same time; Android allows one VPN.": "Eine andere VPN-App kann nicht gleichzeitig laufen; Android erlaubt nur ein VPN.",
  "On-device VPN": "VPN auf dem Gerät",
  "No router answered over UPnP. To see every device's internet traffic here, turn on UPnP in your router's settings.": "Kein Router hat über UPnP geantwortet. Um hier den Internetverkehr aller Geräte zu sehen, aktiviere UPnP in den Einstellungen deines Routers.",
- "Couldn't scan: {error}": "Scan fehlgeschlagen: {error}"
+ "Couldn't scan: {error}": "Scan fehlgeschlagen: {error}",
+ "Copied {text}": "Kopiert: {text}",
+ "Open details": "Details öffnen",
+ "Show its connections": "Verbindungen anzeigen",
+ "Block network access": "Netzwerkzugriff sperren",
+ "Copy name": "Namen kopieren",
+ "Copy program path": "Programmpfad kopieren",
+ "Copy address": "Adresse kopieren",
+ "Copy host name": "Hostnamen kopieren",
+ "Block this address": "Diese Adresse sperren",
+ "Blocked from a connection": "Aus einer Verbindung gesperrt",
+ "Details…": "Details…",
+ "Copy MAC address": "MAC-Adresse kopieren"
 }

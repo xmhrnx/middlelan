@@ -113,7 +113,7 @@ func (c *connectionsScreen) row(conn monitor.Conn) giode.Element {
 	if state == "" {
 		state = "—"
 	}
-	return giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Padding: giode.SymmetricInset(10, 8), Width: -1, Wrap: giode.WrapNoWrap},
+	row := giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Padding: giode.SymmetricInset(10, 8), Width: -1, Wrap: giode.WrapNoWrap},
 		appAvatar(conn.Process, 28),
 		giode.Stack(giode.Styles{Gap: 3, FlexGrow: 1, Width: -1},
 			giode.Row(giode.Styles{Gap: 8, Align: giode.AlignCenter, Wrap: giode.WrapNoWrap},
@@ -124,4 +124,15 @@ func (c *connectionsScreen) row(conn monitor.Conn) giode.Element {
 		),
 		giode.Stack(giode.Styles{Align: giode.AlignEnd, Gap: 3}, right...),
 	)
+	if conn.Listening() || conn.RemoteIP == "" {
+		return withMenu(row, c.shell.appMenu(conn.Process))
+	}
+	info := c.shell.svc.Resolver.Get(conn.RemoteIP)
+	return withMenu(row, c.shell.hostMenu(conn.RemoteIP, nonEmpty(info.Domain, info.Host)))
+}
+
+// showOnly shows one program's connections, from its menu.
+func (c *connectionsScreen) showOnly(app string) {
+	c.search.SetText(app)
+	c.filter.SetSelected(3)
 }

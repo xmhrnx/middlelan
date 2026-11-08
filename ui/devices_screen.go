@@ -116,19 +116,26 @@ func (d *devicesScreen) networkCard() giode.Element {
 }
 
 func (d *devicesScreen) devicePressable(key string) giode.Element {
-	return giode.Keyed("device-row", key, func() *giode.PressableElement {
+	p := giode.Keyed("device-row", key, func() *giode.PressableElement {
 		return giode.Pressable(func(s giode.PressState) giode.Element {
 			dev, ok := d.find(key)
 			if !ok {
 				return giode.Box(giode.Styles{})
 			}
 			return deviceRow(dev, s, time.Now())
-		}).Label(key).OnClick(func(giode.ClickEvent) {
+		}).Label(key).OnClick(func(e giode.ClickEvent) {
+			if e.Button == giode.MouseSecondary { // a right-click opens the menu
+				return
+			}
 			if dev, ok := d.find(key); ok {
 				d.dialog.open(dev)
 			}
 		})
 	})
+	if dev, ok := d.find(key); ok {
+		p.Context(d.shell.deviceMenu(dev, func() { d.dialog.open(dev) }))
+	}
+	return p
 }
 
 func (d *devicesScreen) find(key string) (inventory.Device, bool) {

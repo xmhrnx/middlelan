@@ -21,10 +21,15 @@ func (sh *Shell) appPressable(scope, name string, share float64) giode.Element {
 				a = monitor.App{Name: name}
 			}
 			return appRow(a, rs.share, s, giode.Compact())
-		}).Label(name).OnClick(func(giode.ClickEvent) { sh.openApp(name) })
+		}).Label(name).OnClick(func(e giode.ClickEvent) {
+			if e.Button != giode.MouseSecondary { // a right-click opens the menu
+				sh.openApp(name)
+			}
+		})
 		return rs
 	})
 	st.share = share
+	st.p.Context(sh.appMenu(name))
 	return st.p
 }
 

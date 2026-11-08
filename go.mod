@@ -4,7 +4,7 @@ go 1.26.10
 
 require (
 	gioui.org v0.10.2
-	github.com/xmhrnx/giode v0.1.30-alpha.1
+	github.com/xmhrnx/giode v1.0.0-alpha.1
 	golang.org/x/net v0.54.0
 	golang.org/x/sys v0.44.0
 	gvisor.dev/gvisor v0.0.0-20261008000517-3b87f090dbda
