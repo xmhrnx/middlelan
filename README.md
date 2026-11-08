@@ -45,7 +45,7 @@ Platforms: **Windows, macOS, Linux, Android** (one codebase).
   live speeds, today's total and the busiest apps, plus pause and quit.
 - **Android home screen widget** with live speeds, today's usage and the busiest app.
 - Optional **start in the tray at login** (Windows Run key, macOS LaunchAgent, Linux autostart).
-- Right-click (long-press on Android) an app, connection, destination or device for its actions:
+- Right-click (long-press on Android) an app, a connection, an app's destination or a device for its actions:
   copy the address or name, ping, traceroute, WHOIS, scan ports, wake, or block it.
 - Keyboard shortcuts: Ctrl/⌘+1–6 switch pages, Ctrl/⌘+F search, Ctrl/⌘+P pause, Ctrl/⌘+, settings, F5 refresh.
 - Sampling every 2 s while the window is shown and every 6 s while hidden. When idle it draws
