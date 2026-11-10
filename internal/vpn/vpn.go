@@ -91,6 +91,12 @@ type Hooks struct {
 	// DNS receives every DNS response passing the virtual resolver (and
 	// any other port-53 flow). The slice is the hook's to keep.
 	DNS func(response []byte)
+	// Filter decides whether to refuse a DNS query for name (lowercase,
+	// without the final dot) from an app: ad and tracker blocking. A
+	// refused A or AAAA query is answered with the unspecified address,
+	// any other type with NXDOMAIN. With Filter set, plain DNS to any
+	// server goes through the filter and the upstream servers too.
+	Filter func(app, pkg, name string) bool
 }
 
 // run is one Start..Stop cycle of an engine.

@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/xmhrnx/middlelan/internal/adblock"
 	"image"
 	"io/fs"
 	"log"
@@ -106,6 +107,7 @@ func run() error {
 	scanner := inventory.NewScanner(inv)
 	gateway := &router.Watcher{}
 	threats := threat.Open(dir)
+	blocker := adblock.Open(dir)
 	watcher = alerts.New(threats, names.Lookup, dir)
 	fw, err = firewall.Open(dir, firewall.DefaultBackend())
 	if err != nil {
@@ -162,10 +164,13 @@ func run() error {
 	shell = ui.NewShell(ctx, ui.Services{
 		App: app, Collector: collector, Resolver: resolver, Settings: prefs, Inventory: inv, Scanner: scanner,
 		Router: gateway, Speed: speedlog.Open(dir), Updates: updates.New(giode.AppVersion),
-		Firewall: fw, Alerts: watcher, Threats: threats, Names: names,
+		Firewall: fw, Alerts: watcher, Threats: threats, Names: names, AdBlock: blocker,
 	})
 	gateway.OnChange = shell.Redraw
-	shell.OnSettingsChanged = func(s settings.Settings) { applyKeepAlive(app, s) }
+	shell.OnSettingsChanged = func(s settings.Settings) {
+		applyKeepAlive(app, s)
+		setVPNHooks(fw, names, blocker, s)
+	}
 	resolver.OnChange(shell.Redraw)
 	scanner.OnChange = shell.Redraw
 	scanner.OnNew = func(devs []inventory.Device) {
@@ -190,16 +195,8 @@ func run() error {
 		return time.Minute
 	})
 	shell.Start(ctx)
-	// The Android VPN: new flows obey the firewall rules, and the DNS
-	// answers it relays give domain names. (A no-op elsewhere.)
-	vpn.SetHooks(vpn.Hooks{
-		Block: func(app, pkg, ip string, port int) bool { return fw != nil && fw.Blocks(app, pkg, ip) },
-		DNS: func(resp []byte) {
-			for _, a := range dnslog.ParseResponse(resp, time.Now()) {
-				names.Add(a)
-			}
-		},
-	})
+	setVPNHooks(fw, names, blocker, prefs.Get())
+	go blocker.Run(ctx, 24*time.Hour, func() bool { return isAndroid && prefs.Get().AdBlock })
 	go threats.Run(ctx, 24*time.Hour, func() bool { return prefs.Get().ThreatAlerts })
 	go resolver.Run(ctx)
 	go func() {
@@ -289,4 +286,30 @@ func notify(app *giode.App, title, body string) {
 	if err := app.Notify(title, body); err != nil {
 		log.Printf("notification: %v", err)
 	}
+}
+
+// setVPNHooks sets what the Android VPN does (a no-op elsewhere): new
+// flows obey the firewall rules, the DNS answers it relays give domain
+// names, and with ad blocking on, queries for listed domains are
+// answered on the device.
+func setVPNHooks(fw *firewall.Firewall, names *dnslog.Log, blocker *adblock.Blocker, s settings.Settings) {
+	h := vpn.Hooks{
+		Block: func(app, pkg, ip string, port int) bool { return fw != nil && fw.Blocks(app, pkg, ip) },
+		DNS: func(resp []byte) {
+			for _, a := range dnslog.ParseResponse(resp, time.Now()) {
+				names.Add(a)
+			}
+		},
+	}
+	blocker.SetAllowed(s.AdBlockAllow)
+	if s.AdBlock {
+		h.Filter = func(app, pkg, name string) bool {
+			if !blocker.Blocked(name) {
+				return false
+			}
+			blocker.Record(app, name)
+			return true
+		}
+	}
+	vpn.SetHooks(h)
 }

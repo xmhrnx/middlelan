@@ -43,6 +43,11 @@ type Settings struct {
 	PlanUpMbps   float64 `json:"planUpMbps"`
 	// ThreatAlerts checks destinations against public blocklists.
 	ThreatAlerts bool `json:"threatAlerts"`
+	// AdBlock answers queries for ad and tracker domains on the device
+	// (Android, while the on-device VPN runs). Off by default.
+	AdBlock bool `json:"adBlock"`
+	// AdBlockAllow are domains never blocked, with their subdomains.
+	AdBlockAllow []string `json:"adBlockAllow,omitempty"`
 	// FirewallAsk asks what to do when a program connects for the first
 	// time (only while the firewall is on).
 	FirewallAsk bool `json:"firewallAsk"`

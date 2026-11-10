@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"golang.org/x/net/dns/dnsmessage"
 	"io"
 	"math/rand/v2"
 	"net"
@@ -165,6 +166,12 @@ func TestEngineOnTUN(t *testing.T) {
 			return 10042, "Test App", "com.example.test"
 		},
 		Block: func(app, pkg, ip string, port int) bool { return port == blockedPort },
+		Filter: func(app, pkg, name string) bool {
+			if app != "Test App" {
+				t.Errorf("filter asked for app %q", app)
+			}
+			return name == "ads.example.net"
+		},
 		DNS: func(b []byte) {
 			mu.Lock()
 			dnsSeen = append(dnsSeen, b)
@@ -276,6 +283,30 @@ func TestEngineOnTUN(t *testing.T) {
 		t.Fatalf("DNS hook saw %d responses", len(dnsSeen))
 	}
 	mu.Unlock()
+
+	// Ad blocking: a filtered name is answered on the device with the
+	// unspecified address, at the virtual resolver and at any other
+	// server, and never reaches upstream.
+	for _, server := range []string{VirtualDNS + ":53", net.JoinHostPort(tunDest, "53")} {
+		fd, err := net.Dial("udp", server)
+		if err != nil {
+			t.Fatal(err)
+		}
+		fd.Write(query(t, "ads.example.net.", dnsmessage.TypeA))
+		fd.SetReadDeadline(time.Now().Add(5 * time.Second))
+		n, err := fd.Read(buf)
+		fd.Close()
+		var m dnsmessage.Message
+		if err != nil || m.Unpack(buf[:n]) != nil || len(m.Answers) != 1 {
+			t.Fatalf("%s: filtered answer %x, %v", server, buf[:n], err)
+		}
+		if a, ok := m.Answers[0].Body.(*dnsmessage.AResource); !ok || a.A != [4]byte{} {
+			t.Fatalf("%s: filtered answer %+v", server, m.Answers[0])
+		}
+	}
+	if dnsQueries.Load() != 1 {
+		t.Fatalf("a filtered query reached upstream: %d queries", dnsQueries.Load())
+	}
 
 	// ICMP: pings get no answer from the stack.
 	if pc, err := icmp.ListenPacket("ip4:icmp", "0.0.0.0"); err == nil {

@@ -55,7 +55,7 @@ func (d *appDetailScreen) content() giode.Element {
 		responsiveGrid(170, 4, 14,
 			statTile("gauge", tr("Right now"), rateOrDash(a), "↓ "+formatRate(a.RateRx)+"  ↑ "+formatRate(a.RateTx), colDown),
 			statTile("activity", tr("Today"), formatBytes(a.TodayRx+a.TodayTx), formatBytes(a.TodayRx)+" down · "+formatBytes(a.TodayTx)+" up", "theme.success"),
-			statTile("clock", tr("This session"), formatBytes(a.SessionRx+a.SessionTx), "Since MiddleMan started", colUp),
+			statTile("clock", tr("This session"), formatBytes(a.SessionRx+a.SessionTx), tr("Since MiddleMan started"), colUp),
 			statTile("waypoints", tr("Connections"), itoa(a.Active), plural(a.Listening, "listening port", "listening ports"), "theme.warning"),
 		),
 		responsiveGrid(380, 2, 18,

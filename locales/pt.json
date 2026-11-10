@@ -582,5 +582,21 @@
  "Block this address": "Bloquear este endereço",
  "Blocked from a connection": "Bloqueado a partir de uma conexão",
  "Details…": "Detalhes…",
- "Copy MAC address": "Copiar endereço MAC"
+ "Copy MAC address": "Copiar endereço MAC",
+ "Block ads and trackers": "Bloquear anúncios e rastreadores",
+ "Ad and tracker blocking": "Bloqueio de anúncios e rastreadores",
+ "Answers requests for ad, tracking and analytics domains on the phone itself, so they never load, in every app and browser. Uses open source blocklists: the AdGuard DNS filter and StevenBlack's hosts list, updated daily.": "Responde no próprio telefone aos pedidos de domínios de anúncios, rastreamento e análise, para que nunca carreguem, em todos os apps e navegadores. Usa listas de bloqueio de código aberto: o filtro DNS do AdGuard e a lista hosts do StevenBlack, atualizadas diariamente.",
+ "Blocking works while the on-device VPN is on.": "O bloqueio funciona enquanto a VPN do dispositivo está ligada.",
+ "Downloading the lists…": "Baixando as listas…",
+ "Lists not downloaded yet": "Listas ainda não baixadas",
+ "{count} domains · updated {ago}": "{count} domínios · atualizado {ago}",
+ "Blocked today": "Bloqueados hoje",
+ "Apps affected today": "Apps afetados hoje",
+ "Most blocked today": "Mais bloqueados hoje",
+ "Never blocked": "Nunca bloqueados",
+ "Allowed": "Permitido",
+ "Block again": "Bloquear de novo",
+ "{domain} is no longer blocked": "{domain} não está mais bloqueado",
+ "Ad blocking lists are up to date": "As listas de bloqueio estão atualizadas",
+ "Since MiddleMan started": "Desde que o MiddleMan iniciou"
 }

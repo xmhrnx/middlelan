@@ -158,3 +158,14 @@ func (sh *Shell) toggleAppBlock(name string) {
 	a, _ := sh.findApp(name)
 	sh.blockRule(firewall.Rule{App: name, Exe: a.Exe, Note: tr("Blocked from the app's page")})
 }
+
+// blockedDomainMenu is the menu of a domain ad blocking refused.
+func (sh *Shell) blockedDomainMenu(name string) *menu.Menu {
+	return giode.Keyed("blocked-domain-menu", menuKey(name), func() *menu.Menu {
+		return newMenu().
+			Item(tr("Allow"), func() { sh.allowDomain(name) }).
+			Item(tr("DNS lookup"), func() { sh.tools.openWith(toolDNS, name) }).
+			Separator().
+			Item(tr("Copy host name"), func() { sh.copyText(name) })
+	})
+}

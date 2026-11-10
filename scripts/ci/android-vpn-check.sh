@@ -106,6 +106,30 @@ cat "$OUT/tunnel.txt"
 log "traffic through the tunnel"
 adb shell "echo -e 'GET / HTTP/1.0\r\nHost: example.com\r\n\r\n' | toybox nc -w 8 example.com 80 | head -3" 2>&1 | tee -a "$OUT/steps.txt"
 sleep 6
+
+# Ad blocking: turn it on (still on the Security page), wait for the
+# lists, then resolve an ad domain and an ordinary one on the phone.
+log "ad blocking"
+id=$(node_id "Block ads and trackers" checkbox); echo "ad blocking switch: $id" | tee -a "$OUT/steps.txt"
+[ -n "$id" ] && mcp ui_click "{\"id\":\"$id\"}" >/dev/null
+for i in $(seq 1 45); do
+  if mcp ui_snapshot '{"query":"domains"}' | grep -q 'domains ·'; then echo "lists ready after ${i}x2s" | tee -a "$OUT/steps.txt"; break; fi
+  sleep 2
+done
+mcp ui_snapshot '{"query":"domains"}' | grep -o '"label": "[^"]*domains[^"]*"' | tee -a "$OUT/steps.txt"
+for host in ad.doubleclick.net googleads.g.doubleclick.net example.com; do
+  echo "[adblock] $host -> $(adb shell "ping -c 1 -W 2 $host 2>&1 | head -1" | tr -d '\r')" | tee -a "$OUT/steps.txt"
+done
+if adb shell "ping -c 1 -W 2 ad.doubleclick.net 2>&1 | head -1" | grep -q "(0.0.0.0)"; then
+  echo "[adblock] blocked: yes" | tee -a "$OUT/steps.txt"
+else
+  echo "[adblock] blocked: NO" | tee -a "$OUT/steps.txt"; adblock_failed=1
+fi
+if adb shell "ping -c 1 -W 2 example.com 2>&1 | head -1" | grep -q "(0.0.0.0)"; then
+  echo "[adblock] example.com blocked: WRONG" | tee -a "$OUT/steps.txt"; adblock_failed=1
+fi
+shot 05-adblock
+mcp ui_snapshot '{"query":"Most blocked"}' | grep -o '"label": "[^"]*"' | head -3 | tee -a "$OUT/steps.txt"
 id=$(node_id "Apps" button); [ -n "$id" ] && mcp ui_click "{\"id\":\"$id\"}" >/dev/null
 sleep 3
 shot 05-apps
@@ -185,5 +209,6 @@ echo "app pid: ${pid:-not running}" | tee -a "$OUT/steps.txt"
 } | grep -v "avc:  denied" | sort -u -k1,2 > "$OUT/logcat-relevant.txt"
 echo "--- relevant logcat ($(wc -l < "$OUT/logcat-relevant.txt") lines)"
 tail -150 "$OUT/logcat-relevant.txt"
+if [ "${adblock_failed:-0}" = 1 ]; then echo "Ad blocking didn't block the test domain."; exit 1; fi
 if [ "$stuck" = 1 ]; then echo "The app stopped drawing after it was left and reopened."; exit 1; fi
 exit 0
