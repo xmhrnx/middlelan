@@ -111,12 +111,13 @@ sleep 6
 # lists, then resolve an ad domain and an ordinary one on the phone.
 log "ad blocking"
 resolve() { adb shell "ping -c 1 -W 2 $1 2>&1 | head -1" | tr -d '\r' | sed -n 's/^PING [^ ]* (\([0-9a-f.:]*\)).*/\1/p'; }
-before=$(resolve ad.doubleclick.net)
-echo "[adblock] before: ad.doubleclick.net -> $before" | tee -a "$OUT/steps.txt"
+# A different ad domain than the one checked after: Android caches answers.
+before=$(resolve stats.g.doubleclick.net)
+echo "[adblock] before: stats.g.doubleclick.net -> $before" | tee -a "$OUT/steps.txt"
 id=$(node_id "Block ads and trackers" checkbox); echo "ad blocking switch: $id" | tee -a "$OUT/steps.txt"
 [ -n "$id" ] && mcp ui_click "{\"id\":\"$id\"}" >/dev/null
 for i in $(seq 1 45); do
-  if mcp ui_snapshot '{"query":"domains"}' | grep -q 'domains ·'; then echo "lists ready after ${i}x2s" | tee -a "$OUT/steps.txt"; break; fi
+  if mcp ui_snapshot '{"query":"domains"}' | grep -q 'domains · updated'; then echo "lists ready after ${i}x2s" | tee -a "$OUT/steps.txt"; break; fi
   sleep 2
 done
 # ping shows an unspecified-address answer as 127.0.0.1.
