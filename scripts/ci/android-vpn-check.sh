@@ -110,26 +110,26 @@ sleep 6
 # Ad blocking: turn it on (still on the Security page), wait for the
 # lists, then resolve an ad domain and an ordinary one on the phone.
 log "ad blocking"
+resolve() { adb shell "ping -c 1 -W 2 $1 2>&1 | head -1" | tr -d '\r' | sed -n 's/^PING [^ ]* (\([0-9a-f.:]*\)).*/\1/p'; }
+before=$(resolve ad.doubleclick.net)
+echo "[adblock] before: ad.doubleclick.net -> $before" | tee -a "$OUT/steps.txt"
 id=$(node_id "Block ads and trackers" checkbox); echo "ad blocking switch: $id" | tee -a "$OUT/steps.txt"
 [ -n "$id" ] && mcp ui_click "{\"id\":\"$id\"}" >/dev/null
 for i in $(seq 1 45); do
   if mcp ui_snapshot '{"query":"domains"}' | grep -q 'domains ·'; then echo "lists ready after ${i}x2s" | tee -a "$OUT/steps.txt"; break; fi
   sleep 2
 done
-mcp ui_snapshot '{"query":"domains"}' | grep -o '"label": "[^"]*domains[^"]*"' | tee -a "$OUT/steps.txt"
-for host in ad.doubleclick.net googleads.g.doubleclick.net example.com; do
-  echo "[adblock] $host -> $(adb shell "ping -c 1 -W 2 $host 2>&1 | head -1" | tr -d '\r')" | tee -a "$OUT/steps.txt"
-done
-if adb shell "ping -c 1 -W 2 ad.doubleclick.net 2>&1 | head -1" | grep -q "(0.0.0.0)"; then
-  echo "[adblock] blocked: yes" | tee -a "$OUT/steps.txt"
-else
-  echo "[adblock] blocked: NO" | tee -a "$OUT/steps.txt"; adblock_failed=1
-fi
-if adb shell "ping -c 1 -W 2 example.com 2>&1 | head -1" | grep -q "(0.0.0.0)"; then
-  echo "[adblock] example.com blocked: WRONG" | tee -a "$OUT/steps.txt"; adblock_failed=1
-fi
+# ping shows an unspecified-address answer as 127.0.0.1.
+after=$(resolve ad.doubleclick.net); plain=$(resolve example.com)
+echo "[adblock] after: ad.doubleclick.net -> $after, example.com -> $plain" | tee -a "$OUT/steps.txt"
+sleep 3
+listed=$(node_id "ad.doubleclick.net" text)
+echo "[adblock] listed as blocked in the app: ${listed:-no}" | tee -a "$OUT/steps.txt"
+case "$after" in 0.0.0.0|127.0.0.1) ;; *) echo "[adblock] FAILED: not blocked" | tee -a "$OUT/steps.txt"; adblock_failed=1 ;; esac
+case "$before" in 0.0.0.0|127.0.0.1) echo "[adblock] FAILED: blocked before turning it on" | tee -a "$OUT/steps.txt"; adblock_failed=1 ;; esac
+case "$plain" in ""|0.0.0.0|127.0.0.1) echo "[adblock] FAILED: example.com blocked" | tee -a "$OUT/steps.txt"; adblock_failed=1 ;; esac
+[ -n "$listed" ] || adblock_failed=1
 shot 05-adblock
-mcp ui_snapshot '{"query":"Most blocked"}' | grep -o '"label": "[^"]*"' | head -3 | tee -a "$OUT/steps.txt"
 id=$(node_id "Apps" button); [ -n "$id" ] && mcp ui_click "{\"id\":\"$id\"}" >/dev/null
 sleep 3
 shot 05-apps
