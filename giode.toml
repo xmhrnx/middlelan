@@ -8,7 +8,7 @@ version = "1.0.0"
 build = 1
 icon = "assets/icon.png"
 package = "."
-platforms = ["windows", "macos", "linux", "android"]
+platforms = ["windows", "macos", "linux", "android", "ios"]
 publisher = "MiddleMan"
 description = "See which apps use your network, where they connect, and every device on your LAN."
 website = "https://github.com/xmhrnx/middlelan"
@@ -37,6 +37,15 @@ java = ["android/java"]      # NetStats, Wi-Fi, widget, permission and VPN helpe
 # location permission prompt). Rebuild with android/aar/build-aar.sh.
 libraries = ["android/libs/middlelan.aar"]
 # keystore = "release.keystore"   # created by giode keystore; signs giode build -release
+
+[ios]
+min_os = 15
+# Opaque and full-bleed: iOS rounds the corners and would show
+# transparent pixels white.
+icon = "assets/ios-icon.png"
+[ios.usage]
+# Asked before the device scan, ping and port scan reach the local network.
+local_network = "MiddleMan finds the devices on your network and tests their connections."
 
 [macos]
 min_os = 11

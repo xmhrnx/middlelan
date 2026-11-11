@@ -10,7 +10,7 @@ import (
 // routerCard shows the whole network's internet traffic, every device
 // included, from the router's UPnP counters.
 func (sh *Shell) routerCard() giode.Element {
-	if sh.svc.Router == nil {
+	if sh.svc.Router == nil || isIOS { // UPnP needs multicast
 		return nil
 	}
 	st := sh.svc.Router.Status()

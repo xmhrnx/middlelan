@@ -39,7 +39,13 @@ func (d *dashboardScreen) content() giode.Element {
 	kids = append(kids,
 		d.tiles(snap),
 		card(tr("Live throughput"), giode.Text(historySpan(snap), styleMuted), rateChart(snap.History, 190)),
-		responsiveGrid(380, 2, 18, d.topApps(snap), d.topDestinations(snap)),
+	)
+	if isIOS { // iOS shows no connections, so no destinations
+		kids = append(kids, d.topApps(snap))
+	} else {
+		kids = append(kids, responsiveGrid(380, 2, 18, d.topApps(snap), d.topDestinations(snap)))
+	}
+	kids = append(kids,
 		card(tr("Last 7 days"), ratePair(
 			formatBytes(sumDays(d.week(), true)), formatBytes(sumDays(d.week(), false)), 12),
 			usageBars(d.week(), 140)),
@@ -83,12 +89,16 @@ func (d *dashboardScreen) tiles(s *monitor.Snapshot) giode.Element {
 			conns += a.Active
 		}
 	}
+	fourth := statTile("app-window", tr("Apps online"), itoa(active), plural(conns, "open connection", "open connections"), "theme.info")
+	if isIOS { // iOS shows no apps' connections
+		fourth = statTile("clock", tr("This session"), formatBytes(s.TotalRx+s.TotalTx), tr("Since MiddleMan started"), "theme.info")
+	}
 	return responsiveGrid(150, 4, 12,
 		statTile("arrow-down", tr("Download"), formatRate(s.RateRx), tr("Peak {rate}", "rate", formatRate(peakRx)), colDown),
 		statTile("arrow-up", tr("Upload"), formatRate(s.RateTx), tr("Peak {rate}", "rate", formatRate(peakTx)), colUp),
 		statTile("activity", tr("Today"), formatBytes(s.TodayRx+s.TodayTx),
 			tr("{down} down · {up} up", "down", formatBytes(s.TodayRx), "up", formatBytes(s.TodayTx)), "theme.success"),
-		statTile("app-window", tr("Apps online"), itoa(active), plural(conns, "open connection", "open connections"), "theme.info"),
+		fourth,
 	)
 }
 
@@ -120,6 +130,7 @@ func (d *dashboardScreen) topApps(s *monitor.Snapshot) giode.Element {
 }
 
 func (d *dashboardScreen) topDestinations(s *monitor.Snapshot) giode.Element {
+
 	dests := groupDestinations(s.Apps, d.shell.svc.Resolver, false)
 	rows := []giode.Element{}
 	for i, dst := range dests {

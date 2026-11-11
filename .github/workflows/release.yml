@@ -19,6 +19,7 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -41,6 +42,7 @@ jobs:
             runner: ubuntu-latest
             primary: true
     runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -111,6 +113,11 @@ jobs:
           rm cert.p12
       - name: Build
         env:
+          # Signed with the certificate's Developer ID identity, and
+          # notarized with these (macos.notary_id, macos.notary_team_id
+          # when not set here).
+          GIODE_NOTARY_ID: ${{ secrets.GIODE_NOTARY_ID }}
+          GIODE_NOTARY_TEAM_ID: ${{ secrets.GIODE_NOTARY_TEAM_ID }}
           GIODE_NOTARY_PASS: ${{ secrets.GIODE_NOTARY_PASS }}
         run: |
           release=""
@@ -124,8 +131,49 @@ jobs:
             dist/macos/*.dmg
             dist/macos/appstore/*.pkg
 
+  ios:
+    needs: test
+    runs-on: macos-latest
+    # A hung signing step fails in an hour rather than GitHub's six.
+    timeout-minutes: 60
+    env:
+      IOS_CERT_BASE64: ${{ secrets.IOS_CERT_BASE64 }}
+      IOS_PROFILE_BASE64: ${{ secrets.IOS_PROFILE_BASE64 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - run: go install github.com/xmhrnx/giode-cli/cmd/giode@latest
+      - name: Signing certificate and profile
+        if: env.IOS_CERT_BASE64 != '' && env.IOS_PROFILE_BASE64 != ''
+        env:
+          IOS_CERT_PASS: ${{ secrets.IOS_CERT_PASS }}
+        run: |
+          echo "$IOS_CERT_BASE64" | base64 -d > cert.p12
+          security create-keychain -p ci build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p ci build.keychain
+          security import cert.p12 -k build.keychain -P "$IOS_CERT_PASS" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k ci build.keychain
+          rm cert.p12
+          echo "$IOS_PROFILE_BASE64" | base64 -d > "$RUNNER_TEMP/app.mobileprovision"
+          echo "GIODE_IOS_PROFILE=$RUNNER_TEMP/app.mobileprovision" >> "$GITHUB_ENV"
+      - name: Build
+        env:
+          GIODE_IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+        run: |
+          # A device build needs the certificate and profile; without
+          # them, check that the app builds for the simulator.
+          if [ -n "$GIODE_IOS_PROFILE" ]; then giode build ios; else giode build ios-sim; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          if-no-files-found: ignore
+          path: dist/ios/*.ipa
+
   publish:
-    needs: [linux, macos]
+    needs: [linux, macos, ios]
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     steps:

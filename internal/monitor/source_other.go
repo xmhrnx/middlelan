@@ -1,4 +1,4 @@
-//go:build !linux && !windows && !(darwin && !ios) && !android
+//go:build !linux && !windows && !darwin && !android
 
 package monitor
 

@@ -121,7 +121,7 @@ func (s *settingsScreen) content() giode.Element {
 	}
 	note := func(text string) giode.Element { return giode.Text(text, styleMuted) }
 	monitoring := []giode.Element{s.fast, note(tr("Sampling slows to every 6 seconds while the window is hidden, to save battery."))}
-	if isMobile {
+	if isMobile && !isIOS { // Android's foreground service
 		monitoring = append(monitoring, s.keepAlive, note(tr("Shows an ongoing notification while monitoring in the background.")))
 	} else {
 		monitoring = append(monitoring, s.tray, s.login)
@@ -135,9 +135,7 @@ func (s *settingsScreen) content() giode.Element {
 		section(tr("Monitoring"), monitoring...),
 		section(tr("Privacy"), s.online,
 			note(tr("Sends remote IP addresses to geojs.io to find their country, city and owner. Turn off to keep everything on this device; host names still resolve through your DNS."))),
-		section(tr("Alerts"), s.newApps, s.newDevs, s.bgScan,
-			giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Width: -1, Wrap: giode.WrapNoWrap},
-				giode.Text(tr("Background scan"), giode.Styles{Color: "theme.text", FontSize: sizeBody, FlexGrow: 1}), s.scanEvery)),
+		section(tr("Alerts"), s.alertRows()...),
 		section(tr("Data"), note(tr("Usage is kept for 90 days on this device only. Nothing is uploaded.")),
 			giode.Row(giode.Styles{Gap: 8}, s.exports[0], s.exports[1], s.exports[2]),
 			giode.Row(giode.Styles{}, s.reset)),
@@ -204,4 +202,15 @@ func (sh *Shell) ApplySettings() {
 	if sh.OnSettingsChanged != nil {
 		sh.OnSettingsChanged(st)
 	}
+}
+
+// alertRows are the Alerts section's settings; iOS shows no other apps,
+// so it has no new-app alerts.
+func (s *settingsScreen) alertRows() []giode.Element {
+	rows := []giode.Element{s.newApps, s.newDevs, s.bgScan}
+	if isIOS {
+		rows = rows[1:]
+	}
+	return append(rows, giode.Row(giode.Styles{Gap: 12, Align: giode.AlignCenter, Width: -1, Wrap: giode.WrapNoWrap},
+		giode.Text(tr("Background scan"), giode.Styles{Color: "theme.text", FontSize: sizeBody, FlexGrow: 1}), s.scanEvery))
 }

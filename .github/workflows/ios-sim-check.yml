@@ -1,0 +1,44 @@
+# Builds MiddleMan for the iOS simulator, runs it and drives it through
+# giode's automation server: the pages and tools iOS can't serve are
+# gone, the phone's traffic shows up, and the app keeps drawing.
+# Uploads screenshots and UI snapshots.
+name: ios-sim-check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ccr-0ff7da25-kagnto]
+    paths:
+      - .github/workflows/ios-sim-check.yml
+      - scripts/ci/ios-sim-check.sh
+      - giode.toml
+      - go.mod
+      - main.go
+      - platform_*.go
+      - ui/**
+      - internal/monitor/**
+      - internal/nettools/**
+      - assets/**
+
+jobs:
+  simulator:
+    runs-on: macos-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Build for the simulator (with the automation server)
+        run: |
+          go install github.com/xmhrnx/giode-cli/cmd/giode@latest
+          sed -i '' 's/^package = "\."/package = "."\ntags = "mcpdebug"/' giode.toml
+          giode build ios-sim
+          find dist -maxdepth 3 | head -20
+      - name: Run in the simulator
+        run: bash scripts/ci/ios-sim-check.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ios-sim-check
+          path: ios-check

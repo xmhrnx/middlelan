@@ -35,7 +35,7 @@ type toolInfo struct {
 	color giode.Color
 }
 
-var toolCatalog = []toolInfo{
+var toolCatalog = availableTools([]toolInfo{
 	{toolSpeed, msg("Speed test"), msg("Download, upload, latency and jitter of your internet connection."), "gauge", "theme.primary"},
 	{toolUptime, msg("Internet monitor"), msg("Watches latency and packet loss continuously and logs outages."), "signal", "theme.success"},
 	{toolRouter, msg("Router check"), msg("Audits your router for risky open services and DNS hijacking."), "shield-check", "theme.warning"},
@@ -50,6 +50,20 @@ var toolCatalog = []toolInfo{
 	{toolWake, msg("Wake on LAN"), msg("Turns on a sleeping computer over the network."), "power", "theme.warning"},
 	{toolNetInfo, msg("Network info"), msg("Interfaces, addresses, router, DNS servers and public IP."), "network", "theme.accent"},
 	{toolSubnet, msg("Subnet calculator"), msg("Network, broadcast, host range and mask of any CIDR."), "calculator", "theme.info"},
+})
+
+// availableTools leaves out the tools this platform can't run: on iOS,
+// traceroute (the system's ping), the Wi-Fi analyzer (iOS shares no Wi-Fi
+// details) and UPnP and Bonjour discovery (multicast).
+func availableTools(tools []toolInfo) []toolInfo {
+	out := tools[:0]
+	for _, t := range tools {
+		if isIOS && (t.id == toolTrace || t.id == toolWifi || t.id == toolDiscovery) {
+			continue
+		}
+		out = append(out, t)
+	}
+	return out
 }
 
 // tool is one tool's page.

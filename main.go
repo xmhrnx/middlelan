@@ -136,7 +136,7 @@ func run() error {
 		Intl:   &giode.IntlOptions{FS: locales.FS, Dir: ".", Fallback: "en"},
 		// A custom title bar (ui/window_bar.go) replaces the OS frame on
 		// desktops; phones have none.
-		Frameless:  !isAndroid,
+		Frameless:  !isAndroid && !isIOS,
 		Background: "theme.background",
 		Icon:       assets.Icon,
 		MCP:        debugMCP,
@@ -188,12 +188,14 @@ func run() error {
 	go collector.Run(ctx)
 	// The router is polled every 10 s while the window shows, every
 	// minute in the background.
-	go gateway.Run(ctx, func() time.Duration {
-		if app.WindowVisible() {
-			return 10 * time.Second
-		}
-		return time.Minute
-	})
+	if !isIOS { // UPnP discovery needs multicast, which iOS withholds
+		go gateway.Run(ctx, func() time.Duration {
+			if app.WindowVisible() {
+				return 10 * time.Second
+			}
+			return time.Minute
+		})
+	}
 	shell.Start(ctx)
 	setVPNHooks(fw, names, blocker, prefs.Get())
 	go blocker.Run(ctx, 24*time.Hour, func() bool { return isAndroid && prefs.Get().AdBlock })
@@ -274,9 +276,10 @@ func dataDir() (string, error) {
 // monitor; it brings the running window forward instead. Android already
 // runs one instance per app, and giode's lock file lives in the temp
 // folder, which Android apps can't write: there the lock would report
-// "already running" and the app would exit before opening.
+// "already running" and the app would exit before opening. iOS runs one
+// instance too.
 func singleInstance(show func()) *giode.SingleInstanceLock {
-	if isAndroid {
+	if isAndroid || isIOS {
 		return nil
 	}
 	return &giode.SingleInstanceLock{UniqueID: "com.middlelan.app", OnSecondInstanceLaunch: show}

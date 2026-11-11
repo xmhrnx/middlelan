@@ -48,6 +48,9 @@ func (sh *Shell) appMenu(name string) *menu.Menu {
 				sh.connections.showOnly(name)
 				sh.navigate(screenConnections)
 			})
+		if isIOS { // no Connections page
+			m = newMenu().Item(tr("Open details"), func() { sh.openApp(name) })
+		}
 		if fw := sh.svc.Firewall; fw != nil && fw.Capabilities().PerApp {
 			m.Separator().CheckItem(tr("Block network access"),
 				func() bool { return sh.appBlockRule(name) != "" },
@@ -72,8 +75,10 @@ func (sh *Shell) hostMenu(ip, host string) *menu.Menu {
 		target := nonEmpty(host, ip)
 		m.Separator().
 			Item(tr("Ping"), func() { sh.tools.openWith(toolPing, ip) }).
-			Item(tr("Traceroute"), func() { sh.tools.openWith(toolTrace, ip) }).
 			Item(tr("WHOIS"), func() { sh.tools.openWith(toolWhois, ip) })
+		if !isIOS {
+			m.Item(tr("Traceroute"), func() { sh.tools.openWith(toolTrace, ip) })
+		}
 		if host != "" {
 			m.Item(tr("DNS lookup"), func() { sh.tools.openWith(toolDNS, target) })
 		}
