@@ -265,6 +265,12 @@ func (e *Engine) handleUDP(r *run, f *flow, app net.Conn) {
 		}
 		return
 	}
+	if f.dst.Port() == 53 && e.hooks.Load().Filter != nil {
+		// Plain DNS to a server of the app's choosing goes through the
+		// filter too, answered by the upstream servers.
+		e.serveDNS(f, app)
+		return
+	}
 	addr, _ := e.target(f.dst)
 	remote, err := e.dialWithTimeout(r.ctx, "udp", addr)
 	if err != nil {

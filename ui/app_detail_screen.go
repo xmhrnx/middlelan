@@ -8,7 +8,6 @@ import (
 	"github.com/xmhrnx/giode"
 	"github.com/xmhrnx/giode/components/copybutton"
 	"github.com/xmhrnx/giode/components/scroll"
-	"github.com/xmhrnx/middlelan/internal/firewall"
 	"github.com/xmhrnx/middlelan/internal/monitor"
 )
 
@@ -56,7 +55,7 @@ func (d *appDetailScreen) content() giode.Element {
 		responsiveGrid(170, 4, 14,
 			statTile("gauge", tr("Right now"), rateOrDash(a), "↓ "+formatRate(a.RateRx)+"  ↑ "+formatRate(a.RateTx), colDown),
 			statTile("activity", tr("Today"), formatBytes(a.TodayRx+a.TodayTx), formatBytes(a.TodayRx)+" down · "+formatBytes(a.TodayTx)+" up", "theme.success"),
-			statTile("clock", tr("This session"), formatBytes(a.SessionRx+a.SessionTx), "Since MiddleMan started", colUp),
+			statTile("clock", tr("This session"), formatBytes(a.SessionRx+a.SessionTx), tr("Since MiddleMan started"), colUp),
 			statTile("waypoints", tr("Connections"), itoa(a.Active), plural(a.Listening, "listening port", "listening ports"), "theme.warning"),
 		),
 		responsiveGrid(380, 2, 18,
@@ -101,7 +100,7 @@ func (d *appDetailScreen) header(a monitor.App) giode.Element {
 		right = append(right, d.copy)
 	}
 	if fw := d.shell.svc.Firewall; fw != nil && fw.Capabilities().PerApp {
-		if d.blockRule(a.Name) != "" {
+		if d.shell.appBlockRule(a.Name) != "" {
 			d.block.Label(tr("Unblock"))
 		} else {
 			d.block.Label(tr("Block"))
@@ -126,7 +125,7 @@ func (d *appDetailScreen) liveEndpoints(a monitor.App, now time.Time) giode.Elem
 			break
 		}
 		info := d.shell.svc.Resolver.Get(e.IP)
-		rows = append(rows, endpointRow(info, e.Port, e.Proto, e.Rx+e.Tx, e.Active, e.LastSeen, now))
+		rows = append(rows, withMenu(endpointRow(info, e.Port, e.Proto, e.Rx+e.Tx, e.Active, e.LastSeen, now), d.shell.hostMenu(e.IP, nonEmpty(info.Domain, info.Host))))
 	}
 	if len(rows) == 0 {
 		rows = append(rows, emptyState("globe", tr("No connections seen yet"), tr("Places this app connects to appear here while MiddleMan runs."), nil))
@@ -149,7 +148,7 @@ func (d *appDetailScreen) history(a monitor.App, now time.Time) giode.Element {
 			break
 		}
 		info := d.shell.svc.Resolver.Get(dst.IP)
-		rows = append(rows, endpointRow(info, dst.Port, "tcp", dst.Rx+dst.Tx, false, dst.LastSeen, now))
+		rows = append(rows, withMenu(endpointRow(info, dst.Port, "tcp", dst.Rx+dst.Tx, false, dst.LastSeen, now), d.shell.hostMenu(dst.IP, nonEmpty(info.Domain, info.Host))))
 	}
 	return card(tr("Known destinations"), giode.Text(tr("Remembered across sessions"), styleMuted),
 		giode.Stack(giode.Styles{Width: -1}, withDividers(rows)...))
@@ -194,20 +193,4 @@ func withDividers(rows []giode.Element) []giode.Element {
 }
 
 // blockRule returns the ID of the rule blocking the whole app, or "".
-func (d *appDetailScreen) blockRule(name string) string {
-	for _, r := range d.shell.svc.Firewall.Rules() {
-		if r.App == name && r.Dest == "" {
-			return r.ID
-		}
-	}
-	return ""
-}
-
-func (d *appDetailScreen) toggleBlock() {
-	a, _ := d.shell.findApp(d.name)
-	if id := d.blockRule(d.name); id != "" {
-		d.shell.firewallChange(func(fw *firewall.Firewall) error { return fw.Remove(id) })
-		return
-	}
-	d.shell.blockRule(firewall.Rule{App: d.name, Exe: a.Exe, Note: tr("Blocked from the app's page")})
-}
+func (d *appDetailScreen) toggleBlock() { d.shell.toggleAppBlock(d.name) }

@@ -29,10 +29,12 @@ type securityScreen struct {
 	cancel      *giode.ButtonElement
 	busy        bool
 	vpn         *vpnControl
+	adblock     *adBlockControl
 }
 
 func newSecurityScreen(sh *Shell) *securityScreen {
 	s := &securityScreen{shell: sh, vpn: newVPNControl(sh)}
+	s.adblock = newAdBlockControl(sh, s.vpn)
 	cur := sh.svc.Settings.Get()
 	sw := func(label string, on bool, onChange func(bool)) *toggle.Switch {
 		t := switchT(label, giode.Styles{Color: "theme.text", FontSize: sizeBody, Width: -1}, onChange)
@@ -149,6 +151,7 @@ func (s *securityScreen) content() giode.Element {
 		s.alertsCard(),
 		s.firewallCard(),
 		s.vpn.card(),
+		s.adblock.card(),
 		s.threatCard(),
 		s.namesCard(),
 	)

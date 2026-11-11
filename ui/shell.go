@@ -2,6 +2,7 @@ package ui
 
 import (
 	"context"
+	"github.com/xmhrnx/middlelan/internal/adblock"
 	"sync/atomic"
 	"time"
 
@@ -36,6 +37,7 @@ type Services struct {
 	Alerts    *alerts.Watcher
 	Threats   *threat.DB
 	Names     *dnslog.Log
+	AdBlock   *adblock.Blocker
 }
 
 // Shell is the root of the UI: navigation around the current page.

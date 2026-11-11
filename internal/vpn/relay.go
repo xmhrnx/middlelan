@@ -137,6 +137,9 @@ func (e *Engine) drainUDP(f *flow, app net.Conn, idle time.Duration) {
 // forwarding each to the upstream servers.
 func (e *Engine) serveDNS(f *flow, app net.Conn) {
 	var wmu sync.Mutex
+	e.mu.Lock()
+	owner, pkg := f.App, f.Package
+	e.mu.Unlock()
 	buf := make([]byte, 64<<10)
 	for {
 		app.SetReadDeadline(time.Now().Add(dnsIdle))
@@ -151,6 +154,19 @@ func (e *Engine) serveDNS(f *flow, app net.Conn) {
 			continue
 		}
 		e.addSent(f, n)
+		if filter := e.hooks.Load().Filter; filter != nil {
+			if name, ok := questionName(buf[:n]); ok && filter(owner, pkg, name) {
+				if resp := refusedReply(buf[:n]); resp != nil {
+					wmu.Lock()
+					_, err := app.Write(resp)
+					wmu.Unlock()
+					if err == nil {
+						e.addRecv(f, len(resp))
+					}
+				}
+				continue
+			}
+		}
 		select {
 		case e.dnsSem <- struct{}{}:
 		default:

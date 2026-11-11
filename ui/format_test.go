@@ -14,3 +14,11 @@ func TestFormat(t *testing.T) {
 		}
 	}
 }
+
+func TestFormatCount(t *testing.T) {
+	for n, want := range map[int]string{0: "0", 999: "999", 1000: "1,000", 1234567: "1,234,567", -4500: "-4,500"} {
+		if got := formatCount(n); got != want {
+			t.Errorf("%d: %q, want %q", n, got, want)
+		}
+	}
+}

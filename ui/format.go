@@ -103,3 +103,15 @@ func endpointLabel(ip string, port int) string {
 	}
 	return ip + ":" + strconv.Itoa(port)
 }
+
+// formatCount writes a count with thousands separators.
+func formatCount(n int) string {
+	s := strconv.Itoa(n)
+	if n < 0 {
+		return "-" + formatCount(-n)
+	}
+	for i := len(s) - 3; i > 0; i -= 3 {
+		s = s[:i] + "," + s[i:]
+	}
+	return s
+}

@@ -70,6 +70,7 @@ var (
 	styleField   = giode.Styles{Background: colSurface2, BorderColor: "theme.border", BorderRadius: 10, Color: "theme.text"}
 	stylePrimary = giode.Styles{Background: "theme.primary", Color: "theme.onprimary", BorderRadius: 10, FontWeight: giode.FontWeightSemiBold, Padding: giode.SymmetricInset(18, 10)}
 	styleGhost   = giode.Styles{Background: "theme.text", Color: "theme.text", BorderRadius: 10, Padding: giode.SymmetricInset(14, 10)}
+	styleMenu    = giode.Styles{Background: colSurface3, Color: "theme.text", BorderRadius: 12}
 	styleOutline = giode.Styles{BorderColor: "theme.border", Color: "theme.text", BorderRadius: 10, Padding: giode.SymmetricInset(14, 9)}
 )
 

@@ -39,12 +39,21 @@ Platforms: **Windows, macOS, Linux, Android** (one codebase).
   a program first uses the network.
 - **On-device VPN on Android**: relays traffic on the phone itself (no server) to show every
   app's connections and domain names, and enforce firewall rules.
+- **Ad and tracker blocking on Android**, off by default: while the on-device VPN runs, DNS queries
+  for ad, tracking and analytics domains are answered on the phone (with 0.0.0.0, or NXDOMAIN), in
+  every app and browser, including apps that send DNS to their own server. Uses the open source
+  [AdGuard DNS filter](https://github.com/AdguardTeam/AdGuardSDNSFilter) (GPL-3.0) and
+  [StevenBlack's hosts](https://github.com/StevenBlack/hosts) (MIT), downloaded and refreshed daily.
+  Shows what was blocked, by which app, and lets you allow a domain. Apps using encrypted DNS
+  (DNS over HTTPS, or Android's Private DNS set to a provider) bypass it.
 
 ### Runs quietly in the background
 - Closes to the system tray / macOS menu bar and keeps monitoring. The tray menu is a mini panel:
   live speeds, today's total and the busiest apps, plus pause and quit.
 - **Android home screen widget** with live speeds, today's usage and the busiest app.
 - Optional **start in the tray at login** (Windows Run key, macOS LaunchAgent, Linux autostart).
+- Right-click (long-press on Android) an app, a connection, an app's destination or a device for its actions:
+  copy the address or name, ping, traceroute, WHOIS, scan ports, wake, or block it.
 - Keyboard shortcuts: Ctrl/⌘+1–6 switch pages, Ctrl/⌘+F search, Ctrl/⌘+P pause, Ctrl/⌘+, settings, F5 refresh.
 - Sampling every 2 s while the window is shown and every 6 s while hidden. When idle it draws
   about one frame per sample, and per-socket counters come straight from the kernel, so it
@@ -125,7 +134,8 @@ internal/nettools                ping, traceroute, port scan, DNS, WHOIS, LAN sc
 internal/inventory               known devices, presence timeline, background scanner
 internal/firewall                block rules: Windows Firewall, nftables, pf, Android VPN
 internal/threat, internal/alerts blocklists and the alerts they raise
-internal/vpn                     Android on-device VPN (gVisor netstack)
+internal/vpn                     Android on-device VPN (gVisor netstack), DNS filter
+internal/adblock                 ad and tracker blocklists, matching and statistics
 internal/wifi                    Wi-Fi link, scans, channel congestion
 internal/router                  whole-network traffic over UPnP IGD
 internal/speedlog                speed test history and ISP report card

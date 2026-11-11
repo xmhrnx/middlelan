@@ -106,6 +106,31 @@ cat "$OUT/tunnel.txt"
 log "traffic through the tunnel"
 adb shell "echo -e 'GET / HTTP/1.0\r\nHost: example.com\r\n\r\n' | toybox nc -w 8 example.com 80 | head -3" 2>&1 | tee -a "$OUT/steps.txt"
 sleep 6
+
+# Ad blocking: turn it on (still on the Security page), wait for the
+# lists, then resolve an ad domain and an ordinary one on the phone.
+log "ad blocking"
+resolve() { adb shell "ping -c 1 -W 2 $1 2>&1 | head -1" | tr -d '\r' | sed -n 's/^PING [^ ]* (\([0-9a-f.:]*\)).*/\1/p'; }
+# A different ad domain than the one checked after: Android caches answers.
+before=$(resolve stats.g.doubleclick.net)
+echo "[adblock] before: stats.g.doubleclick.net -> $before" | tee -a "$OUT/steps.txt"
+id=$(node_id "Block ads and trackers" checkbox); echo "ad blocking switch: $id" | tee -a "$OUT/steps.txt"
+[ -n "$id" ] && mcp ui_click "{\"id\":\"$id\"}" >/dev/null
+for i in $(seq 1 45); do
+  if mcp ui_snapshot '{"query":"domains"}' | grep -q 'domains · updated'; then echo "lists ready after ${i}x2s" | tee -a "$OUT/steps.txt"; break; fi
+  sleep 2
+done
+# ping shows an unspecified-address answer as 127.0.0.1.
+after=$(resolve ad.doubleclick.net); plain=$(resolve example.com)
+echo "[adblock] after: ad.doubleclick.net -> $after, example.com -> $plain" | tee -a "$OUT/steps.txt"
+sleep 3
+listed=$(node_id "ad.doubleclick.net" text)
+echo "[adblock] listed as blocked in the app: ${listed:-no}" | tee -a "$OUT/steps.txt"
+case "$after" in 0.0.0.0|127.0.0.1) ;; *) echo "[adblock] FAILED: not blocked" | tee -a "$OUT/steps.txt"; adblock_failed=1 ;; esac
+case "$before" in 0.0.0.0|127.0.0.1) echo "[adblock] FAILED: blocked before turning it on" | tee -a "$OUT/steps.txt"; adblock_failed=1 ;; esac
+case "$plain" in ""|0.0.0.0|127.0.0.1) echo "[adblock] FAILED: example.com blocked" | tee -a "$OUT/steps.txt"; adblock_failed=1 ;; esac
+[ -n "$listed" ] || adblock_failed=1
+shot 05-adblock
 id=$(node_id "Apps" button); [ -n "$id" ] && mcp ui_click "{\"id\":\"$id\"}" >/dev/null
 sleep 3
 shot 05-apps
@@ -185,5 +210,6 @@ echo "app pid: ${pid:-not running}" | tee -a "$OUT/steps.txt"
 } | grep -v "avc:  denied" | sort -u -k1,2 > "$OUT/logcat-relevant.txt"
 echo "--- relevant logcat ($(wc -l < "$OUT/logcat-relevant.txt") lines)"
 tail -150 "$OUT/logcat-relevant.txt"
+if [ "${adblock_failed:-0}" = 1 ]; then echo "Ad blocking didn't block the test domain."; exit 1; fi
 if [ "$stuck" = 1 ]; then echo "The app stopped drawing after it was left and reopened."; exit 1; fi
 exit 0
