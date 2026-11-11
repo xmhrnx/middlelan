@@ -26,7 +26,7 @@ type navItem struct {
 	compact bool
 }
 
-var navItems = availableNav([]navItem{
+var navItems = []navItem{
 	{screenDashboard, msg("Overview"), "layout-dashboard", true},
 	{screenApps, msg("Apps"), "app-window", true},
 	{screenConnections, msg("Connections"), "waypoints", false},
@@ -36,19 +36,6 @@ var navItems = availableNav([]navItem{
 	{screenSecurity, msg("Security"), "shield-check", true},
 	{screenTools, msg("Tools"), "wrench", true},
 	{screenSettings, msg("Settings"), "settings", false},
-})
-
-// availableNav leaves out the pages this platform can't fill: on iOS,
-// other apps' connections and the firewall.
-func availableNav(items []navItem) []navItem {
-	out := items[:0]
-	for _, n := range items {
-		if isIOS && (n.screen == screenConnections || n.screen == screenMap || n.screen == screenSecurity) {
-			continue
-		}
-		out = append(out, n)
-	}
-	return out
 }
 
 func (s screen) title() string {

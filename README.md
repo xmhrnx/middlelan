@@ -7,7 +7,7 @@ MiddleMan is a cross-platform network monitor built with [Giode](https://github.
 each one connects (host, owner, country, map), finds the devices on your local network, and
 includes a full toolbox of network diagnostics.
 
-Platforms: **Windows, macOS, Linux, Android, iOS** (one codebase).
+Platforms: **Windows, macOS, Linux, Android** (one codebase).
 
 ## Features
 
@@ -91,13 +91,6 @@ In English, Español, Deutsch, Français, Português and فارسی (right to le
 | Windows | `GetExtendedTcpTable` / `GetExtendedUdpTable` | per-connection extended stats (needs **Run as administrator**, offered in-app) |
 | macOS | `lsof` | `nettop` per-process counters |
 | Android | Android 10+ hides other apps' sockets; MiddleMan's on-device VPN (Security) shows them | `NetworkStatsManager` per-app usage (grant **Usage access**, offered in-app), split by destination with the VPN |
-| iOS | not visible: iOS keeps apps from seeing other apps' traffic | the phone's Wi-Fi and cellular counters, shown as two "apps" |
-
-On iOS, MiddleMan is the phone's traffic meter and network toolbox: Overview, Apps (Wi-Fi and
-cellular), History, Devices, the speed test and the tools. Connections, Map, Security (firewall,
-VPN, ad blocking), traceroute, the Wi-Fi analyzer and UPnP/Bonjour discovery are left out: iOS
-apps can't see other apps' traffic, run system commands, or send multicast without an entitlement
-Apple grants on request. Apps can't see other devices' MAC addresses on iOS either.
 
 Without administrator rights, desktops hide the program names of other users' and system
 sockets; MiddleMan labels those sockets *hidden* and offers to restart elevated.
@@ -120,8 +113,6 @@ giode run android       # build, install and launch on a connected phone
 giode build linux windows deb appimage windows-installer
 giode build android aab # needs the Android SDK, NDK and a JDK
 giode build macos dmg   # on a Mac with Xcode
-giode run ios-sim        # on a Mac: build and run in the iOS simulator
-giode build ios          # signed IPA (needs ios.profile)
 ```
 
 `giode ci` already wrote `.github/workflows/release.yml`. Pushing a tag such as `v1.0.0`
@@ -132,7 +123,7 @@ builds and signs every platform and attaches the packages to a GitHub release.
 ```
 main.go, tray.go, keepalive.go   wiring: window, tray, background services
 assets/                          icons (app, adaptive Android layers, tray), fonts, map data, UI icons
-  src/make_icons.py              regenerates every icon from SVG (desktop, iOS, Android, tray)
+  src/make_icons.py              regenerates every icon from SVG
 android/java/                    Java helpers: usage stats, VPN service, Wi-Fi, widget, permission prompt
 android/aar/                     extra manifest entries and resources, packed by build-aar.sh into android/libs/
 locales/                         translations (English text is the key)

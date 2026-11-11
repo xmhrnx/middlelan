@@ -2,8 +2,7 @@
 """Generates MiddleMan's icons from SVG with rsvg-convert.
 
 Run from this folder: python3 make_icons.py
-Outputs (in ../): icon.png (desktop + store, 1024), ios-icon.png (opaque, square),
-android-foreground.png,
+Outputs (in ../): icon.png (desktop + store, 1024), android-foreground.png,
 android-background.png, android-monochrome.png (adaptive icon layers, 108dp
 canvas with the artwork inside the middle 66dp), tray.png and
 tray-template.png.
@@ -106,10 +105,6 @@ def render(name, content, size=1024):
 render("icon", svg(
     f'<clipPath id="r"><rect width="1024" height="1024" rx="228"/></clipPath>'
     f'<g clip-path="url(#r)">{BG}{scaled(emblem(), 1.0, -24)}{RIM}</g>', EMBLEM_DEFS))
-
-# iOS icon: full-bleed and opaque (iOS rounds the corners itself and
-# shows transparent pixels white), the emblem at the same size.
-render("ios-icon", svg(f'{BG}{scaled(emblem(), 1.0, -24)}', EMBLEM_DEFS))
 
 # Android adaptive icon: the background fills the whole 108dp canvas edge
 # to edge, so launchers never add a white frame; the foreground keeps the
