@@ -11,6 +11,7 @@ import (
 	"github.com/xmhrnx/giode/components/toggle"
 	"github.com/xmhrnx/middlelan/internal/export"
 	"github.com/xmhrnx/middlelan/internal/settings"
+	"github.com/xmhrnx/middlelan/internal/updates"
 )
 
 // settingsScreen holds the preferences and the about box.
@@ -176,7 +177,7 @@ func (s *settingsScreen) about() giode.Element {
 				giode.Text(tr("See every connection. Know every device."), styleMuted),
 			)),
 	}
-	if !isMobile {
+	if !isMobile && !updates.StoreManaged() { // a store updates its own copies
 		kids = append(kids, giode.Divider(giode.Styles{Color: "theme.border"}), s.updates,
 			giode.Row(giode.Styles{Gap: 10, Align: giode.AlignCenter, Width: -1},
 				giode.Text(status, giode.Styles{Color: "theme.muted", FontSize: sizeSmall, FlexGrow: 1}),

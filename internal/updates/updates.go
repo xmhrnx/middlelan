@@ -54,6 +54,9 @@ func (c *Checker) Check(ctx context.Context) (*Release, error) {
 	if c.Current == "" {
 		return nil, ErrDevBuild
 	}
+	if StoreManaged() {
+		return nil, ErrStoreBuild
+	}
 	if c.updater.FeedURL != "" && c.updater.PublicKey != "" {
 		r, err := c.updater.Check(ctx)
 		switch {

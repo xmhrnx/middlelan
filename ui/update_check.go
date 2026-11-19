@@ -33,6 +33,8 @@ func (sh *Shell) checkUpdates(manual bool) {
 		sh.svc.App.Post(func() {
 			sh.update.checking, sh.update.checked, sh.update.release, sh.update.err = false, time.Now(), rel, ""
 			switch {
+			case errors.Is(err, updates.ErrStoreBuild):
+				// The store updates this copy; say nothing.
 			case errors.Is(err, updates.ErrDevBuild):
 				if manual {
 					sh.Toast(giode.ToastInfo, tr("This is a development build; updates come with released versions."))
@@ -88,7 +90,7 @@ func (sh *Shell) runUpdateChecks(ctx context.Context) {
 		case <-time.After(wait):
 		}
 		wait = 24 * time.Hour
-		if sh.svc.Settings.Get().CheckUpdates {
+		if sh.svc.Settings.Get().CheckUpdates && !updates.StoreManaged() {
 			sh.svc.App.Post(func() { sh.checkUpdates(false) })
 		}
 	}
