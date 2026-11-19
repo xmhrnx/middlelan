@@ -9,6 +9,8 @@ includes a full toolbox of network diagnostics.
 
 Platforms: **Windows, macOS, Linux, Android** (one codebase).
 
+Website: <https://xmhrnx.github.io/middlelan/>
+
 ## Features
 
 ### Live monitoring

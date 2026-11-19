@@ -11,7 +11,7 @@ package = "."
 platforms = ["windows", "macos", "linux", "android"]
 publisher = "MiddleMan"
 description = "See which apps use your network, where they connect, and every device on your LAN."
-website = "https://github.com/xmhrnx/middlelan"
+website = "https://xmhrnx.github.io/middlelan/"
 # Fills the screen until the first frame (Android's splash screen): the
 # window's dark background instead of white, in light and dark mode alike
 # (the app starts in its dark theme by default).

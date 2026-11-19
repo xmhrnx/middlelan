@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MiddleMan · See every connection. Know every device.</title>
+<meta name="description" content="MiddleMan is a network monitor for Windows, macOS, Linux and Android: which apps use your network, where they connect, and every device on your LAN.">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b0b0c" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f5f6" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* The app's own palettes (ui/theme.go): graphite and champagne gold. */
+  :root {
+    --bg: #0b0b0c;
+    --surface: #151516;
+    --surface-2: #1b1b1d;
+    --text: #f2f2f0;
+    --muted: #98989d;
+    --border: #27272a;
+    --gold: #d9b36c;
+    --gold-hi: #f8e7bd;
+    --gold-lo: #a87b34;
+    --on-gold: #1a1408;
+    --success: #7fc79a;
+    --danger: #e5736b;
+    --glow: rgba(217, 179, 108, .14);
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #f5f5f6;
+      --surface: #ffffff;
+      --surface-2: #fafaf8;
+      --text: #18181b;
+      --muted: #6b6b72;
+      --border: #e4e4e7;
+      --gold: #9c7130;
+      --gold-hi: #c99b4f;
+      --gold-lo: #7a5420;
+      --on-gold: #ffffff;
+      --success: #2f8a55;
+      --danger: #c0392b;
+      --glow: rgba(156, 113, 48, .12);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.6 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: var(--gold); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  img { max-width: 100%; display: block; }
+  .wrap { width: min(1120px, 100% - 40px); margin-inline: auto; }
+
+  /* Top bar */
+  .top {
+    position: sticky; top: 0; z-index: 10;
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  }
+  .top .wrap { display: flex; align-items: center; gap: 12px; height: 60px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--text); text-decoration: none; letter-spacing: -.01em; }
+  .brand img { width: 30px; height: 30px; }
+  .top nav { margin-left: auto; display: flex; gap: 22px; font-size: 14px; }
+  .top nav a { color: var(--muted); text-decoration: none; }
+  .top nav a:hover { color: var(--text); }
+  .top .gh { padding: 7px 14px; border: 1px solid var(--border); border-radius: 999px; color: var(--text); }
+  @media (max-width: 720px) { .top nav a:not(.gh) { display: none; } }
+
+  /* Hero */
+  .hero { position: relative; padding: 72px 0 40px; text-align: center; }
+  .hero::before {
+    content: ""; position: absolute; inset: -120px 0 auto; height: 620px; z-index: -1;
+    background: radial-gradient(ellipse 50% 60% at 50% 40%, var(--glow), transparent 70%);
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 500 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase;
+    color: var(--gold); padding: 8px 12px; border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent); border-radius: 999px;
+  }
+  .eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 4px color-mix(in srgb, var(--success) 22%, transparent); }
+  h1 { font-size: clamp(40px, 7vw, 76px); line-height: 1.02; letter-spacing: -.035em; margin: 22px 0 16px; font-weight: 800; }
+  h1 .gold {
+    background: linear-gradient(170deg, var(--gold-hi), var(--gold) 55%, var(--gold-lo));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .lede { max-width: 640px; margin: 0 auto; font-size: clamp(17px, 2.2vw, 19px); color: var(--muted); }
+  .cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 30px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; padding: 13px 22px; border-radius: 12px;
+    font-weight: 600; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn.primary { background: var(--gold); color: var(--on-gold); box-shadow: 0 10px 30px -10px var(--gold); }
+  .btn.ghost { border: 1px solid var(--border); color: var(--text); background: var(--surface); }
+
+  /* The man in the middle: two devices, every packet through the centre. */
+  .wire { position: relative; margin: 56px auto 0; max-width: 860px; }
+  .wire svg { width: 100%; height: auto; overflow: visible; }
+  .wire .icon {
+    position: absolute; left: 50%; top: 50%; width: 22%; max-width: 184px; translate: -50% -50%;
+    filter: drop-shadow(0 24px 40px rgba(0,0,0,.45));
+  }
+  .node { fill: var(--surface); stroke: var(--gold); stroke-width: 3; }
+  .node-core { fill: var(--gold-hi); }
+  .track { stroke: color-mix(in srgb, var(--gold) 45%, transparent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1 14; fill: none; }
+  .packet { fill: var(--gold); }
+  .label { font: 500 13px var(--mono); fill: var(--muted); letter-spacing: .08em; }
+  @media (prefers-reduced-motion: reduce) { .packet { display: none; } }
+
+  /* Sections */
+  section { padding: 84px 0; }
+  .kicker { font: 500 12px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+  h2 { font-size: clamp(30px, 4.4vw, 44px); letter-spacing: -.03em; line-height: 1.1; margin: 14px 0 14px; }
+  .sub { color: var(--muted); max-width: 620px; margin: 0; }
+
+  .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px; }
+  .pillar {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 26px;
+    position: relative; overflow: hidden;
+  }
+  .pillar::after {
+    content: ""; position: absolute; right: -40px; top: -40px; width: 140px; height: 140px; border-radius: 50%;
+    background: radial-gradient(circle, var(--glow), transparent 70%);
+  }
+  .pillar .ico { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--gold) 16%, var(--surface)); color: var(--gold); margin-bottom: 18px; }
+  .pillar .ico svg { width: 22px; height: 22px; }
+  .pillar h3 { margin: 0 0 8px; font-size: 19px; letter-spacing: -.01em; }
+  .pillar p { margin: 0 0 14px; color: var(--muted); font-size: 15px; }
+  .pillar ul { margin: 0; padding: 0; list-style: none; font-size: 14.5px; }
+  .pillar li { padding: 7px 0 7px 18px; border-top: 1px dashed var(--border); position: relative; }
+  .pillar li::before { content: ""; position: absolute; left: 0; top: 15px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+  @media (max-width: 900px) { .pillars { grid-template-columns: 1fr; } }
+
+  /* Security band */
+  .band { background: var(--surface); border-block: 1px solid var(--border); }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  @media (max-width: 860px) { .split { grid-template-columns: 1fr; gap: 28px; } }
+  .rules { display: grid; gap: 12px; }
+  .rule { display: grid; grid-template-columns: 34px 1fr; gap: 14px; padding: 18px; border-radius: 14px; background: var(--bg); border: 1px solid var(--border); }
+  .rule b { display: block; margin-bottom: 2px; }
+  .rule span { color: var(--muted); font-size: 15px; }
+  .rule .dot { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font: 600 13px var(--mono); }
+  .dot.ok { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+  .dot.no { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+  .dot.au { background: color-mix(in srgb, var(--gold) 18%, transparent); color: var(--gold); }
+
+  /* How it sees connections */
+  .table { margin-top: 36px; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); }
+  .row { display: grid; grid-template-columns: 140px 1fr 1fr; border-top: 1px solid var(--border); }
+  .row:first-child { border-top: 0; }
+  .row > div { padding: 16px 20px; font-size: 14.5px; }
+  .row.head > div { font: 500 11.5px var(--mono); text-transform: uppercase; letter-spacing: .12em; color: var(--muted); background: var(--surface-2); }
+  .row .os { font-weight: 600; }
+  .row code { font: 13px var(--mono); color: var(--gold); }
+  @media (max-width: 720px) {
+    .row { grid-template-columns: 1fr; }
+    .row.head { display: none; }
+    .row > div { padding: 6px 18px; }
+    .row > div:first-child { padding-top: 16px; }
+    .row > div:last-child { padding-bottom: 16px; }
+    .row > div:nth-child(2)::before { content: "Connections and owners · "; color: var(--muted); }
+    .row > div:nth-child(3)::before { content: "Per-app bytes · "; color: var(--muted); }
+  }
+  .note { color: var(--muted); font-size: 14.5px; margin-top: 18px; }
+
+  /* Tools cloud */
+  .tools { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+  .tool { padding: 10px 16px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface); font-size: 14.5px; }
+  .tool.hl { border-color: color-mix(in srgb, var(--gold) 50%, var(--border)); color: var(--gold); }
+
+  /* Details grid */
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 36px; }
+  .fact { padding: 22px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); }
+  .fact h3 { margin: 0 0 6px; font-size: 16px; }
+  .fact p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  @media (max-width: 900px) { .facts { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .facts { grid-template-columns: 1fr; } }
+
+  /* Download */
+  .download { text-align: center; }
+  .download .card {
+    margin-top: 34px; padding: 44px 28px; border-radius: 24px; border: 1px solid color-mix(in srgb, var(--gold) 30%, var(--border));
+    background: radial-gradient(ellipse 70% 90% at 50% 0%, var(--glow), transparent 70%), var(--surface);
+  }
+  .download img { width: 96px; height: 96px; margin: 0 auto 18px; }
+  .platforms { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 760px; margin: 28px auto 0; }
+  .platform { display: block; padding: 18px 12px; border-radius: 14px; border: 1px solid var(--border); background: var(--bg); color: var(--text); text-decoration: none; transition: border-color .15s ease; }
+  .platform:hover { border-color: var(--gold); }
+  .platform b { display: block; font-size: 16px; }
+  .platform small { color: var(--muted); font: 12px var(--mono); }
+  @media (max-width: 720px) { .platforms { grid-template-columns: 1fr 1fr; } }
+  .build { margin: 26px auto 0; max-width: 560px; text-align: left; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; font: 13px/1.7 var(--mono); color: var(--muted); overflow-x: auto; white-space: pre; }
+  .build .p { color: var(--gold); user-select: none; }
+
+  footer { padding: 40px 0 56px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; justify-content: space-between; }
+  footer a { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="img/icon.png" alt="" width="30" height="30">MiddleMan</a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#security">Security</a>
+      <a href="#how">How it works</a>
+      <a href="#download">Download</a>
+      <a class="gh" href="https://github.com/xmhrnx/middlelan">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <span class="eyebrow">Network monitor · open source</span>
+      <h1>See every connection.<br><span class="gold">Know every device.</span></h1>
+      <p class="lede">MiddleMan watches every app's network connections, shows where each one connects (host, owner, country, map), finds the devices on your local network, and brings a full toolbox of network diagnostics.</p>
+      <div class="cta">
+        <a class="btn primary" href="#download">Download MiddleMan</a>
+        <a class="btn ghost" href="https://github.com/xmhrnx/middlelan">View the source</a>
+      </div>
+
+      <div class="wire" aria-hidden="true">
+        <svg viewBox="0 0 860 260">
+          <path id="lane" class="track" d="M70 150 C 250 150, 300 130, 430 130 S 610 150, 790 150"/>
+          <circle class="packet" r="5"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#lane"/></animateMotion></circle>
+          <circle class="packet" r="5" opacity=".7"><animateMotion dur="3.2s" begin="-1.1s" repeatCount="indefinite"><mpath href="#lane"/></animateMotion></circle>
+          <circle class="packet" r="5" opacity=".45"><animateMotion dur="3.2s" begin="-2.2s" repeatCount="indefinite" keyPoints="1;0" keyTimes="0;1" calcMode="linear"><mpath href="#lane"/></animateMotion></circle>
+          <circle class="node" cx="70" cy="150" r="30"/><circle class="node-core" cx="70" cy="150" r="10"/>
+          <circle class="node" cx="790" cy="150" r="30"/><circle class="node-core" cx="790" cy="150" r="10"/>
+          <text class="label" x="70" y="214" text-anchor="middle">YOUR APPS</text>
+          <text class="label" x="790" y="214" text-anchor="middle">THE INTERNET</text>
+        </svg>
+        <img class="icon" src="img/icon.png" alt="">
+      </div>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="kicker">What it shows</div>
+      <h2>The point every packet passes through.</h2>
+      <p class="sub">Per-app traffic, every destination with the domain name the app looked up, and every device on the network around you.</p>
+
+      <div class="pillars">
+        <article class="pillar">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+          <h3>Live monitoring</h3>
+          <p>Download and upload rates for every program, today's totals, session totals and a 7-day history.</p>
+          <ul>
+            <li>Every remote endpoint per app: domain, owner, country and city</li>
+            <li>Connections view with internet, local and listening filters</li>
+            <li>Dot-matrix world map with arcs to every destination</li>
+            <li>Hourly usage for 14 days, daily for 90</li>
+            <li>Export usage and destinations as CSV, or everything as JSON</li>
+          </ul>
+        </article>
+        <article class="pillar">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6.01 18H6M10.01 18H10M15 10v4M17.84 7.17a4 4 0 0 0-5.66 0M20.66 4.34a8 8 0 0 0-11.31 0"/></svg></div>
+          <h3>Devices on your LAN</h3>
+          <p>Finds devices by ICMP/TCP probes and the ARP table, then names them with reverse DNS, NetBIOS and mDNS.</p>
+          <ul>
+            <li>MAC maker from an offline 54k-entry OUI database</li>
+            <li>Device type: router, phone, computer, TV, printer, camera…</li>
+            <li>Alerts when a new device joins</li>
+            <li>Presence timeline: when each device joined and left</li>
+            <li>Whole-network traffic from the router's UPnP counters</li>
+          </ul>
+        </article>
+        <article class="pillar">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM12 2v2M12 20v2M2 12h2M20 12h2"/></svg></div>
+          <h3>Runs quietly</h3>
+          <p>Closes to the system tray or macOS menu bar and keeps monitoring, with a mini panel of live speeds and the busiest apps.</p>
+          <ul>
+            <li>Android home screen widget with live speeds</li>
+            <li>Optional start in the tray at login</li>
+            <li>Samples every 2 s while shown, every 6 s while hidden</li>
+            <li>Per-socket counters straight from the kernel</li>
+            <li>Keyboard shortcuts for every page</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="security" class="band">
+    <div class="wrap split">
+      <div>
+        <div class="kicker">Security</div>
+        <h2>Block a program with a click. Undo it just as easily.</h2>
+        <p class="sub">Destinations are checked offline against free blocklists (abuse.ch Feodo and URLhaus, Spamhaus DROP, FireHOL level 1), refreshed daily. Alerts fire when a program connects for the first time.</p>
+        <p class="note">On Android, an on-device VPN relays traffic on the phone itself, with no server, to show every app's connections and domain names and enforce firewall rules. Ad and tracker blocking there is off by default and uses the AdGuard DNS filter and StevenBlack's hosts.</p>
+      </div>
+      <div class="rules">
+        <div class="rule"><div class="dot no">✕</div><div><b>Firewall, off by default</b><span>Block a program or an address through Windows Firewall, nftables on Linux, pf on macOS, or the VPN on Android.</span></div></div>
+        <div class="rule"><div class="dot au">?</div><div><b>Ask before new programs connect</b><span>Optional while the firewall is on: Allow or Block when a program first uses the network.</span></div></div>
+        <div class="rule"><div class="dot ok">✓</div><div><b>Leaves your system as it found it</b><span>It never changes your firewall's defaults or turns it on or off; turning it off, or the next start after a crash, removes every rule it added.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="kicker">How it sees connections</div>
+      <h2>Native sources on every platform.</h2>
+      <p class="sub">MiddleMan reads connections from what each operating system already exposes.</p>
+      <div class="table" role="table">
+        <div class="row head" role="row"><div>Platform</div><div>Connections and owners</div><div>Per-app bytes</div></div>
+        <div class="row" role="row"><div class="os">Linux</div><div>netlink <code>sock_diag</code> (falls back to <code>/proc/net</code>), owners from <code>/proc/*/fd</code></div><div>per-socket <code>tcp_info</code> counters, no root needed</div></div>
+        <div class="row" role="row"><div class="os">Windows</div><div><code>GetExtendedTcpTable</code> / <code>GetExtendedUdpTable</code></div><div>per-connection extended stats (Run as administrator, offered in-app)</div></div>
+        <div class="row" role="row"><div class="os">macOS</div><div><code>lsof</code></div><div><code>nettop</code> per-process counters</div></div>
+        <div class="row" role="row"><div class="os">Android</div><div>MiddleMan's on-device VPN (Android 10+ hides other apps' sockets)</div><div><code>NetworkStatsManager</code> per-app usage (grant Usage access), split by destination with the VPN</div></div>
+      </div>
+      <p class="note">Without administrator rights, desktops hide the program names of other users' and system sockets; MiddleMan labels those sockets <em>hidden</em> and offers to restart elevated.</p>
+    </div>
+  </section>
+
+  <section id="tools" class="band">
+    <div class="wrap">
+      <div class="kicker">Toolbox</div>
+      <h2>Diagnostics, built in.</h2>
+      <p class="sub">Right-click (long-press on Android) an app, a connection or a device to ping it, trace it, look it up, scan its ports, wake it or block it.</p>
+      <div class="tools">
+        <span class="tool hl">Speed test + ISP report card</span>
+        <span class="tool hl">Wi-Fi analyzer</span>
+        <span class="tool hl">Internet uptime monitor</span>
+        <span class="tool hl">Router security check</span>
+        <span class="tool">UPnP &amp; Bonjour discovery</span>
+        <span class="tool">Ping</span>
+        <span class="tool">Traceroute</span>
+        <span class="tool">Port scanner</span>
+        <span class="tool">DNS lookup</span>
+        <span class="tool">WHOIS</span>
+        <span class="tool">TLS certificate inspector</span>
+        <span class="tool">Wake on LAN</span>
+        <span class="tool">Network info</span>
+        <span class="tool">Subnet calculator</span>
+      </div>
+
+      <div class="facts">
+        <div class="fact"><h3>Private by design</h3><p>Usage history stays on the device (90 days). Locating remote IPs uses geojs.io and can be switched off in Settings.</p></div>
+        <div class="fact"><h3>Six languages</h3><p>English, Español, Deutsch, Français, Português and فارسی (right to left), following the system language or your choice.</p></div>
+        <div class="fact"><h3>Graphite and gold</h3><p>Dark and light themes, the Inter typeface, a custom title bar on desktops and responsive layouts from phone to desktop.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="download" class="download">
+    <div class="wrap">
+      <div class="kicker">Download</div>
+      <h2>One codebase, four platforms.</h2>
+      <p class="sub" style="margin-inline:auto">Packages for every platform are attached to the latest GitHub release. Desktop builds check for updates daily (you can turn that off).</p>
+      <div class="card">
+        <img src="img/icon.png" alt="MiddleMan icon" width="96" height="96">
+        <a class="btn primary" href="https://github.com/xmhrnx/middlelan/releases/latest">Get the latest release</a>
+        <div class="platforms">
+          <a class="platform" href="https://github.com/xmhrnx/middlelan/releases/latest"><b>Windows</b><small>installer · msix</small></a>
+          <a class="platform" href="https://github.com/xmhrnx/middlelan/releases/latest"><b>macOS</b><small>dmg</small></a>
+          <a class="platform" href="https://github.com/xmhrnx/middlelan/releases/latest"><b>Linux</b><small>deb · rpm</small></a>
+          <a class="platform" href="https://github.com/xmhrnx/middlelan/releases/latest"><b>Android</b><small>apk</small></a>
+        </div>
+        <div class="build"><span class="p">$ </span>go install github.com/xmhrnx/giode-cli/cmd/giode@latest
+<span class="p">$ </span>git clone https://github.com/xmhrnx/middlelan && cd middlelan
+<span class="p">$ </span>giode run</div>
+        <p class="note">Or build it yourself with Go 1.26+ and the Giode CLI.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>MiddleMan · Apache-2.0 · built with <a href="https://github.com/xmhrnx/giode">Giode</a></span>
+    <span><a href="https://github.com/xmhrnx/middlelan">Source on GitHub</a> · <a href="https://github.com/xmhrnx/middlelan/blob/main/LICENSE">License</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
