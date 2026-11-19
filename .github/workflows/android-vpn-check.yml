@@ -24,14 +24,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
-          go-version: stable
+          go-version-file: go.mod
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
       - name: Build a test APK (x86_64, with the automation server)
         run: |
-          go install github.com/xmhrnx/giode-cli/cmd/giode@latest
+          go install github.com/xmhrnx/giode-cli/cmd/giode@v0.1.35-alpha.1
           sed -i 's/^package = "\."/package = "."\ntags = "mcpdebug"/' giode.toml
           sed -i 's/^\[android\]/[android]\narch = ["amd64"]/' giode.toml
           giode build android
