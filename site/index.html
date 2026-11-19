@@ -203,6 +203,18 @@
   .build { margin: 26px auto 0; max-width: 560px; text-align: left; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; font: 13px/1.7 var(--mono); color: var(--muted); overflow-x: auto; white-space: pre; }
   .build .p { color: var(--gold); user-select: none; }
 
+  /* Privacy policy */
+  .policy { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 36px; }
+  .policy .fact.wide { grid-column: 1 / -1; }
+  .policy h3 { margin: 0 0 10px; font-size: 17px; }
+  .policy ul { margin: 0; padding: 0; list-style: none; font-size: 14.5px; color: var(--muted); }
+  .policy li { padding: 8px 0 8px 18px; border-top: 1px dashed var(--border); position: relative; }
+  .policy li:first-child { border-top: 0; }
+  .policy li::before { content: ""; position: absolute; left: 0; top: 16px; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+  .policy li b { color: var(--text); font-weight: 600; }
+  .policy code { font: 13px var(--mono); color: var(--gold); overflow-wrap: anywhere; }
+  @media (max-width: 760px) { .policy { grid-template-columns: 1fr; } }
+
   footer { padding: 40px 0 56px; border-top: 1px solid var(--border); color: var(--muted); font-size: 14px; }
   footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; justify-content: space-between; }
   footer a { color: var(--muted); }
@@ -218,6 +230,7 @@
       <a href="#security">Security</a>
       <a href="#how">How it works</a>
       <a href="#download">Download</a>
+      <a href="#privacy">Privacy</a>
       <a class="gh" href="https://github.com/xmhrnx/middlelan">GitHub</a>
     </nav>
   </div>
@@ -352,7 +365,7 @@
       </div>
 
       <div class="facts">
-        <div class="fact"><h3>Private by design</h3><p>Usage history stays on the device (90 days). Locating remote IPs uses geojs.io and can be switched off in Settings.</p></div>
+        <div class="fact"><h3>Private by design</h3><p>Usage history stays on the device (90 days). Locating remote IPs uses geojs.io and can be switched off in Settings. <a href="#privacy">Privacy policy</a></p></div>
         <div class="fact"><h3>Six languages</h3><p>English, Español, Deutsch, Français, Português and فارسی (right to left), following the system language or your choice.</p></div>
         <div class="fact"><h3>Graphite and gold</h3><p>Dark and light themes, the Inter typeface, a custom title bar on desktops and responsive layouts from phone to desktop.</p></div>
       </div>
@@ -363,7 +376,7 @@
     <div class="wrap">
       <div class="kicker">Download</div>
       <h2>One codebase, four platforms.</h2>
-      <p class="sub" style="margin-inline:auto">Packages for every platform are attached to the latest GitHub release. Desktop builds check for updates daily (you can turn that off).</p>
+      <p class="sub" style="margin-inline:auto">Packages for every platform are attached to the latest GitHub release. Desktop downloads check for updates daily (you can turn that off); store copies are updated by their store.</p>
       <div class="card">
         <img src="img/icon.png" alt="MiddleMan icon" width="96" height="96">
         <a class="btn primary" href="https://github.com/xmhrnx/middlelan/releases/latest">Get the latest release</a>
@@ -380,12 +393,67 @@
       </div>
     </div>
   </section>
+  <section id="privacy" class="band">
+    <div class="wrap">
+      <div class="kicker">Privacy policy</div>
+      <h2>Your network stays yours.</h2>
+      <p class="sub">MiddleMan has no account, no analytics, no ads, no tracking and no crash reporting. Its developer receives nothing from the app. This policy covers every version: Windows, macOS, Linux and Android, from GitHub, the Microsoft Store and Google Play. Effective 19 November 2026.</p>
+      <div class="policy">
+        <div class="fact">
+          <h3>Kept on your device</h3>
+          <ul>
+            <li><b>Network usage</b> per app: hourly for 14 days, daily for 90 days.</li>
+            <li><b>Destinations</b> each app connected to, with domain names, owners and locations.</li>
+            <li><b>Devices</b> found on your network, the names you give them and when they came and went.</li>
+            <li><b>Firewall rules</b>, alerts, speed test results and your settings.</li>
+            <li>Downloaded blocklists and cached location lookups.</li>
+          </ul>
+          <p class="note">All of it lives in MiddleMan's data folder and goes when you uninstall the app. Exports (CSV, JSON) are written only where you save them.</p>
+        </div>
+        <div class="fact">
+          <h3>Sent to other services</h3>
+          <ul>
+            <li><b>geojs.io</b> receives the IP addresses of the servers your apps connect to, to find their country, city and owner; <b>ipinfo.io</b> (or <b>api.ipify.org</b>) is asked for your own public address and its location. Both stop when you turn off online lookups in Settings.</li>
+            <li><b>Threat lists</b> are downloaded from abuse.ch, Spamhaus and FireHOL (on GitHub) while threat alerts are on. Nothing about your traffic is uploaded.</li>
+            <li><b>Ad and tracker lists</b> (AdGuard DNS filter, StevenBlack's hosts) are downloaded while ad blocking is on, on Android from GitHub. The Google Play version has no ad blocking.</li>
+            <li><b>Update checks</b>: desktop downloads ask api.github.com for the latest release once a day; switch it off in Settings. Store copies don't check.</li>
+            <li><b>Speed tests</b> go to speed.cloudflare.com when you run one or schedule them.</li>
+            <li><b>Tools</b> you run (ping, traceroute, port scan, DNS, WHOIS through whois.iana.org and the registry it names, TLS inspector, Wake on LAN) contact only the host you enter. Host names are resolved through your system's DNS.</li>
+          </ul>
+          <p class="note">Like any connection, these services see your IP address; their own privacy policies apply.</p>
+        </div>
+        <div class="fact">
+          <h3>The on-device VPN (Android)</h3>
+          <ul>
+            <li>Runs only when you turn it on, after Android asks for your consent.</li>
+            <li>Relays traffic on the phone itself, straight to where each app was going. There is no VPN server and nothing passes through the developer.</li>
+            <li>Never decrypts or stores what apps send. It records which app connected where and the domain names it looked up, on the phone, to show you and to apply your firewall rules.</li>
+            <li>DNS queries go to your network's own DNS servers.</li>
+          </ul>
+        </div>
+        <div class="fact">
+          <h3>Permissions</h3>
+          <ul>
+            <li><b>Usage access</b> (Android): per-app network totals.</li>
+            <li><b>Location</b> (Android): Android shows Wi-Fi names and nearby networks only to apps with it. Your location is never stored or sent.</li>
+            <li><b>Notifications</b>: alerts you choose, such as new apps, new devices and outages.</li>
+            <li><b>Local network</b> (macOS): the device scan and discovery.</li>
+            <li><b>Administrator rights</b> (desktops, optional): every program's connections, per-app bytes on Windows, the firewall.</li>
+          </ul>
+        </div>
+        <div class="fact wide">
+          <h3>Children, changes and contact</h3>
+          <p>MiddleMan isn't directed at children and collects no data from anyone. Changes to this policy appear on this page with a new date, and in the <a href="https://github.com/xmhrnx/middlelan/commits/main/site/index.html">site's history</a>. Questions: <a href="https://github.com/xmhrnx/middlelan/issues">open an issue on GitHub</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer>
   <div class="wrap">
     <span>MiddleMan · Apache-2.0 · built with <a href="https://github.com/xmhrnx/giode">Giode</a></span>
-    <span><a href="https://github.com/xmhrnx/middlelan">Source on GitHub</a> · <a href="https://github.com/xmhrnx/middlelan/blob/main/LICENSE">License</a></span>
+    <span><a href="https://github.com/xmhrnx/middlelan">Source on GitHub</a> · <a href="https://github.com/xmhrnx/middlelan/blob/main/LICENSE">License</a> · <a href="#privacy">Privacy</a></span>
   </div>
 </footer>
 
