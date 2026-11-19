@@ -107,7 +107,10 @@ func run() error {
 	scanner := inventory.NewScanner(inv)
 	gateway := &router.Watcher{}
 	threats := threat.Open(dir)
-	blocker := adblock.Open(dir)
+	var blocker *adblock.Blocker // nil without ad blocking (the Play build)
+	if adBlockBuilt {
+		blocker = adblock.Open(dir)
+	}
 	watcher = alerts.New(threats, names.Lookup, dir)
 	fw, err = firewall.Open(dir, firewall.DefaultBackend())
 	if err != nil {
@@ -196,7 +199,9 @@ func run() error {
 	})
 	shell.Start(ctx)
 	setVPNHooks(fw, names, blocker, prefs.Get())
-	go blocker.Run(ctx, 24*time.Hour, func() bool { return isAndroid && prefs.Get().AdBlock })
+	if blocker != nil {
+		go blocker.Run(ctx, 24*time.Hour, func() bool { return isAndroid && prefs.Get().AdBlock })
+	}
 	go threats.Run(ctx, 24*time.Hour, func() bool { return prefs.Get().ThreatAlerts })
 	go resolver.Run(ctx)
 	go func() {
@@ -291,7 +296,7 @@ func notify(app *giode.App, title, body string) {
 // setVPNHooks sets what the Android VPN does (a no-op elsewhere): new
 // flows obey the firewall rules, the DNS answers it relays give domain
 // names, and with ad blocking on, queries for listed domains are
-// answered on the device.
+// answered on the device. blocker is nil in builds without ad blocking.
 func setVPNHooks(fw *firewall.Firewall, names *dnslog.Log, blocker *adblock.Blocker, s settings.Settings) {
 	h := vpn.Hooks{
 		Block: func(app, pkg, ip string, port int) bool { return fw != nil && fw.Blocks(app, pkg, ip) },
@@ -300,6 +305,10 @@ func setVPNHooks(fw *firewall.Firewall, names *dnslog.Log, blocker *adblock.Bloc
 				names.Add(a)
 			}
 		},
+	}
+	if blocker == nil {
+		vpn.SetHooks(h)
+		return
 	}
 	blocker.SetAllowed(s.AdBlockAllow)
 	if s.AdBlock {
