@@ -72,7 +72,15 @@ jobs:
           win=""; if [ -n "$GIODE_WINDOWS_CERT_PASS" ]; then win="-release"; fi
           giode build $win -arch amd64 windows-installer msix
           apk=""; if [ -n "$GIODE_KEYSTORE_PASS" ]; then apk="-release"; fi
-          giode build $apk android aab
+          giode build $apk android
+          # The Google Play bundle is built without ad blocking (Play
+          # doesn't allow blocking other apps' ads): the playstore tag.
+          # Edited by hand after giode ci; see [ci] in giode.toml.
+          cp giode.toml giode.toml.orig
+          sed -i 's/^package = "\."/package = "."\ntags = "playstore"/' giode.toml
+          grep -q '^tags = "playstore"' giode.toml
+          giode build $apk aab
+          mv giode.toml.orig giode.toml
       - uses: actions/upload-artifact@v4
         with:
           name: linux-${{ matrix.arch }}

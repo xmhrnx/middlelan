@@ -19,7 +19,12 @@ splash_color = "#0b0b0c"
 
 [android]
 min_sdk = 23                 # NetworkStatsManager (per-app usage) needs Android 6
-target_sdk = 35
+# Google Play requires Android 16 (API 36) for new apps and updates since
+# 31 Aug 2026; the CLI's default (35) is rejected.
+target_sdk = 36
+# Android 16 stops calling onBackPressed for apps targeting it unless they
+# opt out of predictive back; Gio's activity still handles Back there.
+application_attributes = { enableOnBackInvokedCallback = "false" }
 # Adaptive icon: a full-bleed background layer and a foreground kept inside
 # the 66dp safe zone, so launchers never draw a white frame around it.
 icon_foreground = "assets/android-foreground.png"
@@ -37,13 +42,27 @@ java = ["android/java"]      # NetStats, Wi-Fi, widget, permission and VPN helpe
 # Manifest entries and resources giode doesn't generate (home screen widget,
 # location permission prompt). Rebuild with android/aar/build-aar.sh.
 libraries = ["android/libs/middlelan.aar"]
-# keystore = "release.keystore"   # created by giode keystore; signs giode build -release
+# Signs giode build -release (giode keystore creates it; git ignores it).
+# CI writes it from ANDROID_KEYSTORE_BASE64 with GIODE_KEYSTORE_PASS: -release
+# fails when android.keystore isn't set, so it's set even though the file
+# only exists there.
+keystore = "release.keystore"
 
+# macOS ships as a Developer ID signed, notarized .dmg on GitHub only.
+# There is deliberately no [macos.store] (Mac App Store): the App Sandbox
+# hides other apps' sockets from lsof and nettop (what MiddleMan exists to
+# show), and the store forbids the administrator prompt that pf blocking
+# and DNS packet capture need. See RELEASING.md.
 [macos]
 min_os = 11
-# identity = "Developer ID Application: Your Name (TEAMID)"
-# notary_id = "you@example.com"
-# notary_team_id = "TEAMID"
+# identity = "Developer ID Application: Your Name (TEAMID)"   # CI uses the certificate in MACOS_CERT_BASE64
+# notary_id = "you@example.com"                               # CI: GIODE_NOTARY_ID
+# notary_team_id = "TEAMID"                                   # CI: GIODE_NOTARY_TEAM_ID
+
+[macos.usage]
+# macOS 15 asks before an app reaches the local network (the device scan,
+# Bonjour and UPnP discovery, Wake on LAN, the router check).
+local_network = "MiddleMan finds the devices on your network and checks your router."
 
 [macos.plist]
 LSApplicationCategoryType = "public.app-category.utilities"
@@ -55,10 +74,14 @@ arch = "amd64"
 desktop_shortcut = true
 # per_machine = true
 
+# The Microsoft Store package (giode build msix). identity_name must match
+# Partner Center → MiddleMan → Product identity (Package/Identity/Name) once
+# the name is reserved; publisher and publisher_display_name are the
+# account's (as for EasySend and AnyFile). The Store signs the package.
 [windows.msix]
-# The signing certificate's subject (or the Partner Center publisher ID for
-# the Microsoft Store); must match the certificate that signs the package.
-publisher = "CN=MiddleMan"
+identity_name = "MehranZahir.MiddleMan"
+publisher = "CN=B40E8F57-A7E0-40BB-8E74-5D051D0B578B"
+publisher_display_name = "Mehran Zahiroddini"
 startup_task = true          # lets "Start in the tray when I log in" work in the MSIX
 
 [windows.signing]
@@ -68,3 +91,20 @@ startup_task = true          # lets "Start in the tray when I log in" work in th
 [linux]
 categories = ["Network", "Monitor", "Utility"]
 license = "Apache-2.0"
+
+# The privacy manifest (PrivacyInfo.xcprivacy) giode puts in Apple builds.
+# MiddleMan sends nothing to its developer; see the website's #privacy.
+[privacy]
+tracking = false
+
+# GitHub Actions: giode ci writes .github/workflows/release.yml from this.
+# A pushed v* tag (or Run workflow) tests, builds every package and
+# attaches them to the release. After `giode ci -f`, redo three edits:
+#   1. go install github.com/xmhrnx/giode-cli/cmd/giode@v0.1.35-alpha.1
+#      instead of @latest (every job);
+#   2. go-version-file: go.mod instead of go-version: stable (every job);
+#   3. in "Build Windows Android", build the APK, then the Play bundle
+#      with tags = "playstore" (no ad blocking: Play forbids it).
+[ci]
+trigger = "tag"
+test = "go test ./..."
